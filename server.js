@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+// const axios = require('axios');
 
 const app = express();
 
@@ -26,10 +27,16 @@ db.sequelize.sync();
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Welcome to Grocery Management application." });
 });
 
-require("./app/routes/turorial.routes")(app);
+// app.get('/users', (req, res) => {
+//   axios.get('https://randomuser.me/api/?page=1&results=10').then(response => {
+//     res.send(response.data);
+//   });
+// });
+
+require("./app/routes/products.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

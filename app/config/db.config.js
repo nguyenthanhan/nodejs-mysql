@@ -1,9 +1,10 @@
 module.exports = {
-  HOST: "localhost",
+  HOST: "127.0.0.1",
   USER: "root",
-  PASSWORD: "123456",
-  DB: "testdb",
-  dialect: "mysql",
+  PASSWORD: "password",
+  DB: "depotManagementDB",
+  dialect: "mariadb",
+  // if using mysql, change dialect: "mysql",
   pool: {
     max: 5,
     min: 0,
@@ -11,3 +12,4 @@ module.exports = {
     idle: 10000
   }
 };
+
