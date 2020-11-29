@@ -1,6 +1,7 @@
 "use strict"
 const common = require('../utils/common');
 const db = require("../models");
+const lang = require('../lang');
 const Product = db.products;
 const Op = db.Sequelize.Op;
 
@@ -8,9 +9,9 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {
   // Validate request
   if (!req.body.title) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
+    res.status(400).send(
+      common(400, false, 'Content can not be empty!', {})
+      );
     return;
   }
 
@@ -27,10 +28,9 @@ exports.create = (req, res) => {
       res.send(data);
     })
     .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the product."
-      });
+      res.status(500).send(
+        common(400, false, err.message || "Some error occurred while creating the product.", {})
+        );
     });
 };
 
@@ -44,10 +44,9 @@ exports.findAll = (req, res) => {
       res.send(common.returnAPIData(200, true, '', data));
     })
     .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving products."
-      });
+      res.status(500).send(
+        common(400, false, err.message || lang.products.errorWhenGetAll, {})
+       );
     });
 };
 

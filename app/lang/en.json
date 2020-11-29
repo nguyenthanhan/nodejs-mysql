@@ -1,0 +1,8 @@
+{
+  "general": {
+    "app": "Welcome to Grocery Management application."
+  },
+  "products": {
+    "errorWhenGetAll": "Some error occurred while retrieving products."
+  }
+}

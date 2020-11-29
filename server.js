@@ -1,6 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const common = require('./app/utils/common');
+const lang = require('./app/lang/index');
+
 // const axios = require('axios');
 
 const app = express();
@@ -27,12 +30,8 @@ db.sequelize.sync();
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Grocery Management application." });
+  res.json(common.returnAPIData(200, true, lang.general.app));
 });
-
-app.use(function(req, res) {
-  res.status(404).send({url: req.originalUrl + ' not found'})
-})
 
 // app.get('/users', (req, res) => {
 //   axios.get('https://randomuser.me/api/?page=1&results=10').then(response => {
@@ -41,6 +40,10 @@ app.use(function(req, res) {
 // });
 
 require("./app/routes/products.routes")(app);
+
+app.use(function(req, res) {
+  res.status(404).send(common.returnAPIData(404, false, req.originalUrl + ' not found'))
+})
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
