@@ -1,3 +1,4 @@
+"use strict"
 const common = require('../utils/common');
 const db = require("../models");
 const Product = db.products;

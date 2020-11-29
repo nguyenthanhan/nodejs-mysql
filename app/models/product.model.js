@@ -1,3 +1,4 @@
+"use strict"
 module.exports = (sequelize, Sequelize) => {
   const Products = sequelize.define("products", {
     title: {

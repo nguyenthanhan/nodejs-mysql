@@ -30,6 +30,10 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Grocery Management application." });
 });
 
+app.use(function(req, res) {
+  res.status(404).send({url: req.originalUrl + ' not found'})
+})
+
 // app.get('/users', (req, res) => {
 //   axios.get('https://randomuser.me/api/?page=1&results=10').then(response => {
 //     res.send(response.data);
