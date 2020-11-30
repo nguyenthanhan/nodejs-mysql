@@ -1,0 +1,14 @@
+{
+  "general": {
+    "app": "Welcome to Grocery Management application.",
+    "success": "Lấy dữ liệu thành công",
+    "error": {
+      "_400": "Nội dung không được trống!",
+      "getAll": "Có lỗi khi lấy tất cả %{name}",
+      "create": "Có lỗi khi tạo %{name}",
+      "getId": "Lỗi khi lấy %{name} với id %{id}",
+      "update": "Lỗi khi cập nhật %{name} với id %{id}",
+      "delete": "Lỗi khi xoá %{name} với id %{id}"
+    }
+  }
+}

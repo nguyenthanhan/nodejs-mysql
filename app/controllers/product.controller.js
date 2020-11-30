@@ -10,7 +10,7 @@ exports.create = (req, res) => {
   // Validate request
   if (!req.body.title) {
     res.status(400).send(
-      common.returnAPIData(400, false, 'Content can not be empty!', {})
+      common.returnAPIData(400, false, lang.general.error._400)
       );
     return;
   }
@@ -29,7 +29,7 @@ exports.create = (req, res) => {
     })
     .catch(err => {
       res.status(500).send(
-        common.returnAPIData(400, false, err.message || "Some error occurred while creating the product.", {})
+        common.returnAPIData(400, 'put', 'sản phẩm', 0, err.message)
         );
     });
 };
@@ -41,11 +41,13 @@ exports.findAll = (req, res) => {
 
   Product.findAll({ where: condition })
     .then(data => {
-      res.send(common.returnAPIData(200, true, 'Got all', data));
+      res.send(
+        common.returnAPIData(200, 'get',  'sản phẩm', 0, 'got all', data)
+        );
     })
     .catch(err => {
       res.status(500).send(
-        common.returnAPIData(400, false, err.message || lang.products.errorWhenGetAll, {})
+        common.returnAPIData(500, 'get',  'sản phẩm', 0, err.message)
        );
     });
 };
@@ -59,9 +61,9 @@ exports.findOne = (req, res) => {
       res.send(data);
     })
     .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving product with id=" + id
-      });
+      res.status(500).send(
+        common.returnAPIData(500, 'get',  'sản phẩm', id, err.message)
+        );
     });
 };
 
