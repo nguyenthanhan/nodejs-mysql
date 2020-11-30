@@ -1,5 +1,5 @@
-DROP DATABASE  [ IF EXISTS ]
-  `depotManagementDB`
+-- DROP DATABASE [IF EXISTS] depotManagementDB;
+DROP DATABASE IF EXISTS depotManagementDB;
 
 CREATE DATABASE `depotManagementDB`;
 USE `depotManagementDB`;

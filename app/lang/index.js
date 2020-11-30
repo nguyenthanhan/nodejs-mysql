@@ -1,3 +1,3 @@
-const lang = require('./vi.json');
+const lang = require("./vi.json");
 
 module.exports = lang;

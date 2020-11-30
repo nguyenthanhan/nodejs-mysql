@@ -1,37 +1,48 @@
 "use strict";
 const lang = require("../lang");
 
-const returnAPIData = (status, method, name, id, message, data) => {
+const returnAPIData = (data, message) => {
+  return {
+    status: 200,
+    success: true,
+    error: message || "",
+    data,
+  };
+};
+
+const returnAPIError = (status, method, name, id, message) => {
   const tID = id || 0;
+  const _message = message || returnMessage(method, name, tID);
   return {
     status,
     success: status === 200,
-    message: message || returnMessage(method, name, tID),
-    data,
+    error: _message,
   };
 };
 
 const returnMessage = (method, name, id) => {
   switch (method) {
     case "put":
-      return lang.products.error.update
+      return lang.general.error.update
         .replace(`%{name}`, name)
         .replace(`%{id}`, id);
       break;
     case "post":
-      return lang.products.error.create.replace(`%{name}`, name);
+      return lang.general.error.create.replace(`%{name}`, name);
       break;
     case "get":
       return id === 0
-        ? lang.products.error.getAll.replace(`%{name}`, name)
-        : lang.products.error.getId
+        ? lang.general.error.getAll.replace(`%{name}`, name)
+        : lang.general.error.getId
             .replace(`%{name}`, name)
             .replace(`%{id}`, id);
       break;
     case "delete":
-      return lang.products.error.create
-        .replace(`%{name}`, name)
-        .replace(`%{id}`, id);
+      return id === 0
+        ? lang.general.error.deleteAll.replace(`%{name}`, name)
+        : lang.general.error.delete
+            .replace(`%{name}`, name)
+            .replace(`%{id}`, id);
       break;
     default:
       break;
@@ -40,4 +51,5 @@ const returnMessage = (method, name, id) => {
 
 module.exports = {
   returnAPIData,
+  returnAPIError,
 };

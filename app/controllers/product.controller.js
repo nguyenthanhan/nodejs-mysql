@@ -1,36 +1,54 @@
-"use strict"
-const common = require('../utils/common');
+"use strict";
+const common = require("../utils/common");
 const db = require("../models");
-const lang = require('../lang');
+const lang = require("../lang");
 const Product = db.products;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new product
 exports.create = (req, res) => {
   // Validate request
-  if (!req.body.title) {
-    res.status(400).send(
-      common.returnAPIData(400, false, lang.general.error._400)
+  if (!req.body.name) {
+    res
+      .status(400)
+      .send(
+        common.returnAPIError(
+          400,
+          "put",
+          "sản phẩm",
+          0,
+          lang.general.error._400
+        )
       );
     return;
   }
 
   // Create a product
   const product = {
-    title: req.body.title,
-    description: req.body.description,
-    published: req.body.published ? req.body.published : false
+    name: req.body.name,
+    barcode: req.body.barcode,
+    img_url: req.body.img_url,
+    W_curr_qtt: req.body.W_curr_qtt,
+    W_max_qtt: req.body.W_max_qtt,
+    W_min_qtt: req.body.W_min_qtt,
+    S_curr_qtt: req.body.S_curr_qtt,
+    S_max_qtt: req.body.S_max_qtt,
+    S_min_qtt: req.body.S_min_qtt,
+    sell_price: req.body.sell_price,
+    import_price: req.body.import_price,
+    brand: req.body.brand,
+    catID: req.body.catID,
   };
 
   // Save product in the database
   Product.create(product)
-    .then(data => {
-      res.send(data);
+    .then((data) => {
+      res.send(common.returnAPIData({}, ""));
     })
-    .catch(err => {
-      res.status(500).send(
-        common.returnAPIData(400, 'put', 'sản phẩm', 0, err.message)
-        );
+    .catch((err) => {
+      res
+        .status(500)
+        .send(common.returnAPIError(500, "put", "sản phẩm", 0, err.message));
     });
 };
 
@@ -40,15 +58,13 @@ exports.findAll = (req, res) => {
   var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Product.findAll({ where: condition })
-    .then(data => {
-      res.send(
-        common.returnAPIData(200, 'get',  'sản phẩm', 0, 'got all', data)
-        );
+    .then((data) => {
+      res.send(common.returnAPIData(data));
     })
-    .catch(err => {
-      res.status(500).send(
-        common.returnAPIData(500, 'get',  'sản phẩm', 0, err.message)
-       );
+    .catch((err) => {
+      res
+        .status(500)
+        .send(common.returnAPIError(500, "get", "sản phẩm", 0, err.message));
     });
 };
 
@@ -57,13 +73,13 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
 
   Product.findByPk(id)
-    .then(data => {
-      res.send(data);
+    .then((data) => {
+      res.send(common.returnAPIData(data));
     })
-    .catch(err => {
-      res.status(500).send(
-        common.returnAPIData(500, 'get',  'sản phẩm', id, err.message)
-        );
+    .catch((err) => {
+      res
+        .status(500)
+        .send(common.returnAPIError(500, "get", "sản phẩm", id, err.message));
     });
 };
 
@@ -72,23 +88,27 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   Product.update(req.body, {
-    where: { id: id }
+    where: { PID: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
-        res.send({
-          message: "Product was updated successfully."
-        });
+        res.send(common.returnAPIData({}));
       } else {
-        res.send({
-          message: `Cannot update product with id=${id}. Maybe product was not found or req.body is empty!`
-        });
+        res.send(
+          common.returnAPIError(
+            400,
+            "put",
+            "sản phẩm",
+            id,
+            `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`
+          )
+        );
       }
     })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating product with id=" + id
-      });
+    .catch((err) => {
+      res
+        .status(500)
+        .send(common.returnAPIError(500, "put", "sản phẩm", id, err.message));
     });
 };
 
@@ -97,23 +117,29 @@ exports.delete = (req, res) => {
   const id = req.params.id;
 
   Product.destroy({
-    where: { id: id }
+    where: { PID: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
-        res.send({
-          message: "product was deleted successfully!"
-        });
+        res.send(common.returnAPIData({}));
       } else {
-        res.send({
-          message: `Cannot delete product with id=${id}. Maybe product was not found!`
-        });
+        res.send(
+          common.returnAPIError(
+            400,
+            "delete",
+            "sản phẩm",
+            id,
+            `Không thể xoá sản phẩm với id=${id}. Có thể không tìm thấy sản phẩm!`
+          )
+        );
       }
     })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete product with id=" + id
-      });
+    .catch((err) => {
+      res
+        .status(500)
+        .send(
+          common.returnAPIError(500, "delete", "sản phẩm", id, err.message)
+        );
     });
 };
 
@@ -121,29 +147,22 @@ exports.delete = (req, res) => {
 exports.deleteAll = (req, res) => {
   Product.destroy({
     where: {},
-    truncate: false
+    truncate: false,
   })
-    .then(nums => {
-      res.send({ message: `${nums} products were deleted successfully!` });
+    .then((nums) => {
+      res.send(common.returnAPIData({}, `${nums} sản phẩm đã bị xoá!`));
     })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all products."
-      });
-    });
-};
-
-// find all published product
-exports.findAllPublished = (req, res) => {
-  Product.findAll({ where: { published: true } })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving products."
-      });
+    .catch((err) => {
+      res
+        .status(500)
+        .send(
+          common.returnAPIError(
+            500,
+            "delete",
+            "sản phẩm",
+            0,
+            err.message || "Xảy ra lỗi khi xoá tất cả sản phẩm"
+          )
+        );
     });
 };

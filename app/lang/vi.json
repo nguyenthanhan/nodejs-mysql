@@ -8,7 +8,8 @@
       "create": "Có lỗi khi tạo %{name}",
       "getId": "Lỗi khi lấy %{name} với id %{id}",
       "update": "Lỗi khi cập nhật %{name} với id %{id}",
-      "delete": "Lỗi khi xoá %{name} với id %{id}"
+      "delete": "Lỗi khi xoá %{name} với id %{id}",
+      "deleteAll": "Đã xoá tất cả %{name}"
     }
   }
 }
