@@ -46,9 +46,19 @@ module.exports = (sequelize, Sequelize) => {
       catID: {
         type: Sequelize.BIGINT(20),
       },
+      // Timestamps
+      // created_at: {
+      //   type: 'TIMESTAMP',
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      //   allowNull: false
+      // },
+      // updated_at: {
+      //   type: 'TIMESTAMP',
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      //   allowNull: false
+      // }
     },
     {
-      // don't add the timestamp attributes (updatedAt, createdAt)
       timestamps: false,
 
       // don't delete database entries but set the newly added attribute deletedAt
@@ -56,16 +66,10 @@ module.exports = (sequelize, Sequelize) => {
       // timestamps are enabled
       // paranoid: true,
 
-      // don't use camelcase for automatically added attributes but underscore style
-      // so updatedAt will be updated_at
       // underscored: true,
 
-      // disable the modification of tablenames; By default, sequelize will automatically
-      // transform all passed model names (first parameter of define) into plural.
-      // if you don't want that, set the following
       freezeTableName: true,
 
-      // define the table's name
       // tableName: "my_very_custom_table_name",
     }
   );

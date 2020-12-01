@@ -1,23 +1,17 @@
 "use strict";
 module.exports = (sequelize, Sequelize) => {
-  const Shelf = sequelize.define(
-    "Shelf",
+  const Category = sequelize.define(
+    "Category",
     {
-      ShID: {
+      CID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
       },
       name: {
         type: Sequelize.STRING(80),
       },
-      type: {
-        type: Sequelize.ENUM("ware_house", "store"),
-      },
-      capacity: {
+      shelfID: {
         type: Sequelize.BIGINT(20),
-      },
-      state: {
-        type: Sequelize.ENUM("full", "available"),
       },
     },
     {
@@ -26,5 +20,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return Shelf;
+  return Category;
 };
