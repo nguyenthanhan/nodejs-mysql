@@ -42,6 +42,7 @@ app.get("/", (req, res) => {
 require("./app/routes/products.routes")(app);
 require("./app/routes/shelf.routes")(app);
 require("./app/routes/category.routes")(app);
+require("./app/routes/supplier.routes")(app);
 
 app.use(function (req, res) {
   res

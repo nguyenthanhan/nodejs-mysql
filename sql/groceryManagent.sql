@@ -91,7 +91,7 @@ CREATE TABLE `Supplier` (
   `name`          varchar(80) NOT NULL default '',
   `Address`       varchar(80) NOT NULL default '',
   `Tax_ID`        int(20) NOT NULL default '0',
-  `Email`         varchar(80) NOT NULL default '',
+  `Email`         varchar(40) NOT NULL default '',
   PRIMARY KEY  (`SupID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
