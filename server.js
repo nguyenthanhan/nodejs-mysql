@@ -30,7 +30,7 @@ db.sequelize.sync();
 
 // simple route
 app.get("/", (req, res) => {
-  res.json(common.returnAPIData(200, true, lang.general.app));
+  res.json(common.returnAPIData(200, "", lang.general.app));
 });
 
 // app.get('/users', (req, res) => {
