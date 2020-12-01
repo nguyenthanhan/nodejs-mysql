@@ -8,7 +8,19 @@ const Op = db.Sequelize.Op;
 // Create and Save a new product
 exports.create = (req, res) => {
   // Validate request
-  if (!req.body.name) {
+  if (
+    !req.body.name ||
+    !req.body.W_curr_qtt ||
+    !req.body.W_max_qtt ||
+    !req.body.W_min_qtt ||
+    !req.body.S_curr_qtt ||
+    !req.body.S_max_qtt ||
+    !req.body.S_min_qtt ||
+    !req.body.sell_price ||
+    !req.body.import_price ||
+    !req.body.brand ||
+    !req.body.catID
+  ) {
     res
       .status(400)
       .send(
