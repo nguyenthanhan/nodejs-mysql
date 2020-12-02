@@ -2,7 +2,7 @@
 module.exports = (app) => {
   const suppliers = require("../controllers/supplier.controller.js");
 
-  var router = require("express").Router();
+  let router = require("express").Router();
 
   router.post("/", suppliers.create);
 

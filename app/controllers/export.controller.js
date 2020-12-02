@@ -2,20 +2,20 @@
 const common = require("../utils/common");
 const db = require("../models");
 const lang = require("../lang");
-const Category = db.category;
+const Export = db.export;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Category
+// Create and Save a new export
 exports.create = (req, res) => {
   // Validate request
-  if (!req.body.name || !req.body.shelfID) {
+  if (!req.body.mngID || !req.body.date) {
     res
       .status(400)
       .send(
         common.returnAPIError(
           400,
           "put",
-          "phân loại hàng",
+          "thông tin xuất hàng",
           0,
           lang.general.error._400
         )
@@ -23,14 +23,14 @@ exports.create = (req, res) => {
     return;
   }
 
-  // Create a Category
-  const category = {
-    name: req.body.name,
-    shelfID: req.body.shelfID,
+  // Create a export
+  const _export = {
+    mngID: req.body.mngID,
+    date: req.body.date,
   };
 
-  // Save category in the database
-  Category.create(category)
+  // Save export in the database
+  Export.create(_export)
     .then((data) => {
       res.send(common.returnAPIData({}, ""));
     })
@@ -38,17 +38,23 @@ exports.create = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "put", "phân loại hàng", 0, err.message)
+          common.returnAPIError(
+            500,
+            "put",
+            "thông tin xuất hàng",
+            0,
+            err.message
+          )
         );
     });
 };
 
-// Retrieve all shelves from the database.
+// Retrieve all exports from the database.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  const mngID = req.query.mngID;
+  let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
-  Category.findAll({ where: condition })
+  Export.findAll({ where: condition })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -56,16 +62,22 @@ exports.findAll = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "get", "phân loại hàng", 0, err.message)
+          common.returnAPIError(
+            500,
+            "get",
+            "thông tin xuất hàng",
+            0,
+            err.message
+          )
         );
     });
 };
 
-// Find a single category with an id
+// Find a single export with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Category.findByPk(id)
+  Export.findByPk(id)
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -73,17 +85,23 @@ exports.findOne = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "get", "phân loại hàng", id, err.message)
+          common.returnAPIError(
+            500,
+            "get",
+            "thông tin xuất hàng",
+            id,
+            err.message
+          )
         );
     });
 };
 
-// Update a category by the id in the request
+// Update a export by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
 
-  Category.update(req.body, {
-    where: { CID: id },
+  Export.update(req.body, {
+    where: { ExID: id },
   })
     .then((num) => {
       if (num == 1) {
@@ -93,9 +111,9 @@ exports.update = (req, res) => {
           common.returnAPIError(
             400,
             "put",
-            "phân loại hàng",
+            "thông tin xuất hàng",
             id,
-            `Không thể cập nhật phân loại hàng với id=${id}. Phân loại hàng không tìm thấy hoặc req.body trống!`
+            `Không thể cập nhật thông tin xuất hàng với id=${id}. thông tin xuất hàng không tìm thấy hoặc req.body trống!`
           )
         );
       }
@@ -104,17 +122,23 @@ exports.update = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "put", "phân loại hàng", id, err.message)
+          common.returnAPIError(
+            500,
+            "put",
+            "thông tin xuất hàng",
+            id,
+            err.message
+          )
         );
     });
 };
 
-// Delete a category with the specified id in the request
+// Delete a export with the specified id in the request
 exports.delete = (req, res) => {
   const id = req.params.id;
 
-  Category.destroy({
-    where: { CID: id },
+  Export.destroy({
+    where: { ExID: id },
   })
     .then((num) => {
       if (num == 1) {
@@ -124,9 +148,9 @@ exports.delete = (req, res) => {
           common.returnAPIError(
             400,
             "delete",
-            "phân loại hàng",
+            "thông tin xuất hàng",
             id,
-            `Không thể xoá phân loại hàng với id=${id}. Có thể không tìm thấy phân loại hàng!`
+            `Không thể xoá thông tin xuất hàng với id=${id}. Có thể không tìm thấy thông tin xuất hàng!`
           )
         );
       }
@@ -138,7 +162,7 @@ exports.delete = (req, res) => {
           common.returnAPIError(
             500,
             "delete",
-            "phân loại hàng",
+            "thông tin xuất hàng",
             id,
             err.message
           )

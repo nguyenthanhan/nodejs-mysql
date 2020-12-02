@@ -2,7 +2,7 @@
 module.exports = (app) => {
   const shelves = require("../controllers/shelf.controller.js");
 
-  var router = require("express").Router();
+  let router = require("express").Router();
 
   router.post("/", shelves.create);
 

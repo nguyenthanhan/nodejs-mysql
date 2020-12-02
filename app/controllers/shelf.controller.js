@@ -17,13 +17,7 @@ exports.create = (req, res) => {
     res
       .status(400)
       .send(
-        common.returnAPIError(
-          400,
-          "put",
-          "kệ hàng",
-          0,
-          lang.general.error._400
-        )
+        common.returnAPIError(400, "put", "kệ hàng", 0, lang.general.error._400)
       );
     return;
   }
@@ -33,7 +27,7 @@ exports.create = (req, res) => {
     name: req.body.name,
     type: req.body.type,
     capacity: req.body.capacity,
-    state: req.body.state
+    state: req.body.state,
   };
 
   // Save shelf in the database
@@ -51,7 +45,7 @@ exports.create = (req, res) => {
 // Retrieve all shelves from the database.
 exports.findAll = (req, res) => {
   const name = req.query.name;
-  var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Shelf.findAll({ where: condition })
     .then((data) => {
@@ -133,9 +127,7 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(
-          common.returnAPIError(500, "delete", "kệ hàng", id, err.message)
-        );
+        .send(common.returnAPIError(500, "delete", "kệ hàng", id, err.message));
     });
 };
 

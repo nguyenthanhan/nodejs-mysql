@@ -8,21 +8,11 @@ const Op = db.Sequelize.Op;
 // Create and Save a new bill
 exports.create = (req, res) => {
   // Validate request
-  if (
-    !req.body.cus_name ||
-    !req.body.total ||
-    !req.body.M_ID
-  ) {
+  if (!req.body.cus_name || !req.body.total || !req.body.M_ID) {
     res
       .status(400)
       .send(
-        common.returnAPIError(
-          400,
-          "put",
-          "hoá đơn",
-          0,
-          lang.general.error._400
-        )
+        common.returnAPIError(400, "put", "hoá đơn", 0, lang.general.error._400)
       );
     return;
   }
@@ -31,7 +21,7 @@ exports.create = (req, res) => {
   const bill = {
     cus_name: req.body.cus_name,
     total: req.body.total,
-    M_ID: req.body.M_ID
+    M_ID: req.body.M_ID,
   };
 
   // Save bill in the database
@@ -49,7 +39,9 @@ exports.create = (req, res) => {
 // Retrieve all bills from the database.
 exports.findAll = (req, res) => {
   const cus_name = req.query.cus_name;
-  var condition = cus_name ? { cus_name: { [Op.like]: `%${cus_name}%` } } : null;
+  let condition = cus_name
+    ? { cus_name: { [Op.like]: `%${cus_name}%` } }
+    : null;
 
   Bill.findAll({ where: condition })
     .then((data) => {
@@ -131,8 +123,6 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(
-          common.returnAPIError(500, "delete", "hoá đơn", id, err.message)
-        );
+        .send(common.returnAPIError(500, "delete", "hoá đơn", id, err.message));
     });
 };

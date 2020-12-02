@@ -102,7 +102,7 @@ CREATE TABLE `Import` (
   `mngID`         bigint(20) NOT NULL default '0',
   `total`         bigint(20),
   `date`          DATETIME NOT NULL default CURRENT_TIMESTAMP,
-  `state`         enum('ready', 'excecuted', 'close') NOT NULL ,
+  `state`         enum('ready', 'executed', 'close') NOT NULL ,
   PRIMARY KEY (`ImID`),
   FOREIGN KEY (`mngID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

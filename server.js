@@ -8,7 +8,7 @@ const lang = require("./app/lang/index");
 
 const app = express();
 
-var corsOptions = {
+let corsOptions = {
   origin: "http://localhost:3000",
 };
 
@@ -30,7 +30,10 @@ db.sequelize.sync();
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({title: 'Welcome to Grocery App', ...common.returnAPIData({}, "", lang.general.app)});
+  res.json({
+    title: "Welcome to Grocery App",
+    ...common.returnAPIData({}, "", lang.general.app),
+  });
 });
 
 // app.get('/users', (req, res) => {
@@ -39,11 +42,13 @@ app.get("/", (req, res) => {
 //   });
 // });
 
+require("./app/routes/bill.routes")(app);
+require("./app/routes/category.routes")(app);
+require("./app/routes/export.routes")(app);
+require("./app/routes/import.routes")(app);
 require("./app/routes/products.routes")(app);
 require("./app/routes/shelf.routes")(app);
-require("./app/routes/category.routes")(app);
 require("./app/routes/supplier.routes")(app);
-require("./app/routes/bill.routes")(app);
 
 app.use(function (req, res) {
   res

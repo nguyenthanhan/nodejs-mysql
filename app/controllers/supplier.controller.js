@@ -33,7 +33,7 @@ exports.create = (req, res) => {
     name: req.body.name,
     Address: req.body.Address,
     Tax_ID: req.body.Tax_ID,
-    Email: req.body.Email
+    Email: req.body.Email,
   };
 
   // Save supplier in the database
@@ -44,14 +44,16 @@ exports.create = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "put", "nhà cung cấp", 0, err.message));
+        .send(
+          common.returnAPIError(500, "put", "nhà cung cấp", 0, err.message)
+        );
     });
 };
 
 // Retrieve all shelves from the database.
 exports.findAll = (req, res) => {
   const name = req.query.name;
-  var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Supplier.findAll({ where: condition })
     .then((data) => {
@@ -60,7 +62,9 @@ exports.findAll = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "get", "nhà cung cấp", 0, err.message));
+        .send(
+          common.returnAPIError(500, "get", "nhà cung cấp", 0, err.message)
+        );
     });
 };
 
@@ -75,7 +79,9 @@ exports.findOne = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "get", "nhà cung cấp", id, err.message));
+        .send(
+          common.returnAPIError(500, "get", "nhà cung cấp", id, err.message)
+        );
     });
 };
 
@@ -104,7 +110,9 @@ exports.update = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "put", "nhà cung cấp", id, err.message));
+        .send(
+          common.returnAPIError(500, "put", "nhà cung cấp", id, err.message)
+        );
     });
 };
 
