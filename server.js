@@ -9,7 +9,7 @@ const lang = require("./app/lang/index");
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "http://localhost:3000",
 };
 
 app.use(cors(corsOptions));
@@ -43,6 +43,7 @@ require("./app/routes/products.routes")(app);
 require("./app/routes/shelf.routes")(app);
 require("./app/routes/category.routes")(app);
 require("./app/routes/supplier.routes")(app);
+require("./app/routes/bill.routes")(app);
 
 app.use(function (req, res) {
   res
@@ -55,5 +56,9 @@ app.use(function (req, res) {
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+  console.log(`----------------------------------`);
   console.log(`Server is running on port ${PORT}.`);
+  console.log(`Environment:`, process.env.ENV);
+  console.log(`Host:`, process.env.DB_HOST);
+  console.log(`----------------------------------`);
 });
