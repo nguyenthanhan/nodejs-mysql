@@ -30,7 +30,7 @@ db.sequelize.sync();
 
 // simple route
 app.get("/", (req, res) => {
-  res.json(common.returnAPIData(200, "", lang.general.app));
+  res.json({title: 'Welcome to Grocery App', ...common.returnAPIData({}, "", lang.general.app)});
 });
 
 // app.get('/users', (req, res) => {
@@ -53,7 +53,7 @@ app.use(function (req, res) {
 });
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
