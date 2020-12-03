@@ -1,5 +1,4 @@
 "use strict";
-const dateFormat = require("../constants/dateFormat");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const moment = require("moment");
@@ -35,15 +34,14 @@ exports.create = async (req, res) => {
   }
 
   try {
-    ///check username is have
+    //check username is have
     const checkUseName = await Manager.findAll({
       where: {
         accountName: req.body.accountName,
       },
       raw: true,
     });
-
-    if (checkUseName !== []) {
+    if (!_.isEmpty(checkUseName)) {
       res
         .status(400)
         .send(

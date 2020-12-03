@@ -22,6 +22,7 @@ db.bill = require("./bill.model.js")(sequelize, Sequelize);
 db.category = require("./category.model.js")(sequelize, Sequelize);
 db.export = require("./export.model.js")(sequelize, Sequelize);
 db.import = require("./import.model.js")(sequelize, Sequelize);
+db.manager = require("./manager.model.js")(sequelize, Sequelize);
 db.products = require("./product.model.js")(sequelize, Sequelize);
 db.shelf = require("./shelf.model.js")(sequelize, Sequelize);
 db.supplier = require("./supplier.model.js")(sequelize, Sequelize);

@@ -75,6 +75,7 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
   console.log(`Time start:`, new Date());
   console.log(`Environment:`, process.env.ENV);
-  console.log(`Host:`, process.env.DB_HOST);
+  console.log(`Host DB:`, process.env.DB_HOST);
+  console.log(`DB Name:`, process.env.DB_NAME);
   console.log(`----------------------------------`);
 });
