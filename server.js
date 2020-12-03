@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const common = require("./app/utils/common");
 const lang = require("./app/lang/index");
+let logger = require("morgan");
 
 // const axios = require('axios');
 
@@ -10,9 +11,16 @@ const app = express();
 
 let corsOptions = {
   origin: "http://localhost:3000",
+  allowedHeaders: ["sessionId", "Content-Type"],
+  exposedHeaders: ["sessionId"],
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
 };
 
 app.use(cors(corsOptions));
+
+app.use(logger("dev"));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
@@ -20,7 +28,7 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = require("./app/models");
+const db = require("./app/models/db");
 
 db.sequelize.sync();
 // // drop the table if it already exists

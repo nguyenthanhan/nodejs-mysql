@@ -49,7 +49,27 @@ const returnMessage = (method, name, id) => {
   }
 };
 
+const randomString = (l) => {
+  let s = "";
+  let randomChar = function () {
+    let n = Math.floor(Math.random() * 62);
+    if (n < 10) return n; //1-10
+    if (n < 36) return String.fromCharCode(n + 55); //A-Z
+    return String.fromCharCode(n + 61); //a-z
+  };
+  while (s.length < l) s += randomChar();
+  return s;
+};
+
+const createImageName = (originalName) => {
+  const array = originalName.split(".");
+  const imageName = randomString(40) + "." + array[array.length - 1];
+  return imageName;
+};
+
 module.exports = {
   returnAPIData,
   returnAPIError,
+  randomString,
+  createImageName,
 };

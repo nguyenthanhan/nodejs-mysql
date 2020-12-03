@@ -1,6 +1,6 @@
 "use strict";
 const common = require("../utils/common");
-const db = require("../models");
+const db = require("../models/db");
 const lang = require("../lang");
 const Import = db.import;
 const Op = db.Sequelize.Op;
@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new import
 exports.create = (req, res) => {
   // Validate request
-  if (!req.body.mngID || !req.body.total || !req.body.date || !req.body.state) {
+  if (!req.body.mngID || !req.body.date || !req.body.state) {
     res
       .status(400)
       .send(

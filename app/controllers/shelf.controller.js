@@ -1,6 +1,6 @@
 "use strict";
 const common = require("../utils/common");
-const db = require("../models");
+const db = require("../models/db");
 const lang = require("../lang");
 const Shelf = db.shelf;
 const Op = db.Sequelize.Op;
@@ -8,12 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new Shelf
 exports.create = (req, res) => {
   // Validate request
-  if (
-    !req.body.name ||
-    !req.body.type ||
-    !req.body.capacity ||
-    !req.body.state
-  ) {
+  if (!req.body.name || !req.body.capacity || !req.body.state) {
     res
       .status(400)
       .send(
@@ -25,7 +20,7 @@ exports.create = (req, res) => {
   // Create a shelf
   const shelf = {
     name: req.body.name,
-    type: req.body.type,
+    type: req.body.type ? req.body.type : "store",
     capacity: req.body.capacity,
     state: req.body.state,
   };

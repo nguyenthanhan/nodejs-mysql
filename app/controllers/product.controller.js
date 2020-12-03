@@ -1,12 +1,15 @@
 "use strict";
+const sharp = require("sharp");
 const common = require("../utils/common");
-const db = require("../models");
+const db = require("../models/db");
 const lang = require("../lang");
+const cloudinary = require("../models/cloudinary.model");
 const Product = db.products;
 const Op = db.Sequelize.Op;
+const path = require("path");
 
 // Create and Save a new product
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (
     !req.body.name ||
@@ -35,11 +38,12 @@ exports.create = (req, res) => {
     return;
   }
 
+  const convertImageResult = await cloudinary.uploadSingle(req.file.path);
   // Create a product
   const product = {
     name: req.body.name,
     barcode: req.body.barcode,
-    img_url: req.body.img_url,
+    img_url: convertImageResult.url ? convertImageResult.url : "",
     W_curr_qtt: req.body.W_curr_qtt,
     W_max_qtt: req.body.W_max_qtt,
     W_min_qtt: req.body.W_min_qtt,
@@ -96,10 +100,18 @@ exports.findOne = (req, res) => {
 };
 
 // Update a product by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
+  let body = req.body;
 
-  Product.update(req.body, {
+  if (req.file) {
+    const convertImageResult = await cloudinary.uploadSingle(req.file.path);
+    if (convertImageResult.url) {
+      body = { ...body, img_url: convertImageResult.url };
+    }
+  }
+
+  Product.update(body, {
     where: { PID: id },
   })
     .then((num) => {

@@ -1,6 +1,6 @@
 "use strict";
 const common = require("../utils/common");
-const db = require("../models");
+const db = require("../models/db");
 const lang = require("../lang");
 const Bill = db.bill;
 const Op = db.Sequelize.Op;
