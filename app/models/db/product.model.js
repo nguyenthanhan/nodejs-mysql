@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(80),
       },
       barcode: {
-        type: Sequelize.STRING(20),
+        type: Sequelize.STRING(40),
       },
       img_url: {
         type: Sequelize.TEXT,

@@ -6,7 +6,7 @@ const Export = db.export;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new export
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (!req.body.mngID || !req.body.date) {
     res
@@ -14,7 +14,7 @@ exports.create = (req, res) => {
       .send(
         common.returnAPIError(
           400,
-          "put",
+          "post",
           "thông tin xuất hàng",
           0,
           lang.general.error._400
@@ -40,7 +40,7 @@ exports.create = (req, res) => {
         .send(
           common.returnAPIError(
             500,
-            "put",
+            "post",
             "thông tin xuất hàng",
             0,
             err.message
@@ -50,7 +50,7 @@ exports.create = (req, res) => {
 };
 
 // Retrieve all exports from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
@@ -74,7 +74,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single export with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Export.findByPk(id)
@@ -97,7 +97,7 @@ exports.findOne = (req, res) => {
 };
 
 // Update a export by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
 
   Export.update(req.body, {
@@ -134,7 +134,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a export with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Export.destroy({

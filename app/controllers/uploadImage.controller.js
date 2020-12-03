@@ -33,8 +33,6 @@ var self = (module.exports = {
         // các bạn có thể sử dụng arrImg để save vào database, hay hơn thì sử dụng mongodb
         res.json(req.files);
       })
-      .catch((error) => {
-        console.error("> Error>", error);
-      });
+      .catch((error) => {});
   },
 });

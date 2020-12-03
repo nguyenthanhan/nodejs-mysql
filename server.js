@@ -50,13 +50,15 @@ app.get("/", (req, res) => {
 //   });
 // });
 
-require("./app/routes/bill.routes")(app);
-require("./app/routes/category.routes")(app);
-require("./app/routes/export.routes")(app);
-require("./app/routes/import.routes")(app);
+require("./app/routes/manager.routes")(app);
 require("./app/routes/products.routes")(app);
+require("./app/routes/category.routes")(app);
 require("./app/routes/shelf.routes")(app);
+require("./app/routes/bill.routes")(app);
 require("./app/routes/supplier.routes")(app);
+require("./app/routes/import.routes")(app);
+require("./app/routes/export.routes")(app);
+require("./app/routes/lot.routes")(app);
 
 app.use(function (req, res) {
   res
@@ -71,6 +73,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`----------------------------------`);
   console.log(`Server is running on port ${PORT}.`);
+  console.log(`Time start:`, new Date());
   console.log(`Environment:`, process.env.ENV);
   console.log(`Host:`, process.env.DB_HOST);
   console.log(`----------------------------------`);

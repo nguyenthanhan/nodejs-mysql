@@ -6,7 +6,7 @@ const Category = db.category;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Category
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (!req.body.name || !req.body.shelfID) {
     res
@@ -14,7 +14,7 @@ exports.create = (req, res) => {
       .send(
         common.returnAPIError(
           400,
-          "put",
+          "post",
           "phân loại hàng",
           0,
           lang.general.error._400
@@ -38,13 +38,13 @@ exports.create = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "put", "phân loại hàng", 0, err.message)
+          common.returnAPIError(500, "post", "phân loại hàng", 0, err.message)
         );
     });
 };
 
 // Retrieve all shelves from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
@@ -62,7 +62,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single category with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Category.findByPk(id)
@@ -79,7 +79,7 @@ exports.findOne = (req, res) => {
 };
 
 // Update a category by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
 
   Category.update(req.body, {
@@ -110,7 +110,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a category with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Category.destroy({

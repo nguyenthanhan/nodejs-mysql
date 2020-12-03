@@ -1,29 +1,28 @@
--- DROP DATABASE [IF EXISTS] depotManagementDB;
-DROP DATABASE IF EXISTS depotManagementDB;
+-- DROP DATABASE IF EXISTS depotManagementDB;
 
-CREATE DATABASE `depotManagementDB`;
-USE `depotManagementDB`;
+-- CREATE DATABASE `depotManagementDB`;
+-- USE `depotManagementDB`;
 
 DROP TABLE IF EXISTS Manager;
 CREATE TABLE `Manager` (
-  `MngID`                     integer NOT NULL auto_increment,
+  `MngID`                     bigint(20) NOT NULL auto_increment,
   `FName`                     varchar(80) NOT NULL default '',
   `LName`                     varchar(80) NOT NULL default '',
   `accountName`               varchar(80) NOT NULL default '',
-  `password`                  text NOT NULL ,
+  `password`                  varchar(80) NOT NULL ,
   `Address`                   varchar(80) NOT NULL default '',
-  `BDay`                      DATE NOT NULL ,
-  `gender`                    enum('male', 'female') default 'male',
+  `BDay`                      DATETIME NOT NULL ,
+  `gender`                    enum('male', 'female', 'other') default 'male',
   `salary`                    bigint(20),
   `avt_url`                   text,
-  `date_start_working`        DATE NOT NULL,
-  `createdDay`                DATE NOT NULL ,
+  `date_start_working`        DATETIME NOT NULL,
+  `createdDay`                DATETIME NOT NULL ,
   `managerType`               enum('normal', 'prime') default 'normal',
-  `createrID`                 bigint(20) NOT NULL,
+  `creatorID`                 bigint(20),
   `deleterID`                 bigint(20),
-  `deletedDay`                DATE ,
+  `deletedDay`                DATETIME ,
   PRIMARY KEY  (`MngID`),
-  FOREIGN KEY (`createrID`) REFERENCES `PrimeMNG` (`mngID`),
+  FOREIGN KEY (`creatorID`) REFERENCES `PrimeMNG` (`mngID`),
   FOREIGN KEY (`deleterID`) REFERENCES `PrimeMNG` (`mngID`),
   UNIQUE  KEY `accountName` (`accountName`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -34,7 +33,7 @@ DROP TABLE IF EXISTS Product;
 CREATE TABLE `Product` (
   `PID`               bigint(20) NOT NULL auto_increment,
   `name`              varchar(80) NOT NULL default '',
-  `barcode`           varchar(20),
+  `barcode`           varchar(40),
   `img_url`           text NOT NULL,
   `W_curr_qtt`        int(20) NOT NULL default '0',
   `W_max_qtt`         int(20) NOT NULL default '0',
@@ -125,7 +124,7 @@ CREATE TABLE `Lot` (
   `proID`         bigint(20) NOT NULL default '0',
   `name`          varchar(80) NOT NULL default '',
   `quantity`      varchar(80) NOT NULL default '',
-  `Exp`           DATE NOT NULL ,
+  `Exp`           DATETIME NOT NULL ,
   PRIMARY KEY  (`proID`,`name`),
   FOREIGN KEY (`proID`) REFERENCES `Product` (`PID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

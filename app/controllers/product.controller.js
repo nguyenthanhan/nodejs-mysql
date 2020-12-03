@@ -1,12 +1,10 @@
 "use strict";
-const sharp = require("sharp");
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
 const Product = db.products;
 const Op = db.Sequelize.Op;
-const path = require("path");
 
 // Create and Save a new product
 exports.create = async (req, res) => {
@@ -29,7 +27,7 @@ exports.create = async (req, res) => {
       .send(
         common.returnAPIError(
           400,
-          "put",
+          "post",
           "sản phẩm",
           0,
           lang.general.error._400
@@ -64,12 +62,12 @@ exports.create = async (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "put", "sản phẩm", 0, err.message));
+        .send(common.returnAPIError(500, "post", "sản phẩm", 0, err.message));
     });
 };
 
 // Retrieve all products from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
@@ -85,7 +83,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single product with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Product.findByPk(id)
@@ -137,7 +135,7 @@ exports.update = async (req, res) => {
 };
 
 // Delete a product with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Product.destroy({
@@ -168,7 +166,7 @@ exports.delete = (req, res) => {
 };
 
 // Delete all products from the database.
-exports.deleteAll = (req, res) => {
+exports.deleteAll = async (req, res) => {
   Product.destroy({
     where: {},
     truncate: false,

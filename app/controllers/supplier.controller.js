@@ -6,7 +6,7 @@ const Supplier = db.supplier;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new supplier
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (
     !req.body.name ||
@@ -19,7 +19,7 @@ exports.create = (req, res) => {
       .send(
         common.returnAPIError(
           400,
-          "put",
+          "post",
           "nhà cung cấp",
           0,
           lang.general.error._400
@@ -45,13 +45,13 @@ exports.create = (req, res) => {
       res
         .status(500)
         .send(
-          common.returnAPIError(500, "put", "nhà cung cấp", 0, err.message)
+          common.returnAPIError(500, "post", "nhà cung cấp", 0, err.message)
         );
     });
 };
 
 // Retrieve all shelves from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
@@ -69,7 +69,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single supplier with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Supplier.findByPk(id)
@@ -86,7 +86,7 @@ exports.findOne = (req, res) => {
 };
 
 // Update a supplier by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
 
   Supplier.update(req.body, {
@@ -117,7 +117,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a supplier with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Supplier.destroy({

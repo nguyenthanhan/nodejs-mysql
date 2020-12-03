@@ -6,13 +6,19 @@ const Bill = db.bill;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new bill
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (!req.body.cus_name || !req.body.total || !req.body.M_ID) {
     res
       .status(400)
       .send(
-        common.returnAPIError(400, "put", "hoá đơn", 0, lang.general.error._400)
+        common.returnAPIError(
+          400,
+          "post",
+          "hoá đơn",
+          0,
+          lang.general.error._400
+        )
       );
     return;
   }
@@ -32,12 +38,12 @@ exports.create = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send(common.returnAPIError(500, "put", "hoá đơn", 0, err.message));
+        .send(common.returnAPIError(500, "post", "hoá đơn", 0, err.message));
     });
 };
 
 // Retrieve all bills from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const cus_name = req.query.cus_name;
   let condition = cus_name
     ? { cus_name: { [Op.like]: `%${cus_name}%` } }
@@ -55,7 +61,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single bill with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Bill.findByPk(id)
@@ -70,7 +76,7 @@ exports.findOne = (req, res) => {
 };
 
 // Update a bill by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
 
   Bill.update(req.body, {
@@ -99,7 +105,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a bill with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Bill.destroy({

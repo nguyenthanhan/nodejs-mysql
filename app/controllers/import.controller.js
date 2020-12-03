@@ -6,7 +6,7 @@ const Import = db.import;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new import
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   // Validate request
   if (!req.body.mngID || !req.body.date || !req.body.state) {
     res
@@ -14,7 +14,7 @@ exports.create = (req, res) => {
       .send(
         common.returnAPIError(
           400,
-          "put",
+          "post",
           "thông tin nhập hàng",
           0,
           lang.general.error._400
@@ -42,7 +42,7 @@ exports.create = (req, res) => {
         .send(
           common.returnAPIError(
             500,
-            "put",
+            "post",
             "thông tin nhập hàng",
             0,
             err.message
@@ -52,7 +52,7 @@ exports.create = (req, res) => {
 };
 
 // Retrieve all imports from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
@@ -76,7 +76,7 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single import with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
   Import.findByPk(id)
@@ -99,7 +99,7 @@ exports.findOne = (req, res) => {
 };
 
 // Update a import by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
 
   Import.update(req.body, {
@@ -136,7 +136,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a import with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
 
   Import.destroy({
