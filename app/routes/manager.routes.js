@@ -1,4 +1,6 @@
 "use strict";
+const uploadMulter = require("../models/multer.model");
+
 module.exports = (app) => {
   const managers = require("../controllers/manager.controller.js");
 
@@ -10,7 +12,7 @@ module.exports = (app) => {
 
   router.get("/:id", managers.findOne);
 
-  router.put("/:id", managers.update);
+  router.put("/:id", uploadMulter.single("avatar"), managers.update);
 
   router.delete("/:id", managers.delete);
 

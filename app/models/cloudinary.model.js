@@ -7,13 +7,13 @@ cloudinary.config({
 });
 
 let self = (module.exports = {
-  uploadSingle: (file) => {
+  uploadSingle: (file, folder = "singleV1.0.0", width = 500, height = 500) => {
     return new Promise((resolve) => {
       cloudinary.uploader
         .upload(file, {
-          folder: "singleV1.0.0",
-          width: 500,
-          height: 500,
+          folder: folder,
+          width: width,
+          height: height,
           crop: "pad",
           quality: "auto",
         })

@@ -36,7 +36,11 @@ exports.create = async (req, res) => {
     return;
   }
 
-  const convertImageResult = await cloudinary.uploadSingle(req.file.path);
+  let convertImageResult = {};
+  if (req.file) {
+    convertImageResult = await cloudinary.uploadSingle(req.file.path);
+  }
+
   // Create a product
   const product = {
     name: req.body.name,

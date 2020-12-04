@@ -10,7 +10,7 @@
       "update": "Lỗi khi cập nhật %{name} với id %{id}",
       "delete": "Lỗi khi xoá %{name} với id %{id}",
       "deleteAll": "Đã xoá tất cả %{name}",
-      "accountInvalid": "Tài khoản này đã có. Vui lòng đổi tên tài khoản khác!"
+      "accountInvalid": "Tài khoản này đã được sử dụng. Vui lòng đổi tên tài khoản khác!"
     }
   }
 }

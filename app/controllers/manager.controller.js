@@ -1,5 +1,6 @@
 "use strict";
 const bcrypt = require("bcrypt");
+const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
 const moment = require("moment");
 const common = require("../utils/common");
@@ -11,6 +12,7 @@ const saltRounds = 10;
 
 // Create and Save a new manager
 exports.create = async (req, res) => {
+  console.log(req.body);
   // Validate request
   if (
     !req.body.FName ||
@@ -141,8 +143,25 @@ exports.findOne = async (req, res) => {
 // Update a manager by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
+  let convertImageResult = {};
 
-  Manager.update(req.body, {
+  if (req.file && req.file !== {}) {
+    convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "avatar",
+      300,
+      300
+    );
+  }
+
+  //can't change accountName
+  const { accountName, ...remain } = req.body;
+  const newBody = {
+    ...remain,
+    avt_url: convertImageResult.url ? convertImageResult.url : "",
+  };
+
+  Manager.update(newBody, {
     where: { MngID: id },
   })
     .then((num) => {
