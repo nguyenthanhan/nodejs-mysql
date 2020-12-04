@@ -65,8 +65,8 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "post", "sản phẩm", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "post", "sản phẩm", 0, err.message));
     });
 };
 
@@ -81,8 +81,8 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "sản phẩm", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "sản phẩm", 0, err.message));
     });
 };
 
@@ -96,8 +96,8 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "sản phẩm", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "sản phẩm", id, err.message));
     });
 };
 
@@ -120,21 +120,23 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "sản phẩm",
-            id,
-            `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "sản phẩm",
+              id,
+              `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "put", "sản phẩm", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "put", "sản phẩm", id, err.message));
     });
 };
 
@@ -149,22 +151,24 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "sản phẩm",
-            id,
-            `Không thể xoá sản phẩm với id=${id}. Có thể không tìm thấy sản phẩm!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "sản phẩm",
+              id,
+              `Không thể xoá sản phẩm với id=${id}. Có thể không tìm thấy sản phẩm!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "delete", "sản phẩm", id, err.message)
+          common.returnAPIError(400, "delete", "sản phẩm", id, err.message)
         );
     });
 };
@@ -176,14 +180,16 @@ exports.deleteAll = async (req, res) => {
     truncate: false,
   })
     .then((nums) => {
-      res.send(common.returnAPIData({}, `${nums} sản phẩm đã bị xoá!`));
+      res
+        .status(400)
+        .send(common.returnAPIData({}, `${nums} sản phẩm đã bị xoá!`));
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "delete",
             "sản phẩm",
             0,

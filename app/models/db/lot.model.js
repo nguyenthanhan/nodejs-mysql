@@ -1,61 +1,20 @@
 "use strict";
 module.exports = (sequelize, Sequelize) => {
-  const Managers = sequelize.define(
-    "Manager",
+  const Lots = sequelize.define(
+    "Lot",
     {
-      MngID: {
+      proID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
       },
-      FName: {
+      name: {
         type: Sequelize.STRING(80),
       },
-      LName: {
+      quantity: {
         type: Sequelize.STRING(80),
       },
-      accountName: {
-        type: Sequelize.STRING(80),
-      },
-      password: {
-        type: Sequelize.TEXT,
-      },
-      Address: {
-        type: Sequelize.STRING(80),
-      },
-      BDay: {
+      Exp: {
         type: Sequelize.DATE,
-      },
-      gender: {
-        type: Sequelize.ENUM("male", "female", "other"),
-        defaultValue: "male",
-      },
-      salary: {
-        type: Sequelize.BIGINT(20),
-      },
-      avt_url: {
-        type: Sequelize.TEXT,
-      },
-      date_start_working: {
-        type: Sequelize.DATE,
-      },
-      createdDay: {
-        type: Sequelize.DATE,
-      },
-      managerType: {
-        type: Sequelize.ENUM("normal", "prime"),
-        defaultValue: "normal",
-      },
-      creatorID: {
-        type: Sequelize.BIGINT(20),
-      },
-      deleterID: {
-        type: Sequelize.BIGINT(20),
-      },
-      deletedDay: {
-        type: Sequelize.DATE,
-      },
-      salt: {
-        type: Sequelize.STRING(20),
       },
     },
     {
@@ -64,5 +23,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return Managers;
+  return Lots;
 };

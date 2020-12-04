@@ -38,10 +38,10 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "post",
             "thông tin nhập hàng",
             0,
@@ -62,10 +62,10 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "get",
             "thông tin nhập hàng",
             0,
@@ -85,10 +85,10 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "get",
             "thông tin nhập hàng",
             id,
@@ -109,23 +109,25 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "thông tin nhập hàng",
-            id,
-            `Không thể cập nhật thông tin nhập hàng với id=${id}. thông tin nhập hàng không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "thông tin nhập hàng",
+              id,
+              `Không thể cập nhật thông tin nhập hàng với id=${id}. thông tin nhập hàng không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "put",
             "thông tin nhập hàng",
             id,
@@ -146,23 +148,25 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "thông tin nhập hàng",
-            id,
-            `Không thể xoá thông tin nhập hàng với id=${id}. Có thể không tìm thấy thông tin nhập hàng!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "thông tin nhập hàng",
+              id,
+              `Không thể xoá thông tin nhập hàng với id=${id}. Có thể không tìm thấy thông tin nhập hàng!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "delete",
             "thông tin nhập hàng",
             id,

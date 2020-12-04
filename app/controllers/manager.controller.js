@@ -85,16 +85,16 @@ exports.create = async (req, res) => {
       })
       .catch((err) => {
         res
-          .status(500)
+          .status(400)
           .send(
-            common.returnAPIError(500, "post", "người quản lí", 0, err.message)
+            common.returnAPIError(400, "post", "người quản lí", 0, err.message)
           );
       });
   } catch (err) {
     res
-      .status(500)
+      .status(400)
       .send(
-        common.returnAPIError(500, "post", "người quản lí", 0, err.message)
+        common.returnAPIError(400, "post", "người quản lí", 0, err.message)
       );
   }
 };
@@ -116,9 +116,9 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "người quản lí", 0, err.message)
+          common.returnAPIError(400, "get", "người quản lí", 0, err.message)
         );
     });
 };
@@ -133,9 +133,9 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "người quản lí", id, err.message)
+          common.returnAPIError(400, "get", "người quản lí", id, err.message)
         );
     });
 };
@@ -168,22 +168,24 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "người quản lí",
-            id,
-            `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "người quản lí",
+              id,
+              `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "put", "người quản lí", id, err.message)
+          common.returnAPIError(400, "put", "người quản lí", id, err.message)
         );
     });
 };
@@ -199,22 +201,24 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "người quản lí",
-            id,
-            `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "người quản lí",
+              id,
+              `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "delete", "người quản lí", id, err.message)
+          common.returnAPIError(400, "delete", "người quản lí", id, err.message)
         );
     });
 };

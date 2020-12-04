@@ -43,9 +43,9 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "post", "nhà cung cấp", 0, err.message)
+          common.returnAPIError(400, "post", "nhà cung cấp", 0, err.message)
         );
     });
 };
@@ -61,9 +61,9 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "nhà cung cấp", 0, err.message)
+          common.returnAPIError(400, "get", "nhà cung cấp", 0, err.message)
         );
     });
 };
@@ -78,9 +78,9 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "nhà cung cấp", id, err.message)
+          common.returnAPIError(400, "get", "nhà cung cấp", id, err.message)
         );
     });
 };
@@ -96,22 +96,24 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "nhà cung cấp",
-            id,
-            `Không thể cập nhật nhà cung cấp với id=${id}. nhà cung cấp không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "nhà cung cấp",
+              id,
+              `Không thể cập nhật nhà cung cấp với id=${id}. nhà cung cấp không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "put", "nhà cung cấp", id, err.message)
+          common.returnAPIError(400, "put", "nhà cung cấp", id, err.message)
         );
     });
 };
@@ -127,22 +129,24 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "nhà cung cấp",
-            id,
-            `Không thể xoá nhà cung cấp với id=${id}. Có thể không tìm thấy nhà cung cấp!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "nhà cung cấp",
+              id,
+              `Không thể xoá nhà cung cấp với id=${id}. Có thể không tìm thấy nhà cung cấp!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "delete", "nhà cung cấp", id, err.message)
+          common.returnAPIError(400, "delete", "nhà cung cấp", id, err.message)
         );
     });
 };

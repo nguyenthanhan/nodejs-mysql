@@ -36,9 +36,9 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "post", "phân loại hàng", 0, err.message)
+          common.returnAPIError(400, "post", "phân loại hàng", 0, err.message)
         );
     });
 };
@@ -54,9 +54,9 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "phân loại hàng", 0, err.message)
+          common.returnAPIError(400, "get", "phân loại hàng", 0, err.message)
         );
     });
 };
@@ -71,9 +71,9 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "get", "phân loại hàng", id, err.message)
+          common.returnAPIError(400, "get", "phân loại hàng", id, err.message)
         );
     });
 };
@@ -89,22 +89,24 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "phân loại hàng",
-            id,
-            `Không thể cập nhật phân loại hàng với id=${id}. Phân loại hàng không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "phân loại hàng",
+              id,
+              `Không thể cập nhật phân loại hàng với id=${id}. Phân loại hàng không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
-          common.returnAPIError(500, "put", "phân loại hàng", id, err.message)
+          common.returnAPIError(400, "put", "phân loại hàng", id, err.message)
         );
     });
 };
@@ -120,23 +122,25 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "phân loại hàng",
-            id,
-            `Không thể xoá phân loại hàng với id=${id}. Có thể không tìm thấy phân loại hàng!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "phân loại hàng",
+              id,
+              `Không thể xoá phân loại hàng với id=${id}. Có thể không tìm thấy phân loại hàng!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "delete",
             "phân loại hàng",
             id,

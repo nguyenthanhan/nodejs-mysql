@@ -2,20 +2,25 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Shelf = db.shelf;
+const Lot = db.lot;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Shelf
+// Create and Save a new lot
 exports.create = async (req, res) => {
   // Validate request
-  if (!req.body.name || !req.body.capacity || !req.body.state) {
+  if (
+    !req.body.proID ||
+    !req.body.name ||
+    !req.body.quantity ||
+    !req.body.Exp
+  ) {
     res
       .status(400)
       .send(
         common.returnAPIError(
           400,
           "post",
-          "kệ hàng",
+          "hoá đơn",
           0,
           lang.general.error._400
         )
@@ -23,135 +28,117 @@ exports.create = async (req, res) => {
     return;
   }
 
-  // Create a shelf
-  const shelf = {
+  // Create a lot
+  const lot = {
+    proID: req.body.proID,
     name: req.body.name,
-    type: req.body.type ? req.body.type : "store",
-    capacity: req.body.capacity,
-    state: req.body.state,
+    quantity: req.body.quantity,
+    Exp: req.body.Exp,
   };
 
-  // Save shelf in the database
-  Shelf.create(shelf)
+  // Save lot in the database
+  Lot.create(lot)
     .then((data) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "post", "kệ hàng", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "post", "hoá đơn", 0, err.message));
     });
 };
 
-// Retrieve all shelves from the database.
+// Retrieve all lots from the database.
 exports.findAll = async (req, res) => {
-  const name = req.query.name;
-  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  const cus_name = req.query.cus_name;
+  let condition = cus_name
+    ? { cus_name: { [Op.like]: `%${cus_name}%` } }
+    : null;
 
-  Shelf.findAll({ where: condition })
+  Lot.findAll({ where: condition })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "kệ hàng", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "hoá đơn", 0, err.message));
     });
 };
 
-// Find a single shelf with an id
+// Find a single lot with an id
 exports.findOne = async (req, res) => {
   const id = req.params.id;
 
-  Shelf.findByPk(id)
+  Lot.findByPk(id)
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "kệ hàng", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "hoá đơn", id, err.message));
     });
 };
 
-// Update a Shelf by the id in the request
+// Update a lot by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
 
-  Shelf.update(req.body, {
-    where: { ShID: id },
+  Lot.update(req.body, {
+    where: { BID: id },
   })
     .then((num) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "kệ hàng",
-            id,
-            `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "hoá đơn",
+              id,
+              `Không thể cập nhật hoá đơn với id=${id}. hoá đơn không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "put", "kệ hàng", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "put", "hoá đơn", id, err.message));
     });
 };
 
-// Delete a Shelf with the specified id in the request
+// Delete a lot with the specified id in the request
 exports.delete = async (req, res) => {
   const id = req.params.id;
 
-  Shelf.destroy({
-    where: { ShID: id },
+  Lot.destroy({
+    where: { BID: id },
   })
     .then((num) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "kệ hàng",
-            id,
-            `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "hoá đơn",
+              id,
+              `Không thể xoá hoá đơn với id=${id}. Có thể không tìm thấy hoá đơn!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "delete", "kệ hàng", id, err.message));
-    });
-};
-
-// Delete all Shelves from the database.
-exports.deleteAll = async (req, res) => {
-  Shelf.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums) => {
-      res.send(common.returnAPIData({}, `${nums} kệ hàng đã bị xoá!`));
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .send(
-          common.returnAPIError(
-            500,
-            "delete",
-            "kệ hàng",
-            0,
-            err.message || "Xảy ra lỗi khi xoá tất cả kệ hàng"
-          )
-        );
+        .status(400)
+        .send(common.returnAPIError(400, "delete", "hoá đơn", id, err.message));
     });
 };

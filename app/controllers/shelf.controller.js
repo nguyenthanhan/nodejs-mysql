@@ -38,8 +38,8 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "post", "kệ hàng", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "post", "kệ hàng", 0, err.message));
     });
 };
 
@@ -54,8 +54,8 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "kệ hàng", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "kệ hàng", 0, err.message));
     });
 };
 
@@ -69,8 +69,8 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "kệ hàng", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "kệ hàng", id, err.message));
     });
 };
 
@@ -85,21 +85,23 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "kệ hàng",
-            id,
-            `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "kệ hàng",
+              id,
+              `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "put", "kệ hàng", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "put", "kệ hàng", id, err.message));
     });
 };
 
@@ -114,21 +116,23 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "kệ hàng",
-            id,
-            `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "kệ hàng",
+              id,
+              `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "delete", "kệ hàng", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "delete", "kệ hàng", id, err.message));
     });
 };
 
@@ -139,14 +143,16 @@ exports.deleteAll = async (req, res) => {
     truncate: false,
   })
     .then((nums) => {
-      res.send(common.returnAPIData({}, `${nums} kệ hàng đã bị xoá!`));
+      res
+        .status(400)
+        .send(common.returnAPIData({}, `${nums} kệ hàng đã bị xoá!`));
     })
     .catch((err) => {
       res
-        .status(500)
+        .status(400)
         .send(
           common.returnAPIError(
-            500,
+            400,
             "delete",
             "kệ hàng",
             0,

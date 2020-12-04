@@ -37,8 +37,8 @@ exports.create = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "post", "hoá đơn", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "post", "hoá đơn", 0, err.message));
     });
 };
 
@@ -55,8 +55,8 @@ exports.findAll = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "hoá đơn", 0, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "hoá đơn", 0, err.message));
     });
 };
 
@@ -70,8 +70,8 @@ exports.findOne = async (req, res) => {
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "get", "hoá đơn", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "get", "hoá đơn", id, err.message));
     });
 };
 
@@ -86,21 +86,23 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "put",
-            "hoá đơn",
-            id,
-            `Không thể cập nhật hoá đơn với id=${id}. hoá đơn không tìm thấy hoặc req.body trống!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "put",
+              "hoá đơn",
+              id,
+              `Không thể cập nhật hoá đơn với id=${id}. hoá đơn không tìm thấy hoặc req.body trống!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "put", "hoá đơn", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "put", "hoá đơn", id, err.message));
     });
 };
 
@@ -115,20 +117,22 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res.send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "hoá đơn",
-            id,
-            `Không thể xoá hoá đơn với id=${id}. Có thể không tìm thấy hoá đơn!`
-          )
-        );
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "delete",
+              "hoá đơn",
+              id,
+              `Không thể xoá hoá đơn với id=${id}. Có thể không tìm thấy hoá đơn!`
+            )
+          );
       }
     })
     .catch((err) => {
       res
-        .status(500)
-        .send(common.returnAPIError(500, "delete", "hoá đơn", id, err.message));
+        .status(400)
+        .send(common.returnAPIError(400, "delete", "hoá đơn", id, err.message));
     });
 };

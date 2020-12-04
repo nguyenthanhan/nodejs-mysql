@@ -26,5 +26,6 @@ db.manager = require("./manager.model.js")(sequelize, Sequelize);
 db.products = require("./product.model.js")(sequelize, Sequelize);
 db.shelf = require("./shelf.model.js")(sequelize, Sequelize);
 db.supplier = require("./supplier.model.js")(sequelize, Sequelize);
+db.lot = require("./lot.model.js")(sequelize, Sequelize);
 
 module.exports = db;
