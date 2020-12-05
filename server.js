@@ -78,6 +78,7 @@ if (!isDev && cluster.isMaster) {
   require("./app/routes/import.routes")(app);
   require("./app/routes/export.routes")(app);
   require("./app/routes/lot.routes")(app);
+  require("./app/routes/auth.routes")(app);
 
   app.use(function (req, res) {
     res

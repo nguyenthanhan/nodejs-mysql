@@ -13,6 +13,7 @@ CREATE TABLE `Manager` (
   `Address`                   varchar(80) NOT NULL default '',
   `BDay`                      DATETIME NOT NULL ,
   `gender`                    enum('male', 'female', 'other') default 'male',
+  `email`                     varchar(80) default '',
   `salary`                    bigint(20),
   `avt_url`                   text,
   `date_start_working`        DATETIME NOT NULL,
@@ -33,6 +34,8 @@ DROP TABLE IF EXISTS Product;
 CREATE TABLE `Product` (
   `PID`               bigint(20) NOT NULL auto_increment,
   `name`              varchar(80) NOT NULL default '',
+  `description`       varchar(80) NOT NULL default '',
+  `otherDetail`       varchar(80) NOT NULL default '',
   `barcode`           varchar(40),
   `img_url`           text NOT NULL,
   `W_curr_qtt`        int(20) NOT NULL default '0',
@@ -45,6 +48,7 @@ CREATE TABLE `Product` (
   `import_price`      bigint(20) NOT NULL default '0',
   `brand`             varchar(80) NOT NULL default '',
   `catID`             bigint(20) NOT NULL default '0',
+  `shID`              bigint(20) NOT NULL default '0',
   PRIMARY KEY  (`PID`),
   FOREIGN KEY (`catID`) REFERENCES `Category` (`CID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -210,8 +214,9 @@ CREATE TABLE `ProductStoreAtShelf` (
 
 DROP TABLE IF EXISTS ProductOnBill;
 CREATE TABLE `ProductOnBill` (
-  `proID`         bigint(20) NOT NULL default '0',
+  `proID`        bigint(20) NOT NULL default '0',
   `bID`          bigint(20) NOT NULL default '0',
+  `quantity`     int(20) NOT NULL default '0'
   PRIMARY KEY (`bID`, `proID`),
   FOREIGN KEY (`bID`) REFERENCES `Shelf` (`BID`),
   FOREIGN KEY (`proID`) REFERENCES `Product` (`PID`)

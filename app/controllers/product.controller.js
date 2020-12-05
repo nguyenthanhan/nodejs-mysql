@@ -3,6 +3,7 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
+const { raw } = require("body-parser");
 const Product = db.products;
 const Op = db.Sequelize.Op;
 
@@ -19,8 +20,7 @@ exports.create = async (req, res) => {
     !req.body.S_min_qtt ||
     !req.body.sell_price ||
     !req.body.import_price ||
-    !req.body.brand ||
-    !req.body.catID
+    !req.body.brand
   ) {
     res
       .status(400)
@@ -56,6 +56,7 @@ exports.create = async (req, res) => {
     import_price: req.body.import_price,
     brand: req.body.brand,
     catID: req.body.catID,
+    shID: req.body.shID,
   };
 
   // Save product in the database
@@ -72,12 +73,25 @@ exports.create = async (req, res) => {
 
 // Retrieve all products from the database.
 exports.findAll = async (req, res) => {
+  const limit = parseInt(req.query.per_page) || 10;
+  const offset = (parseInt(req.query.page) - 1) * limit || 0;
+
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Product.findAll({ where: condition })
+  Product.findAll({
+    limit,
+    offset,
+    where: condition,
+    raw: true,
+  })
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      res.send(
+        common.returnAPIData(data, "", {
+          page: parseInt(req.query.page),
+          per_page: parseInt(req.query.per_page),
+        })
+      );
     })
     .catch((err) => {
       res

@@ -10,6 +10,12 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING(80),
       },
+      description: {
+        type: Sequelize.STRING(80),
+      },
+      otherDetail: {
+        type: Sequelize.STRING(80),
+      },
       barcode: {
         type: Sequelize.STRING(40),
       },
@@ -44,6 +50,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(80),
       },
       catID: {
+        type: Sequelize.BIGINT(20),
+      },
+      shID: {
         type: Sequelize.BIGINT(20),
       },
       // Timestamps

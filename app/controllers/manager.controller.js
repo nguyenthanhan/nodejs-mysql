@@ -4,6 +4,7 @@ const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
 const moment = require("moment");
 const common = require("../utils/common");
+var validator = require("validator");
 const db = require("../models/db");
 const lang = require("../lang");
 const Manager = db.manager;
@@ -12,7 +13,6 @@ const saltRounds = 10;
 
 // Create and Save a new manager
 exports.create = async (req, res) => {
-  console.log(req.body);
   // Validate request
   if (
     !req.body.FName ||
@@ -23,15 +23,38 @@ exports.create = async (req, res) => {
   ) {
     res
       .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "người quản lí",
-          0,
-          lang.general.error._400
-        )
-      );
+      .send(common.returnAPIError(0, "", "", 0, lang.general.error._400));
+    return;
+  }
+
+  if (req.body.email && !validator.isEmail(req.body.email)) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Email không hợp lệ"));
+    return;
+  }
+
+  if (!validator.isAlphanumeric(req.body.accountName)) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Tài khoản không hợp lệ"));
+    return;
+  }
+
+  if (!validator.isAscii(req.body.password)) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu không hợp lệ"));
+    return;
+  }
+
+  if (
+    !validator.isAlpha(req.body.FName.replace(" ", "a")) ||
+    !validator.isAlpha(req.body.LName.replace(" ", "a"))
+  ) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Tài khoản không hợp lệ"));
     return;
   }
 
@@ -70,6 +93,7 @@ exports.create = async (req, res) => {
       Address: req.body.Address,
       BDay: moment(req.body.BDay),
       gender: req.body.gender,
+      email: req.body.email,
       salary: req.body.salary,
       // avt_url: req.body.avt_url,
       date_start_working: moment(req.body.BDay),
@@ -173,9 +197,9 @@ exports.update = async (req, res) => {
           .send(
             common.returnAPIError(
               400,
-              "put",
-              "người quản lí",
-              id,
+              "",
+              "",
+              0,
               `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
             )
           );
@@ -206,9 +230,9 @@ exports.delete = async (req, res) => {
           .send(
             common.returnAPIError(
               400,
-              "delete",
-              "người quản lí",
-              id,
+              "",
+              "",
+              0,
               `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`
             )
           );

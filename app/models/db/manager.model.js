@@ -1,6 +1,4 @@
 "use strict";
-const moment = require("moment");
-const dateFormat = require("../../constants/dateFormat");
 module.exports = (sequelize, Sequelize) => {
   const Managers = sequelize.define(
     "Manager",
@@ -33,6 +31,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       salary: {
         type: Sequelize.BIGINT(20),
+      },
+      email: {
+        type: Sequelize.STRING(80),
       },
       avt_url: {
         type: Sequelize.TEXT,

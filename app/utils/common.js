@@ -1,11 +1,12 @@
 "use strict";
 const lang = require("../lang");
 
-const returnAPIData = (data, message) => {
+const returnAPIData = (data, message, props) => {
   return {
     status: 200,
     success: true,
     error: message || "",
+    ...props,
     data,
   };
 };
