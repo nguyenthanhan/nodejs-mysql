@@ -57,8 +57,8 @@ if (!isDev && cluster.isMaster) {
   // index
   app.get("/", (req, res) => {
     res.json({
-      title: "Welcome to Grocery App",
-      ...common.returnAPIData({}, "", lang.general.app),
+      title: lang.general.app,
+      ...common.returnAPIData({}, ""),
     });
   });
 
