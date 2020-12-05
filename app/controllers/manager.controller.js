@@ -59,29 +59,7 @@ exports.create = async (req, res) => {
   }
 
   try {
-    //check username is have
-    const checkUseName = await Manager.findAll({
-      where: {
-        accountName: req.body.accountName,
-      },
-      raw: true,
-    });
-    if (!_.isEmpty(checkUseName)) {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "post",
-            "",
-            0,
-            lang.general.error.accountInvalid
-          )
-        );
-      return;
-    }
-
-    //hash password
+    //hash password to store
     const hashPassword = await bcrypt.hash(req.body.password, saltRounds);
 
     // Create a manager
@@ -105,7 +83,28 @@ exports.create = async (req, res) => {
     // Save manager in the database
     Manager.create(manager)
       .then((data) => {
-        res.send(common.returnAPIData({}, ""));
+        Manager.findOne({
+          where: {
+            accountName: req.body.accountName,
+          },
+          raw: true,
+        })
+          .then((data) => {
+            res.send(common.returnAPIData(_.omit(data, "password")));
+          })
+          .catch((err) => {
+            res
+              .status(400)
+              .send(
+                common.returnAPIError(
+                  400,
+                  "post",
+                  "người quản lí",
+                  0,
+                  err.message
+                )
+              );
+          });
       })
       .catch((err) => {
         res
@@ -160,6 +159,72 @@ exports.findOne = async (req, res) => {
         .status(400)
         .send(
           common.returnAPIError(400, "get", "người quản lí", id, err.message)
+        );
+    });
+};
+
+exports.findMe = async (req, res) => {
+  const id = req.userId;
+
+  Manager.findByPk(id, { raw: true })
+    .then((data) => {
+      res.send(common.returnAPIData(_.omit(data, "password")));
+    })
+    .catch((err) => {
+      res
+        .status(400)
+        .send(
+          common.returnAPIError(400, "get", "người quản lí", id, err.message)
+        );
+    });
+};
+
+// Update a manager by the id in the request
+exports.updateMe = async (req, res) => {
+  const id = req.userId;
+  let convertImageResult = {};
+
+  if (req.file && req.file !== {}) {
+    convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "avatar",
+      300,
+      300
+    );
+  }
+
+  //can't change accountName
+  const { accountName, ...remain } = req.body;
+  const newBody = {
+    ...remain,
+    avt_url: convertImageResult.url ? convertImageResult.url : "",
+  };
+
+  Manager.update(newBody, {
+    where: { MngID: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.send(common.returnAPIData({}));
+      } else {
+        res
+          .status(400)
+          .send(
+            common.returnAPIError(
+              400,
+              "",
+              "",
+              0,
+              `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
+            )
+          );
+      }
+    })
+    .catch((err) => {
+      res
+        .status(400)
+        .send(
+          common.returnAPIError(400, "put", "người quản lí", id, err.message)
         );
     });
 };

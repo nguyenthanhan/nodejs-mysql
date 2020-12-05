@@ -11,6 +11,7 @@
       "delete": "Lỗi khi xoá %{name} với id %{id}",
       "deleteAll": "Đã xoá tất cả %{name}",
       "accountInvalid": "Tài khoản này đã được sử dụng. Vui lòng đổi tên tài khoản khác!",
+      "emailInvalid": "Email này đã được sử dụng!",
       "accountNotFound": "Không thể tìm thấy tài khoản này!"
     }
   }

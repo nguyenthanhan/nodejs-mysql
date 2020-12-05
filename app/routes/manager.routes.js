@@ -1,20 +1,55 @@
 "use strict";
-const uploadMulter = require("../models/multer.model");
 
 module.exports = (app) => {
+  const uploadMulter = require("../models/multer.model");
+  const { verifyManager, authJwt } = require("../middleware/");
   const managers = require("../controllers/manager.controller.js");
 
   let router = require("express").Router();
 
-  router.post("/", managers.create);
+  app.use(function (req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
 
-  router.get("/", managers.findAll);
+  router.get("/me", [authJwt.verifyToken], managers.findMe);
 
-  router.get("/:id", managers.findOne);
+  router.put(
+    "/me",
+    [authJwt.verifyToken],
+    uploadMulter.single("avatar"),
+    managers.updateMe
+  );
 
-  router.put("/:id", uploadMulter.single("avatar"), managers.update);
+  router.post(
+    "/",
+    [
+      authJwt.verifyToken,
+      authJwt.isAdmin,
+      verifyManager.checkDuplicateUsernameOrEmail,
+    ],
+    managers.create
+  );
 
-  router.delete("/:id", managers.delete);
+  router.get("/", [authJwt.verifyToken, authJwt.isAdmin], managers.findAll);
+
+  router.get("/:id", [authJwt.verifyToken, authJwt.isAdmin], managers.findOne);
+
+  router.put(
+    "/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    uploadMulter.single("avatar"),
+    managers.update
+  );
+
+  router.delete(
+    "/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    managers.delete
+  );
 
   app.use("/api/managers", router);
 };
