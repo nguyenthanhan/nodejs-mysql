@@ -1,7 +1,6 @@
-"use strict";
 module.exports = (app) => {
   const auth = require("../controllers/auth.controller.js");
-  const { verifyManager, authJwt } = require("../middleware/");
+  const { authJwt } = require("../middleware/");
 
   let router = require("express").Router();
 

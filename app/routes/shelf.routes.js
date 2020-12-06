@@ -1,20 +1,28 @@
-"use strict";
 module.exports = (app) => {
   const shelves = require("../controllers/shelf.controller.js");
+  const { authJwt } = require("../middleware/");
 
   let router = require("express").Router();
 
-  router.post("/", shelves.create);
+  app.use(function (req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
 
-  router.get("/", shelves.findAll);
+  router.post("/", [authJwt.verifyToken], shelves.create);
 
-  router.get("/:id", shelves.findOne);
+  router.get("/", [authJwt.verifyToken], shelves.findAll);
 
-  router.put("/:id", shelves.update);
+  router.get("/:id", [authJwt.verifyToken], shelves.findOne);
 
-  router.delete("/:id", shelves.delete);
+  router.put("/:id", [authJwt.verifyToken], shelves.update);
 
-  router.delete("/", shelves.deleteAll);
+  router.delete("/:id", [authJwt.verifyToken], shelves.delete);
+
+  router.delete("/", [authJwt.verifyToken], shelves.deleteAll);
 
   app.use("/api/shelves", router);
 };

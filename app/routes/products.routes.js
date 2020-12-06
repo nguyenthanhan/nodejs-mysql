@@ -1,22 +1,40 @@
-"use strict";
 const uploadMulter = require("../models/multer.model");
 
 module.exports = (app) => {
   const products = require("../controllers/product.controller.js");
+  const { authJwt } = require("../middleware/");
 
   let router = require("express").Router();
 
-  router.post("/", uploadMulter.single("image"), products.create);
+  app.use(function (req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
 
-  router.get("/", products.findAll);
+  router.post(
+    "/",
+    [authJwt.verifyToken],
+    uploadMulter.single("image"),
+    products.create
+  );
 
-  router.get("/:id", products.findOne);
+  router.get("/", [authJwt.verifyToken], products.findAll);
 
-  router.put("/:id", uploadMulter.single("image"), products.update);
+  router.get("/:id", [authJwt.verifyToken], products.findOne);
 
-  router.delete("/:id", products.delete);
+  router.put(
+    "/:id",
+    [authJwt.verifyToken],
+    uploadMulter.single("image"),
+    products.update
+  );
 
-  router.delete("/", products.deleteAll);
+  router.delete("/:id", [authJwt.verifyToken], products.delete);
+
+  router.delete("/", [authJwt.verifyToken], products.deleteAll);
 
   app.use("/api/products", router);
 };

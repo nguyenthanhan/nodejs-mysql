@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = (app) => {
   const uploadMulter = require("../models/multer.model");
   const { verifyManager, authJwt } = require("../middleware/");

@@ -1,18 +1,26 @@
-"use strict";
 module.exports = (app) => {
   const bills = require("../controllers/bill.controller.js");
+  const { authJwt } = require("../middleware/");
 
   let router = require("express").Router();
 
-  router.post("/", bills.create);
+  app.use(function (req, res, next) {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "x-access-token, Origin, Content-Type, Accept"
+    );
+    next();
+  });
 
-  router.get("/", bills.findAll);
+  router.post("/", [authJwt.verifyToken], bills.create);
 
-  router.get("/:id", bills.findOne);
+  router.get("/", [authJwt.verifyToken], bills.findAll);
 
-  router.put("/:id", bills.update);
+  router.get("/:id", [authJwt.verifyToken], bills.findOne);
 
-  router.delete("/:id", bills.delete);
+  router.put("/:id", [authJwt.verifyToken], bills.update);
+
+  router.delete("/:id", [authJwt.verifyToken], bills.delete);
 
   app.use("/api/bills", router);
 };
