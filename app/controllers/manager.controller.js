@@ -198,6 +198,7 @@ exports.updateMe = async (req, res) => {
   const newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : "",
+    updatedAt: new Date(),
   };
 
   Manager.update(newBody, {

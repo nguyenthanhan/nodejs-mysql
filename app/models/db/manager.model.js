@@ -41,9 +41,6 @@ module.exports = (sequelize, Sequelize) => {
       date_start_working: {
         type: Sequelize.DATE,
       },
-      createdDay: {
-        type: Sequelize.DATE,
-      },
       managerType: {
         type: Sequelize.ENUM("normal", "prime"),
         defaultValue: "normal",
@@ -57,9 +54,19 @@ module.exports = (sequelize, Sequelize) => {
       deletedDay: {
         type: Sequelize.DATE,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        updatedAt: Sequelize.NOW,
+      },
     },
     {
-      timestamps: false,
+      timestamps: true,
       freezeTableName: true,
     }
   );

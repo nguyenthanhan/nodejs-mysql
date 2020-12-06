@@ -55,27 +55,24 @@ module.exports = (sequelize, Sequelize) => {
       shID: {
         type: Sequelize.BIGINT(20),
       },
-      // Timestamps
-      // created_at: {
-      //   type: 'TIMESTAMP',
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      //   allowNull: false
-      // },
-      // updated_at: {
-      //   type: 'TIMESTAMP',
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      //   allowNull: false
-      // }
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        updatedAt: Sequelize.NOW,
+      },
     },
     {
-      timestamps: false,
+      timestamps: true,
 
       // don't delete database entries but set the newly added attribute deletedAt
       // to the current date (when deletion was done). paranoid will only work if
       // timestamps are enabled
       // paranoid: true,
-
-      // underscored: true,
 
       freezeTableName: true,
 

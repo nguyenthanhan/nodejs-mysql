@@ -118,7 +118,7 @@ exports.findOne = async (req, res) => {
 // Update a product by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
-  let body = req.body;
+  let body = { ...req.body, updatedAt: new Date() };
 
   if (req.file) {
     const convertImageResult = await cloudinary.uploadSingle(req.file.path);

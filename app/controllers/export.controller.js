@@ -99,8 +99,9 @@ exports.findOne = async (req, res) => {
 // Update a export by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
+  const newBody = { ...req.body, updatedAt: new Date() };
 
-  Export.update(req.body, {
+  Export.update(newBody, {
     where: { ExID: id },
   })
     .then((num) => {

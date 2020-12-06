@@ -88,8 +88,9 @@ exports.findOne = async (req, res) => {
 // Update a supplier by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
+  const newBody = { ...req.body, updatedAt: new Date() };
 
-  Supplier.update(req.body, {
+  Supplier.update(newBody, {
     where: { SupID: id },
   })
     .then((num) => {

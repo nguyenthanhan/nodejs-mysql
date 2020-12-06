@@ -101,8 +101,9 @@ exports.findOne = async (req, res) => {
 // Update a import by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
+  const newBody = { ...req.body, updatedAt: new Date() };
 
-  Import.update(req.body, {
+  Import.update(newBody, {
     where: { ImID: id },
   })
     .then((num) => {

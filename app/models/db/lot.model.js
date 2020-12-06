@@ -17,9 +17,19 @@ module.exports = (sequelize, Sequelize) => {
       Exp: {
         type: Sequelize.DATE,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        updatedAt: Sequelize.NOW,
+      },
     },
     {
-      timestamps: false,
+      timestamps: true,
       freezeTableName: true,
     }
   );

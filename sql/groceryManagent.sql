@@ -16,12 +16,13 @@ CREATE TABLE `Manager` (
   `email`                     varchar(80) default '',
   `salary`                    bigint(20),
   `avt_url`                   text,
-  `date_start_working`        DATETIME NOT NULL,
-  `createdDay`                DATETIME NOT NULL ,
+  `date_start_working`        DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `managerType`               enum('normal', 'prime') default 'normal',
   `creatorID`                 bigint(20),
   `deleterID`                 bigint(20),
   `deletedDay`                DATETIME ,
+  `createdAt`                 DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`                 DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`MngID`),
   FOREIGN KEY (`creatorID`) REFERENCES `PrimeMNG` (`mngID`),
   FOREIGN KEY (`deleterID`) REFERENCES `PrimeMNG` (`mngID`),
@@ -49,6 +50,8 @@ CREATE TABLE `Product` (
   `brand`             varchar(80) NOT NULL default '',
   `catID`             bigint(20) NOT NULL default '0',
   `shID`              bigint(20) NOT NULL default '0',
+  `createdAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`PID`),
   FOREIGN KEY (`catID`) REFERENCES `Category` (`CID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -60,6 +63,8 @@ CREATE TABLE `Category` (
   `CID`           bigint(20) NOT NULL auto_increment,
   `name`          varchar(80) NOT NULL default '',
   `shelfID`       bigint(20) NOT NULL default '0',
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`CID`),
   FOREIGN KEY (`shelfID`) REFERENCES `Shelf` (`ShID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -72,6 +77,8 @@ CREATE TABLE `Shelf` (
   `type`          enum('ware_house', 'store') default 'store',
   `capacity`      bigint(20) NOT NULL default '0',
   `state`         enum('full', 'available') NOT NULL default 'available',
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`ShID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -82,6 +89,8 @@ CREATE TABLE `Bill` (
   `cus_name`      varchar(80),
   `total`         bigint(20),
   `M_ID`          bigint(20),
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`BID`),
   FOREIGN KEY (`M_ID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -95,6 +104,8 @@ CREATE TABLE `Supplier` (
   `Address`       varchar(80) NOT NULL default '',
   `Tax_ID`        int(20) NOT NULL default '0',
   `Email`         varchar(40) NOT NULL default '',
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`SupID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -106,6 +117,8 @@ CREATE TABLE `Import` (
   `total`         bigint(20),
   `date`          DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `state`         enum('ready', 'executed', 'close') NOT NULL ,
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY (`ImID`),
   FOREIGN KEY (`mngID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -117,6 +130,8 @@ CREATE TABLE `Export` (
   `ExID`          bigint(20) NOT NULL auto_increment,
   `mngID`         bigint(20) NOT NULL default '0',
   `date`          DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY (`ExID`),
   FOREIGN KEY (`mngID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -129,6 +144,8 @@ CREATE TABLE `Lot` (
   `name`          varchar(80) NOT NULL default '',
   `quantity`      varchar(80) NOT NULL default '',
   `Exp`           DATETIME NOT NULL ,
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`proID`,`name`),
   FOREIGN KEY (`proID`) REFERENCES `Product` (`PID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -284,3 +301,9 @@ CREATE TABLE `PrimeMNG` (
   PRIMARY KEY (`mngID`),
   FOREIGN KEY (`mngID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+INSERT INTO Manager
+  (FName, LName, accountName, password, Address, BDay,date_start_working, managerType) 
+VALUES
+  ("Admin", "", "admin",  "password", "102 Xóm Chiếu", CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, "prime");

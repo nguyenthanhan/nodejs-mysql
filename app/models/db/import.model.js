@@ -20,9 +20,19 @@ module.exports = (sequelize, Sequelize) => {
       state: {
         type: Sequelize.ENUM("ready", "executed", "close"),
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        updatedAt: Sequelize.NOW,
+      },
     },
     {
-      timestamps: false,
+      timestamps: true,
       freezeTableName: true,
     }
   );
