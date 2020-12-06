@@ -4,12 +4,12 @@ const _ = require("lodash");
 const db = require("../models/db");
 const config = require("../config/auth.config");
 const lang = require("../lang");
-const Manager = db.manager;
-const Op = db.Sequelize.Op;
 const constants = require("../constants");
-
+var validator = require("validator");
 var bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
+const Manager = db.manager;
+const saltRounds = 10;
 
 exports.login = async (req, res) => {
   if (!req.body.account || !req.body.password) {
@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
         .send(
           common.returnAPIError(
             400,
-            "post",
+            "",
             "",
             0,
             lang.general.error.accountNotFound
@@ -50,21 +50,15 @@ exports.login = async (req, res) => {
         );
     }
 
-    const result = bcrypt.compare(req.body.password, managerData.password);
+    const result = await bcrypt.compare(
+      req.body.password,
+      managerData.password
+    );
 
     if (!result) {
       res
         .status(401)
-        .send(
-          common.returnAPIError(
-            401,
-            "delete",
-            "hoá đơn",
-            0,
-            `Mật khẩu không đúng!`
-          )
-        );
-    } else {
+        .send(common.returnAPIError(401, "", "", 0, `Mật khẩu không đúng!`));
     }
 
     let token = jwt.sign({ id: managerData.MngID }, config.secret, {
@@ -82,7 +76,6 @@ exports.login = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-  //TODO
   if (
     !req.body.newPassword ||
     !req.body.oldPassword ||
@@ -90,64 +83,108 @@ exports.changePassword = async (req, res) => {
   ) {
     res
       .status(400)
+      .send(common.returnAPIError(400, "0", "0", 0, lang.general.error._400));
+    return;
+  }
+
+  const { newPassword, oldPassword, confirmPassword } = req.body;
+
+  if (!validator.isAscii(oldPassword)) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu không hợp lệ"));
+    return;
+  }
+
+  if (!validator.isAscii(newPassword) || !validator.isAscii(confirmPassword)) {
+    res
+      .status(400)
+      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu mới không hợp lệ"));
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    res
+      .status(400)
       .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "người quản lí",
-          0,
-          lang.general.error._400
-        )
+        common.returnAPIError(0, "", "", 0, lang.general.error.notSamePassword)
       );
     return;
   }
 
   try {
-    const accountName = req.body.account;
-    const managerData = await Manager.findAll({
-      where: {
-        accountName: accountName,
-      },
-      raw: true,
-    });
-
+    //get password from db
+    const managerData = await Manager.findByPk(req.userId, { raw: true });
     if (_.isEmpty(managerData)) {
-      res
-        .status(400)
+      return res
+        .status(404)
         .send(
           common.returnAPIError(
             400,
-            "post",
+            "",
             "",
             0,
             lang.general.error.accountNotFound
           )
         );
-      return;
     }
 
-    bcrypt.compare(
-      req.body.password,
-      managerData[0].password,
-      function (err, result) {
-        console.log(result);
-        if (result) {
-          res.send(common.returnAPIData(_.omit(managerData[0], "password")));
-        } else {
+    //compare password
+    const result = bcrypt.compare(oldPassword, managerData.password);
+    if (!result) {
+      res
+        .status(401)
+        .send(
+          common.returnAPIError(
+            401,
+            "",
+            "",
+            0,
+            lang.general.error.notSamePassword
+          )
+        );
+      return;
+    } else {
+      const hashNewPassword = await bcrypt.hash(newPassword, saltRounds);
+      const manager = {
+        password: hashNewPassword,
+        updatedAt: new Date(),
+      };
+
+      Manager.update(manager, {
+        where: { MngID: req.userId },
+      })
+        .then((num) => {
+          if (num == 1) {
+            res.send(common.returnAPIData({}));
+          } else {
+            res
+              .status(400)
+              .send(
+                common.returnAPIError(
+                  400,
+                  "",
+                  "",
+                  0,
+                  `Không thể cập nhật mật khẩu! Có thể không tìm thấy thông tin người quản lí hoặc req.body trống!`
+                )
+              );
+          }
+        })
+        .catch((err) => {
           res
             .status(400)
             .send(
               common.returnAPIError(
                 400,
-                "delete",
-                "hoá đơn",
-                0,
-                `Mật khẩu không đúng!`
+                "put",
+                "người quản lí",
+                id,
+                err.message
               )
             );
-        }
-      }
-    );
+        });
+    }
   } catch (error) {
     res
       .status(400)

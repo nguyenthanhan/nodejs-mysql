@@ -193,8 +193,8 @@ exports.updateMe = async (req, res) => {
     );
   }
 
-  //can't change accountName
-  const { accountName, ...remain } = req.body;
+  //can't change accountName and password
+  const { accountName, password, ...remain } = req.body;
   const newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : "",
@@ -235,7 +235,7 @@ exports.update = async (req, res) => {
   const id = req.params.id;
   let convertImageResult = {};
 
-  if (req.file && req.file !== {}) {
+  if (!_.isEmpty(req.file)) {
     convertImageResult = await cloudinary.uploadSingle(
       req.file.path,
       "avatar",
@@ -245,7 +245,7 @@ exports.update = async (req, res) => {
   }
 
   //can't change accountName
-  const { accountName, ...remain } = req.body;
+  const { accountName, password, ...remain } = req.body;
   const newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : "",
