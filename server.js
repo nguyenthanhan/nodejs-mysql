@@ -69,6 +69,7 @@ if (!isDev && cluster.isMaster) {
   // });
 
   // Answer API requests.
+  require("./app/routes/auth.routes")(app);
   require("./app/routes/manager.routes")(app);
   require("./app/routes/products.routes")(app);
   require("./app/routes/category.routes")(app);
@@ -78,7 +79,6 @@ if (!isDev && cluster.isMaster) {
   require("./app/routes/import.routes")(app);
   require("./app/routes/export.routes")(app);
   require("./app/routes/lot.routes")(app);
-  require("./app/routes/auth.routes")(app);
   require("./app/routes/log.routes")(app);
 
   app.use(function (req, res) {
@@ -99,7 +99,6 @@ if (!isDev && cluster.isMaster) {
     );
     console.warn(`Time start:`, new Date());
     console.warn(`Environment:`, process.env.ENV);
-    console.warn(`Host DB:`, process.env.DB_HOST);
     console.warn(`----------------------------------`);
   });
 }
