@@ -3,7 +3,7 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const Logs = db.log;
 // const Manager = db.manager;
-const Op = db.Sequelize.Op;
+// const Op = db.Sequelize.Op;
 
 // Retrieve all logs from the database.
 exports.getAll = async (req, res) => {
