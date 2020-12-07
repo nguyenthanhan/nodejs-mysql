@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new bill
 exports.create = async (req, res) => {
   // Validate request
-  if (!req.body.cus_name || !req.body.total || !req.body.M_ID) {
+  if (!req.body.cus_name || !req.body.total) {
     res
       .status(400)
       .send(
@@ -27,7 +27,7 @@ exports.create = async (req, res) => {
   const bill = {
     cus_name: req.body.cus_name,
     total: req.body.total,
-    M_ID: req.body.M_ID,
+    M_ID: req.userId,
   };
 
   // Save bill in the database

@@ -7,7 +7,7 @@ const cluster = require("cluster");
 const logger = require("morgan");
 const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 // const axios = require('axios');
 
 // Multi-process to utilize all CPU cores.
@@ -28,7 +28,7 @@ if (!isDev && cluster.isMaster) {
   const app = express();
 
   let corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5000",
     allowedHeaders: ["sessionId", "Content-Type"],
     exposedHeaders: ["sessionId"],
     origin: "*",
@@ -79,6 +79,7 @@ if (!isDev && cluster.isMaster) {
   require("./app/routes/export.routes")(app);
   require("./app/routes/lot.routes")(app);
   require("./app/routes/auth.routes")(app);
+  require("./app/routes/log.routes")(app);
 
   app.use(function (req, res) {
     res

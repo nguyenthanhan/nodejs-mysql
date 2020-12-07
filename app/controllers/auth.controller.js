@@ -50,13 +50,21 @@ exports.login = async (req, res) => {
         );
     }
 
+    //-----
+    // const hashPassword = await bcrypt.hash("password", saltRounds);
+    // console.log(
+    //   "remove comment below line to see password for admin",
+    //   hashPassword
+    // );
+    //-----
+
     const result = await bcrypt.compare(
       req.body.password,
       managerData.password
     );
 
     if (!result) {
-      res
+      return res
         .status(401)
         .send(common.returnAPIError(401, "", "", 0, `Mật khẩu không đúng!`));
     }

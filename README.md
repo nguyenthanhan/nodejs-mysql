@@ -1,6 +1,6 @@
 # Node.js Rest APIs with Express, Sequelize & MySQL
 
-<!-- For more detail, please visit:
+For more detail, please visit:
 > [Build Node.js Rest APIs with Express, Sequelize & MySQL](https://bezkoder.com/node-js-express-sequelize-mysql/)
 
 > [Server side Pagination in Node.js with Sequelize and MySQL](https://bezkoder.com/node-js-sequelize-pagination-mysql/)
@@ -19,7 +19,7 @@ Fullstack:
 
 > [Angular + Node.js + Express + MySQL example](https://bezkoder.com/angular-node-express-mysql/)
 
-> [React + Node.js + Express + MySQL example](https://bezkoder.com/react-node-express-mysql/) -->
+> [React + Node.js + Express + MySQL example](https://bezkoder.com/react-node-express-mysql/)
 
 ## Project setup
 ```

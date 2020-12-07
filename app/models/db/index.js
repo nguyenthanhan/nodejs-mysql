@@ -1,4 +1,6 @@
 "use strict";
+const Logs = require("../../controllers/log.controller");
+
 const dbConfig = require("../../config/db.config.js");
 
 const Sequelize = require("sequelize");
@@ -27,5 +29,6 @@ db.products = require("./product.model.js")(sequelize, Sequelize);
 db.shelf = require("./shelf.model.js")(sequelize, Sequelize);
 db.supplier = require("./supplier.model.js")(sequelize, Sequelize);
 db.lot = require("./lot.model.js")(sequelize, Sequelize);
+db.log = require("./log.model.js")(sequelize, Sequelize);
 
 module.exports = db;

@@ -303,7 +303,20 @@ CREATE TABLE `PrimeMNG` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
+DROP TABLE IF EXISTS Logs;
+CREATE TABLE `Logs` (
+  `id`            bigint(20) NOT NULL auto_increment,
+  `MngID`         bigint(20) NOT NULL,    
+  `action`        enum('add', 'edit', 'delete') NOT NULL ,
+  `tableOfAction` enum('Bill', 'Category', 'Export', 'Import', 'Lot', 'Manager', 'Product', 'Shelf', 'Supplier') NOT NULL ,
+  `idOfAffectedObject`  bigint(20) NOT NULL ,
+  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`),
+  FOREIGN KEY (`MngID`) REFERENCES `Manager` (`MngID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
 INSERT INTO Manager
   (FName, LName, accountName, password, Address, BDay,date_start_working, managerType) 
 VALUES
-  ("Admin", "", "admin",  "password", "102 Xóm Chiếu", CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, "prime");
+  ("Admin", "", "admin",  "$2b$10$/vEpr7cQewqynPD38Om1yuvQflO5AfVNdIiRpqCSIVNxPfd/vogiG", "102 Xóm Chiếu", CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, "prime");
