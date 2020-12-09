@@ -6,20 +6,13 @@ const Shelf = db.shelf;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Shelf
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body.name || !req.body.capacity || !req.body.state) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "kệ hàng",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
@@ -37,14 +30,19 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "post", "kệ hàng", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "post",
+        name: "kệ hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Retrieve all shelves from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
@@ -53,29 +51,47 @@ exports.findAll = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "kệ hàng", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "kệ hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single shelf with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Shelf.findByPk(id)
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy thông tin kệ hàng",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "kệ hàng", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "kệ hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a Shelf by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   const newBody = { ...req.body, updatedAt: new Date() };
 
@@ -86,28 +102,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "kệ hàng",
-              id,
-              `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "put", "kệ hàng", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "kệ hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a Shelf with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Shelf.destroy({
@@ -117,48 +132,44 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "kệ hàng",
-              id,
-              `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "delete", "kệ hàng", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "kệ hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete all Shelves from the database.
-exports.deleteAll = async (req, res) => {
+exports.deleteAll = async (req, res, next) => {
   Shelf.destroy({
     where: {},
     truncate: false,
   })
     .then((nums) => {
       res
-        .status(400)
+        .status(200)
         .send(common.returnAPIData({}, `${nums} kệ hàng đã bị xoá!`));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "kệ hàng",
-            0,
-            err.message || "Xảy ra lỗi khi xoá tất cả kệ hàng"
-          )
-        );
+      next({
+        status: 400,
+        message: err.message || "Xảy ra lỗi khi xoá tất cả kệ hàng",
+        method: "delete",
+        name: "kệ hàng",
+        id: 0,
+      });
+      return;
     });
 };

@@ -6,20 +6,10 @@ const Bill = db.bill;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new bill
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body.cus_name || !req.body.total) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "hoá đơn",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({ status: 400, message: lang.general.error._400 });
     return;
   }
 
@@ -36,14 +26,19 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "post", "hoá đơn", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        id: 0,
+        name: "hoá đơn",
+        method: "post",
+      });
+      return;
     });
 };
 
 // Retrieve all bills from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const cus_name = req.query.cus_name;
   let condition = cus_name
     ? { cus_name: { [Op.like]: `%${cus_name}%` } }
@@ -54,29 +49,47 @@ exports.findAll = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "hoá đơn", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        id: 0,
+        name: "hoá đơn",
+        method: "get",
+      });
+      return;
     });
 };
 
 // Find a single bill with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Bill.findByPk(id)
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy hoá đơn này",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "hoá đơn", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        id: id,
+        name: "hoá đơn",
+        method: "get",
+      });
+      return;
     });
 };
 
 // Update a bill by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   const newBody = { ...req.body, updatedAt: new Date() };
 
@@ -87,28 +100,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "hoá đơn",
-              id,
-              `Không thể cập nhật hoá đơn với id=${id}. hoá đơn không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật hoá đơn với id này. hoá đơn không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "put", "hoá đơn", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        id: id,
+        name: "hoá đơn",
+        method: "put",
+      });
+      return;
     });
 };
 
 // Delete a bill with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Bill.destroy({
@@ -118,22 +130,21 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "hoá đơn",
-              id,
-              `Không thể xoá hoá đơn với id=${id}. Có thể không tìm thấy hoá đơn!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá hoá đơn với id này. Có thể không tìm thấy hoá đơn!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "delete", "hoá đơn", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        id: id,
+        name: "hoá đơn",
+        method: "delete",
+      });
+      return;
     });
 };

@@ -6,7 +6,7 @@ const Logs = db.log;
 // const Op = db.Sequelize.Op;
 
 // Retrieve all logs from the database.
-exports.getAll = async (req, res) => {
+exports.getAll = async (req, res, next) => {
   const per_page = parseInt(req.query.per_page) || 10;
   const page = parseInt(req.query.page) || 1;
 
@@ -22,17 +22,7 @@ exports.getAll = async (req, res) => {
   // const managerData = await Manager.findOne({findByAccountCondition});
 
   // if (_.isEmpty(managerData)) {
-  //   return res
-  //     .status(400)
-  //     .send(
-  //       common.returnAPIError(
-  //         400,
-  //         "",
-  //         "",
-  //         id,
-  //         "Không tìm thấy người quản lí này!"
-  //       )
-  //     );
+
   // }
 
   // const id = managerData.MngID;
@@ -53,9 +43,14 @@ exports.getAll = async (req, res) => {
       );
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "sản phẩm", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "bản ghi",
+        id: 0,
+      });
+      return;
     });
 };
 
@@ -66,7 +61,5 @@ exports.log = async (userID, action, tableOfAction, idOfAffectedObject) => {
     tableOfAction,
     idOfAffectedObject,
   };
-  Logs.create(createLogs).catch((err) =>
-    console.log("Ghi log thất bại. Lý do: ", err)
-  );
+  Logs.create(createLogs).catch((err) => console.log("Write log fail: ", err));
 };

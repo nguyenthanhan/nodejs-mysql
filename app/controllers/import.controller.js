@@ -6,20 +6,13 @@ const Import = db.import;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new import
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body.mngID || !req.body.date || !req.body.state) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "thông tin nhập hàng",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
@@ -37,22 +30,19 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "post",
-            "thông tin nhập hàng",
-            0,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "post",
+        name: "thông tin nhập hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Retrieve all imports from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
@@ -61,22 +51,19 @@ exports.findAll = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "get",
-            "thông tin nhập hàng",
-            0,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "thông tin nhập hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single import with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Import.findByPk(id)
@@ -84,22 +71,19 @@ exports.findOne = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "get",
-            "thông tin nhập hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "thông tin nhập hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a import by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   const newBody = { ...req.body, updatedAt: new Date() };
 
@@ -108,38 +92,37 @@ exports.update = async (req, res) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        if (data) {
+          res.send(common.returnAPIData(data));
+        } else {
+          next({
+            status: 400,
+            message: "Không tìm thấy thông tin nhập hàng",
+          });
+          return;
+        }
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "thông tin nhập hàng",
-              id,
-              `Không thể cập nhật thông tin nhập hàng với id=${id}. thông tin nhập hàng không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật thông tin nhập hàng với id này. thông tin nhập hàng không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "put",
-            "thông tin nhập hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "thông tin nhập hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a import with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Import.destroy({
@@ -149,30 +132,21 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "thông tin nhập hàng",
-              id,
-              `Không thể xoá thông tin nhập hàng với id=${id}. Có thể không tìm thấy thông tin nhập hàng!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá thông tin nhập hàng với id này. Có thể không tìm thấy thông tin nhập hàng!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "thông tin nhập hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "thông tin nhập hàng",
+        id: id,
+      });
+      return;
     });
 };

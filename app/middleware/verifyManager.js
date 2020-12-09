@@ -12,17 +12,10 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     },
   }).then((user) => {
     if (user) {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "",
-            "",
-            0,
-            lang.general.error.accountInvalid
-          )
-        );
+      next({
+        status: 400,
+        message: lang.general.error.accountInvalid,
+      });
       return;
     }
 
@@ -34,17 +27,10 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
         },
       }).then((user) => {
         if (user) {
-          res
-            .status(400)
-            .send(
-              common.returnAPIError(
-                400,
-                "",
-                "",
-                0,
-                lang.general.error.accountInvalid
-              )
-            );
+          next({
+            status: 400,
+            message: lang.general.error.accountInvalid,
+          });
           return;
         }
 

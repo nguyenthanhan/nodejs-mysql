@@ -6,20 +6,13 @@ const Category = db.category;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Category
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body.name || !req.body.shelfID) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "phân loại hàng",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
@@ -35,16 +28,19 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "post", "phân loại hàng", 0, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "post",
+        name: "phân loại hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Retrieve all shelves from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
@@ -53,33 +49,47 @@ exports.findAll = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "get", "phân loại hàng", 0, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "phân loại hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single category with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Category.findByPk(id)
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy danh mục hàng này",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "get", "phân loại hàng", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "phân loại hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a category by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   const newBody = { ...req.body, updatedAt: new Date() };
 
@@ -90,30 +100,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "phân loại hàng",
-              id,
-              `Không thể cập nhật phân loại hàng với id=${id}. Phân loại hàng không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật phân loại hàng với id này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "put", "phân loại hàng", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "phân loại hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a category with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Category.destroy({
@@ -123,30 +130,21 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "phân loại hàng",
-              id,
-              `Không thể xoá phân loại hàng với id=${id}. Có thể không tìm thấy phân loại hàng!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá phân loại hàng với id này. Có thể không tìm thấy phân loại hàng!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "phân loại hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "phân loại hàng",
+        id: id,
+      });
+      return;
     });
 };

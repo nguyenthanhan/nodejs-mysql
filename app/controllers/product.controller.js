@@ -8,7 +8,7 @@ const Product = db.products;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new product
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (
     !req.body.name ||
@@ -22,17 +22,10 @@ exports.create = async (req, res) => {
     !req.body.import_price ||
     !req.body.brand
   ) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "sản phẩm",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
@@ -65,14 +58,19 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "post", "sản phẩm", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "post",
+        name: "sản phẩm",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Retrieve all products from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const limit = parseInt(req.query.per_page) || 10;
   const offset = (parseInt(req.query.page) - 1) * limit || 0;
 
@@ -94,29 +92,47 @@ exports.findAll = async (req, res) => {
       );
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "sản phẩm", 0, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "sản phẩm",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single product with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Product.findByPk(id)
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy thông tin sản phẩm",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "get", "sản phẩm", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "sản phẩm",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a product by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   let body = { ...req.body, updatedAt: new Date() };
 
@@ -134,28 +150,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "sản phẩm",
-              id,
-              `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(common.returnAPIError(400, "put", "sản phẩm", id, err.message));
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "sản phẩm",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a product with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Product.destroy({
@@ -165,50 +180,44 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "sản phẩm",
-              id,
-              `Không thể xoá sản phẩm với id=${id}. Có thể không tìm thấy sản phẩm!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá sản phẩm với id này. Có thể không tìm thấy sản phẩm!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "delete", "sản phẩm", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "sản phẩm",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete all products from the database.
-exports.deleteAll = async (req, res) => {
+exports.deleteAll = async (req, res, next) => {
   Product.destroy({
     where: {},
     truncate: false,
   })
     .then((nums) => {
       res
-        .status(400)
+        .status(200)
         .send(common.returnAPIData({}, `${nums} sản phẩm đã bị xoá!`));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "delete",
-            "sản phẩm",
-            0,
-            err.message || "Xảy ra lỗi khi xoá tất cả sản phẩm"
-          )
-        );
+      next({
+        status: 400,
+        message: err.message || "Xảy ra lỗi khi xoá tất cả sản phẩm",
+        method: "delete",
+        name: "sản phẩm",
+        id: 0,
+      });
+      return;
     });
 };

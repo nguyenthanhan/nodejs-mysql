@@ -1,6 +1,4 @@
 "use strict";
-const Logs = require("../../controllers/log.controller");
-
 const dbConfig = require("../../config/db.config.js");
 
 const Sequelize = require("sequelize");

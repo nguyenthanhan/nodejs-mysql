@@ -6,20 +6,13 @@ const Export = db.export;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new export
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (!req.body.mngID || !req.body.date) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "thông tin xuất hàng",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
@@ -35,46 +28,48 @@ exports.create = async (req, res) => {
       res.send(common.returnAPIData({}, ""));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "post",
-            "thông tin xuất hàng",
-            0,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "post",
+        name: "thông tin xuất hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Retrieve all exports from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
   Export.findAll({ where: condition })
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy thông tin xuất hàng",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "get",
-            "thông tin xuất hàng",
-            0,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "thông tin xuất hàng",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single export with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Export.findByPk(id)
@@ -82,22 +77,19 @@ exports.findOne = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            400,
-            "get",
-            "thông tin xuất hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "thông tin xuất hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a export by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   const newBody = { ...req.body, updatedAt: new Date() };
 
@@ -108,36 +100,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "put",
-              "thông tin xuất hàng",
-              id,
-              `Không thể cập nhật thông tin xuất hàng với id=${id}. thông tin xuất hàng không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật thông tin xuất hàng với id này. thông tin xuất hàng không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            500,
-            "put",
-            "thông tin xuất hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "thông tin xuất hàng",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a export with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Export.destroy({
@@ -147,30 +130,21 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "delete",
-              "thông tin xuất hàng",
-              id,
-              `Không thể xoá thông tin xuất hàng với id=${id}. Có thể không tìm thấy thông tin xuất hàng!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá thông tin xuất hàng với id này. Có thể không tìm thấy thông tin xuất hàng!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(
-            500,
-            "delete",
-            "thông tin xuất hàng",
-            id,
-            err.message
-          )
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "thông tin xuất hàng",
+        id: id,
+      });
+      return;
     });
 };

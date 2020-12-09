@@ -11,9 +11,11 @@ const returnAPIData = (data, message = "", props) => {
   };
 };
 
-const returnAPIError = (status, method, name, id, message) => {
-  const tID = id || 0;
-  const _message = message || returnMessage(method, name, tID);
+const returnCustomError = (error) => {
+  const { method = "", name = "", id = 0, status = 500 } = error;
+  const _message =
+    error && error.message ? error.message : returnMessage(method, name, id);
+
   return {
     status,
     success: status === 200,
@@ -27,24 +29,20 @@ const returnMessage = (method, name, id) => {
       return lang.general.error.update
         .replace(`%{name}`, name)
         .replace(`%{id}`, id);
-      break;
     case "post":
       return lang.general.error.create.replace(`%{name}`, name);
-      break;
     case "get":
       return id === 0
         ? lang.general.error.getAll.replace(`%{name}`, name)
         : lang.general.error.getId
             .replace(`%{name}`, name)
             .replace(`%{id}`, id);
-      break;
     case "delete":
       return id === 0
         ? lang.general.error.deleteAll.replace(`%{name}`, name)
         : lang.general.error.delete
             .replace(`%{name}`, name)
             .replace(`%{id}`, id);
-      break;
     default:
       break;
   }
@@ -70,7 +68,7 @@ const createImageName = (originalName) => {
 
 module.exports = {
   returnAPIData,
-  returnAPIError,
   randomString,
   createImageName,
+  returnCustomError,
 };

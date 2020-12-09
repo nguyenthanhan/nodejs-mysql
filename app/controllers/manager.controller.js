@@ -12,7 +12,7 @@ const Op = db.Sequelize.Op;
 const saltRounds = 10;
 
 // Create and Save a new manager
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   // Validate request
   if (
     !req.body.FName ||
@@ -21,30 +21,34 @@ exports.create = async (req, res) => {
     !req.body.password ||
     !req.body.managerType
   ) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, lang.general.error._400));
+    next({
+      status: 400,
+      message: lang.general.error._400,
+    });
     return;
   }
 
   if (req.body.email && !validator.isEmail(req.body.email)) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Email không hợp lệ"));
+    next({
+      status: 400,
+      message: "Email không hợp lệ",
+    });
     return;
   }
 
   if (!validator.isAlphanumeric(req.body.accountName)) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Tài khoản không hợp lệ"));
+    next({
+      status: 400,
+      message: "Tên tài khoản không hợp lệ",
+    });
     return;
   }
 
   if (!validator.isAscii(req.body.password)) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu không hợp lệ"));
+    next({
+      status: 400,
+      message: "Mật khẩu không hợp lệ",
+    });
     return;
   }
 
@@ -52,9 +56,10 @@ exports.create = async (req, res) => {
     !validator.isAlpha(req.body.FName.replace(" ", "a")) ||
     !validator.isAlpha(req.body.LName.replace(" ", "a"))
   ) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Tài khoản không hợp lệ"));
+    next({
+      status: 400,
+      message: "Tài khoản không hợp lệ",
+    });
     return;
   }
 
@@ -93,37 +98,40 @@ exports.create = async (req, res) => {
             res.send(common.returnAPIData(_.omit(data, "password")));
           })
           .catch((err) => {
-            res
-              .status(400)
-              .send(
-                common.returnAPIError(
-                  400,
-                  "post",
-                  "người quản lí",
-                  0,
-                  err.message
-                )
-              );
+            next({
+              status: 400,
+              message: err.message,
+              method: "post",
+              name: "người quản lí",
+              id: 0,
+            });
+            return;
           });
       })
       .catch((err) => {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(400, "post", "người quản lí", 0, err.message)
-          );
+        next({
+          status: 400,
+          message: err.message,
+          method: "post",
+          name: "người quản lí",
+          id: 0,
+        });
+        return;
       });
   } catch (err) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(400, "post", "người quản lí", 0, err.message)
-      );
+    next({
+      status: 400,
+      message: err.message,
+      method: "post",
+      name: "người quản lí",
+      id: 0,
+    });
+    return;
   }
 };
 
 // Retrieve all managers from the database.
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
   const accountName = req.query.accountName;
   let condition = accountName
     ? { accountName: { [Op.like]: `%${accountName}%` } }
@@ -138,49 +146,74 @@ exports.findAll = async (req, res) => {
       res.send(common.returnAPIData(data));
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "get", "người quản lí", 0, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "người quản lí",
+        id: 0,
+      });
+      return;
     });
 };
 
 // Find a single manager with an id
-exports.findOne = async (req, res) => {
+exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Manager.findByPk(id)
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      if (data) {
+        res.send(common.returnAPIData(data));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy người quản lí này",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "get", "người quản lí", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "người quản lí",
+        id: id,
+      });
+      return;
     });
 };
 
-exports.findMe = async (req, res) => {
+exports.findMe = async (req, res, next) => {
   const id = req.userId;
 
   Manager.findByPk(id, { raw: true })
     .then((data) => {
-      res.send(common.returnAPIData(_.omit(data, "password")));
+      if (data) {
+        res.send(common.returnAPIData(_.omit(data, "password")));
+      } else {
+        next({
+          status: 400,
+          message: "Không tìm thấy thông tin của bạn",
+        });
+        return;
+      }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "get", "người quản lí", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "get",
+        name: "người quản lí",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a manager by the id in the request
-exports.updateMe = async (req, res) => {
+exports.updateMe = async (req, res, next) => {
   const id = req.userId;
   let convertImageResult = {};
 
@@ -208,30 +241,27 @@ exports.updateMe = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "",
-              "",
-              0,
-              `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "put", "người quản lí", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "người quản lí",
+        id: id,
+      });
+      return;
     });
 };
 
 // Update a manager by the id in the request
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   const id = req.params.id;
   let convertImageResult = {};
 
@@ -258,30 +288,27 @@ exports.update = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "",
-              "",
-              0,
-              `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể cập nhật người quản lí với id này. người quản lí không tìm thấy hoặc req.body trống!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "put", "người quản lí", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "người quản lí",
+        id: id,
+      });
+      return;
     });
 };
 
 // Delete a manager with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   const id = req.params.id;
 
   Manager.destroy({
@@ -291,24 +318,21 @@ exports.delete = async (req, res) => {
       if (num == 1) {
         res.send(common.returnAPIData({}));
       } else {
-        res
-          .status(400)
-          .send(
-            common.returnAPIError(
-              400,
-              "",
-              "",
-              0,
-              `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`
-            )
-          );
+        next({
+          status: 400,
+          message: `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`,
+        });
+        return;
       }
     })
     .catch((err) => {
-      res
-        .status(400)
-        .send(
-          common.returnAPIError(400, "delete", "người quản lí", id, err.message)
-        );
+      next({
+        status: 400,
+        message: err.message,
+        method: "delete",
+        name: "người quản lí",
+        id: id,
+      });
+      return;
     });
 };

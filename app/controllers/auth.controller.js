@@ -11,19 +11,9 @@ var jwt = require("jsonwebtoken");
 const Manager = db.manager;
 const saltRounds = 10;
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   if (!req.body.account || !req.body.password) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(
-          400,
-          "post",
-          "người quản lí",
-          0,
-          lang.general.error._400
-        )
-      );
+    next({ status: 400, message: lang.general.error._400 });
     return;
   }
 
@@ -37,17 +27,8 @@ exports.login = async (req, res) => {
     });
 
     if (_.isEmpty(managerData)) {
-      return res
-        .status(404)
-        .send(
-          common.returnAPIError(
-            400,
-            "",
-            "",
-            0,
-            lang.general.error.accountNotFound
-          )
-        );
+      next({ status: 404, message: lang.general.error.accountNotFound });
+      return;
     }
 
     //-----
@@ -64,9 +45,8 @@ exports.login = async (req, res) => {
     );
 
     if (!result) {
-      return res
-        .status(401)
-        .send(common.returnAPIError(401, "", "", 0, `Mật khẩu không đúng!`));
+      next({ status: 401, message: `Mật khẩu không đúng!` });
+      return;
     }
 
     let token = jwt.sign({ id: managerData.MngID }, config.secret, {
@@ -77,46 +57,35 @@ exports.login = async (req, res) => {
       common.returnAPIData({ ..._.omit(managerData, "password"), token }, "")
     );
   } catch (error) {
-    res
-      .status(400)
-      .send(common.returnAPIError(400, "post", "", 0, error.message));
+    next({ status: 400, message: error.message });
+    return;
   }
 };
 
-exports.changePassword = async (req, res) => {
+exports.changePassword = async (req, res, next) => {
   if (
     !req.body.newPassword ||
     !req.body.oldPassword ||
     !req.body.confirmPassword
   ) {
-    res
-      .status(400)
-      .send(common.returnAPIError(400, "0", "0", 0, lang.general.error._400));
+    next({ status: 400, message: lang.general.error._400 });
     return;
   }
 
   const { newPassword, oldPassword, confirmPassword } = req.body;
 
   if (!validator.isAscii(oldPassword)) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu không hợp lệ"));
+    next({ status: 400, message: "Mật khẩu không hợp lệ" });
     return;
   }
 
   if (!validator.isAscii(newPassword) || !validator.isAscii(confirmPassword)) {
-    res
-      .status(400)
-      .send(common.returnAPIError(0, "", "", 0, "Mật khẩu mới không hợp lệ"));
+    next({ status: 400, message: "Mật khẩu mới không hợp lệ" });
     return;
   }
 
   if (newPassword !== confirmPassword) {
-    res
-      .status(400)
-      .send(
-        common.returnAPIError(0, "", "", 0, lang.general.error.notSamePassword)
-      );
+    next({ status: 400, message: lang.general.error.notSamePassword });
     return;
   }
 
@@ -124,33 +93,14 @@ exports.changePassword = async (req, res) => {
     //get password from db
     const managerData = await Manager.findByPk(req.userId, { raw: true });
     if (_.isEmpty(managerData)) {
-      return res
-        .status(404)
-        .send(
-          common.returnAPIError(
-            400,
-            "",
-            "",
-            0,
-            lang.general.error.accountNotFound
-          )
-        );
+      next({ status: 404, message: lang.general.error.accountNotFound });
+      return;
     }
 
     //compare password
     const result = bcrypt.compare(oldPassword, managerData.password);
     if (!result) {
-      res
-        .status(401)
-        .send(
-          common.returnAPIError(
-            401,
-            "",
-            "",
-            0,
-            lang.general.error.notSamePassword
-          )
-        );
+      next({ status: 401, message: lang.general.error.notSamePassword });
       return;
     } else {
       const hashNewPassword = await bcrypt.hash(newPassword, saltRounds);
@@ -166,36 +116,32 @@ exports.changePassword = async (req, res) => {
           if (num == 1) {
             res.send(common.returnAPIData({}));
           } else {
-            res
-              .status(400)
-              .send(
-                common.returnAPIError(
-                  400,
-                  "",
-                  "",
-                  0,
-                  `Không thể cập nhật mật khẩu! Có thể không tìm thấy thông tin người quản lí hoặc req.body trống!`
-                )
-              );
+            next({
+              status: 400,
+              message: `Không thể cập nhật mật khẩu! Có thể không tìm thấy thông tin người quản lí hoặc req.body trống!`,
+            });
+            return;
           }
         })
         .catch((err) => {
-          res
-            .status(400)
-            .send(
-              common.returnAPIError(
-                400,
-                "put",
-                "người quản lí",
-                id,
-                err.message
-              )
-            );
+          next({
+            status: 400,
+            message: err.message,
+            method: "put",
+            name: "người quản lí",
+            id: req.userId,
+          });
+          return;
         });
     }
-  } catch (error) {
-    res
-      .status(400)
-      .send(common.returnAPIError(400, "post", "", 0, error.message));
+  } catch (err) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "put",
+      name: "người quản lí",
+      id: req.userId,
+    });
+    return;
   }
 };

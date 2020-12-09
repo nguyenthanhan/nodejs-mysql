@@ -55,14 +55,14 @@ if (!isDev && cluster.isMaster) {
   // });
 
   // index
-  app.get("/", (req, res) => {
+  app.get("/", (req, res, next) => {
     res.json({
       title: lang.general.app,
       ...common.returnAPIData({}, ""),
     });
   });
 
-  // app.get('/users', (req, res) => {
+  // app.get('/users', (req, res, next) => {
   //   axios.get('https://randomuser.me/api/?page=1&results=10').then(response => {
   //     res.send(response.data);
   //   });
@@ -81,12 +81,17 @@ if (!isDev && cluster.isMaster) {
   require("./app/routes/lot.routes")(app);
   require("./app/routes/log.routes")(app);
 
-  app.use(function (req, res) {
-    res
-      .status(404)
-      .send(
-        common.returnAPIError(404, "get", "", 0, req.originalUrl + " not found")
-      );
+  // Catch 404 Errors and forward them to error handler
+  app.use((req, res, next) => {
+    const err = new Error(req.originalUrl + " not found");
+    err.status = 404;
+    next(err);
+  });
+
+  // Error handler function
+  app.use((err, req, res, next) => {
+    // response to client
+    return res.status(err.status || 500).send(common.returnCustomError(err));
   });
 
   // set port, listen for requests
