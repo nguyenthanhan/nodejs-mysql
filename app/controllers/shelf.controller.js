@@ -104,7 +104,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update kệ hàng với id=${id}. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update kệ hàng với id này. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -123,18 +123,18 @@ exports.update = async (req, res, next) => {
 
 // Delete a Shelf with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Shelf.destroy({
-    where: { ShID: id },
+    where: { ShID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num >= 1) {
+        res.send(common.returnAPIData({}, `${num} kệ hàng đã bị xoá!`));
       } else {
         next({
           status: 400,
-          message: `Không thể xoá kệ hàng với id=${id}. Có thể không tìm thấy kệ hàng!`,
+          message: `Không thể xoá kệ hàng. Có thể không tìm thấy kệ hàng!`,
         });
         return;
       }
@@ -146,29 +146,6 @@ exports.delete = async (req, res, next) => {
         method: "delete",
         name: "kệ hàng",
         id: id,
-      });
-      return;
-    });
-};
-
-// Delete all Shelves from the database.
-exports.deleteAll = async (req, res, next) => {
-  Shelf.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums) => {
-      res
-        .status(200)
-        .send(common.returnAPIData({}, `${nums} kệ hàng đã bị xoá!`));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message || "Xảy ra lỗi khi xoá tất cả kệ hàng",
-        method: "delete",
-        name: "kệ hàng",
-        id: 0,
       });
       return;
     });

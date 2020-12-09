@@ -5,7 +5,7 @@ const returnAPIData = (data, message = "", props) => {
   return {
     status: 200,
     success: true,
-    error: message,
+    message: message,
     ...props,
     data,
   };

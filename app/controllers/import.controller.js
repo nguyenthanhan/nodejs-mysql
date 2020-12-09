@@ -123,14 +123,14 @@ exports.update = async (req, res, next) => {
 
 // Delete a import with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Import.destroy({
-    where: { ImID: id },
+    where: { ImID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num > 0) {
+        res.send(common.returnAPIData({}, `${num} phiếu nhập đã bị xoá!`));
       } else {
         next({
           status: 400,

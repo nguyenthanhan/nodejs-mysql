@@ -243,7 +243,7 @@ exports.updateMe = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật người quản lí với id=${id}. người quản lí không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật người quản lí với id này. người quản lí không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -309,18 +309,18 @@ exports.update = async (req, res, next) => {
 
 // Delete a manager with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Manager.destroy({
-    where: { MngID: id },
+    where: { MngID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num >= 1) {
+        res.send(common.returnAPIData({}, `${num} quản lí đã bị xoá!`));
       } else {
         next({
           status: 400,
-          message: `Không thể xoá người quản lí với id=${id}. Có thể không tìm thấy người quản lí!`,
+          message: `Không thể xoá người quản lí với id này. Có thể không tìm thấy người quản lí!`,
         });
         return;
       }

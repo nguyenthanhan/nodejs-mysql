@@ -20,9 +20,7 @@ module.exports = (app) => {
 
   router.put("/:id", [authJwt.verifyToken], shelves.update);
 
-  router.delete("/:id", [authJwt.verifyToken], shelves.delete);
-
-  router.delete("/", [authJwt.verifyToken], shelves.deleteAll);
+  router.delete("/", [authJwt.verifyToken], shelves.delete);
 
   app.use("/api/shelves", router);
 };

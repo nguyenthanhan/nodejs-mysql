@@ -152,7 +152,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update sản phẩm với id=${id}. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update sản phẩm với id này. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -171,14 +171,14 @@ exports.update = async (req, res, next) => {
 
 // Delete a product with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Product.destroy({
-    where: { PID: id },
+    where: { PID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num >= 1) {
+        res.send(common.returnAPIData({}, `${num} sản phẩm đã bị xoá!`));
       } else {
         next({
           status: 400,

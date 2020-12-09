@@ -91,7 +91,10 @@ exports.changePassword = async (req, res, next) => {
 
   try {
     //get password from db
-    const managerData = await Manager.findByPk(req.userId, { raw: true });
+    const managerData = await Manager.findByPk(req.userId, {
+      raw: true,
+      attributes: { include: ["password"] },
+    });
     if (_.isEmpty(managerData)) {
       next({ status: 404, message: lang.general.error.accountNotFound });
       return;

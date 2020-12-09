@@ -130,14 +130,14 @@ exports.update = async (req, res, next) => {
 
 // Delete a lot with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Lot.destroy({
-    where: { BID: id },
+    where: { proID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num >= 1) {
+        res.send(common.returnAPIData({}, `${num} lô hàng đã bị xoá!`));
       } else {
         next({
           status: 400,

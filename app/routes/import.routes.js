@@ -20,7 +20,7 @@ module.exports = (app) => {
 
   router.put("/:id", [authJwt.verifyToken], _imports.update);
 
-  router.delete("/:id", [authJwt.verifyToken], _imports.delete);
+  router.delete("/", [authJwt.verifyToken], _imports.delete);
 
   app.use("/api/imports", router);
 };

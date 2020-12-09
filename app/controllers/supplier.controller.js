@@ -128,13 +128,13 @@ exports.update = async (req, res, next) => {
 
 // Delete a supplier with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Supplier.destroy({
-    where: { SupID: id },
+    where: { SupID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
+      if (num >= 1) {
         res.send(common.returnAPIData({}));
       } else {
         next({

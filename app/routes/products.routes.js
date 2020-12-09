@@ -32,7 +32,7 @@ module.exports = (app) => {
     products.update
   );
 
-  router.delete("/:id", [authJwt.verifyToken], products.delete);
+  router.delete("/", [authJwt.verifyToken], products.delete);
 
   router.delete("/", [authJwt.verifyToken], products.deleteAll);
 

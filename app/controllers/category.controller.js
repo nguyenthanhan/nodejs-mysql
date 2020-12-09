@@ -121,14 +121,14 @@ exports.update = async (req, res, next) => {
 
 // Delete a category with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Category.destroy({
-    where: { CID: id },
+    where: { CID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num > 0) {
+        res.send(common.returnAPIData({}, `${num} phân loại hàng đã bị xoá!`));
       } else {
         next({
           status: 400,

@@ -121,14 +121,14 @@ exports.update = async (req, res, next) => {
 
 // Delete a export with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
+  const { arrayIds = [] } = req.body;
 
   Export.destroy({
-    where: { ExID: id },
+    where: { ExID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num > 0) {
+        res.send(common.returnAPIData({}, `${num} phiếu xuất đã bị xoá!`));
       } else {
         next({
           status: 400,

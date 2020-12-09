@@ -121,14 +121,13 @@ exports.update = async (req, res, next) => {
 
 // Delete a bill with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const id = req.params.id;
-
+  const { arrayIds = [] } = req.body;
   Bill.destroy({
-    where: { BID: id },
+    where: { BID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}));
+      if (num > 0) {
+        res.send(common.returnAPIData({}, `${num} hoá đơn đã bị xoá!`));
       } else {
         next({
           status: 400,
@@ -141,7 +140,7 @@ exports.delete = async (req, res, next) => {
       next({
         status: 400,
         message: err.message,
-        id: id,
+        id: arrayIds.length === 1 ? arrayIds[0] : 0,
         name: "hoá đơn",
         method: "delete",
       });
