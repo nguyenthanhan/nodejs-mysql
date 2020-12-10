@@ -32,14 +32,9 @@ module.exports = (sequelize, Sequelize) => {
       affectedRowID: {
         type: Sequelize.BIGINT(20),
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
     },
     {
-      timestamps: false,
+      updatedAt: false,
       freezeTableName: true,
     }
   );

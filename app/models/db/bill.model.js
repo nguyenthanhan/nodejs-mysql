@@ -18,16 +18,6 @@ module.exports = (sequelize, Sequelize) => {
       M_ID: {
         type: Sequelize.BIGINT(20),
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
     },
     {
       timestamps: true,

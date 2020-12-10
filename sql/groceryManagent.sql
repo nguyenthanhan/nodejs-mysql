@@ -64,11 +64,11 @@ CREATE TABLE `Product` (
   `S_curr_qtt`        int(20) NOT NULL default '0',
   `S_max_qtt`         int(20) NOT NULL default '0',
   `S_min_qtt`         int(20) NOT NULL default '0',
-  `qtt_per_unit`        int(20) NOT NULL default '1',
+  `qtt_per_unit`      int(20) NOT NULL default '1',
   `sell_price`        bigint(20) NOT NULL default '0',
   `import_price`      bigint(20) NOT NULL default '0',
   `brand`             varchar(80) NOT NULL default '',
-  `catID`             bigint(20) NOT NULL default '0',
+  `categoryId`        bigint(20) NOT NULL default '0',
   `createdAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`PID`),
@@ -91,12 +91,13 @@ CREATE TABLE `Bill` (
 
 DROP TABLE IF EXISTS Discount;
 CREATE TABLE `Discount` (
-  `Discount_ID`             bigint(20) NOT NULL auto_increment,
-  `rate`                    int(5),
-  `title`                   varchar(80),
+  `DiscountID`              bigint(20) NOT NULL auto_increment,
+  `discount_code`           varchar(10) NOT NULL,
+  `rate`                    int(5) NOT NULL,
+  `title`                   varchar(80) NOT NULL,
   `description`             text,
-  `start_date`              DATETIME ,
-  `end_date`                DATETIME ,
+  `start_date`              DATETIME NOT NULL,
+  `end_date`                DATETIME NOT NULL,
   `createdAt`               DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`               DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`Discount_ID`)

@@ -18,18 +18,22 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.bill = require("./bill.model.js")(sequelize, Sequelize);
-db.category = require("./category.model.js")(sequelize, Sequelize);
-db.export = require("./export.model.js")(sequelize, Sequelize);
-db.import = require("./import.model.js")(sequelize, Sequelize);
 db.manager = require("./manager.model.js")(sequelize, Sequelize);
-db.product = require("./product.model.js")(sequelize, Sequelize);
 db.shelf = require("./shelf.model.js")(sequelize, Sequelize);
+db.category = require("./category.model.js")(sequelize, Sequelize);
+db.product = require("./product.model.js")(sequelize, Sequelize);
+db.bill = require("./bill.model.js")(sequelize, Sequelize);
+db.discount = require("./discount.model")(sequelize, Sequelize);
 db.supplier = require("./supplier.model.js")(sequelize, Sequelize);
+db.import = require("./import.model.js")(sequelize, Sequelize);
+db.export = require("./export.model.js")(sequelize, Sequelize);
 db.lot = require("./lot.model.js")(sequelize, Sequelize);
 db.log = require("./log.model.js")(sequelize, Sequelize);
 
-db.category.hasMany(db.product, { as: "products" });
-db.product.belongsTo(db.category, { foreignKey: "catID", as: "category" });
+db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
+db.product.belongsTo(db.category, {
+  foreignKey: "categoryId",
+  as: "category",
+});
 
 module.exports = db;

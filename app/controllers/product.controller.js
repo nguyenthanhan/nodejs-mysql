@@ -52,8 +52,9 @@ exports.create = async (req, res, next) => {
     sell_price: req.body.sell_price,
     import_price: req.body.import_price,
     brand: req.body.brand,
-    catID: req.body.catID,
-    CategoryCID: req.body.CategoryCID,
+    categoryId: req.body.categoryId,
+    otherDetail: req.body.otherDetail,
+    description: req.body.description,
   };
 
   // Save product in the database
@@ -106,6 +107,7 @@ exports.findAll = async (req, res, next) => {
     where: condition,
     raw: true,
     order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
+    include: ["category"],
   })
     .then((data) => {
       const message = data.length === 0 ? "Không có sản phẩm nào" : "";

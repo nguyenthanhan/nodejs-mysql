@@ -26,16 +26,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM("full", "available"),
         defaultValue: "available",
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        updatedAt: Sequelize.NOW,
-      },
     },
     {
       timestamps: true,

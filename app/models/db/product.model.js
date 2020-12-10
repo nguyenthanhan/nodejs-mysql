@@ -15,12 +15,12 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: "",
       },
       description: {
-        type: Sequelize.STRING(80),
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: "",
       },
       otherDetail: {
-        type: Sequelize.STRING(80),
+        type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: "",
       },
@@ -84,21 +84,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "",
       },
-      catID: {
-        type: Sequelize.BIGINT(20),
-        allowNull: false,
-        defaultValue: 0,
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        updatedAt: Sequelize.NOW,
-      },
     },
     {
       timestamps: true,
@@ -109,7 +94,6 @@ module.exports = (sequelize, Sequelize) => {
       // paranoid: true,
 
       freezeTableName: true,
-
       // tableName: "my_very_custom_table_name",
     }
   );

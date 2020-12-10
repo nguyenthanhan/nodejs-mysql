@@ -24,6 +24,9 @@ exports.create = async (req, res, next) => {
       "category"
     );
   }
+  const message = convertImageResult.url
+    ? ""
+    : "Không tạo được url cho hình ảnh";
 
   // Create a Category
   const category = {
@@ -34,7 +37,7 @@ exports.create = async (req, res, next) => {
   // Save category in the database
   Category.create(category)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData({}, message));
     })
     .catch((err) => {
       next({
@@ -53,7 +56,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Category.findAll({ where: condition, include: ["products"] })
+  Category.findAll({ where: condition })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -73,7 +76,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Category.findByPk(id)
+  Category.findByPk(id, { include: ["products"] })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

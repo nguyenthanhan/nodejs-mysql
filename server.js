@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const multer = require("multer");
 const common = require("./app/utils/common");
 const lang = require("./app/lang/index");
 const cluster = require("cluster");
@@ -9,6 +10,7 @@ const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
 const PORT = process.env.PORT || 5000;
 // const axios = require('axios');
+const resetDB = false;
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
@@ -46,10 +48,11 @@ if (!isDev && cluster.isMaster) {
   // parse requests of content-type - application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: true }));
 
+  app.use(multer().array());
+
   const db = require("./app/models/db");
 
-  //TODO
-  if (process.env.ENV === "dev") {
+  if (process.env.ENV === "dev" && resetDB) {
     // drop the table if it already exists
     db.sequelize.sync({ force: true }).then(() => {
       db.manager.create({
@@ -83,6 +86,7 @@ if (!isDev && cluster.isMaster) {
   // Answer API requests.
   require("./app/routes/auth.routes")(app);
   require("./app/routes/manager.routes")(app);
+  require("./app/routes/discount.routes")(app);
   require("./app/routes/products.routes")(app);
   require("./app/routes/category.routes")(app);
   require("./app/routes/shelf.routes")(app);
