@@ -41,7 +41,7 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all shelves from the database.
 exports.findAll = async (req, res, next) => {
-  const name = req.query.name;
+  const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Category.findAll({ where: condition })
@@ -98,7 +98,9 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(
+          common.returnAPIData({}, "Cập nhật phân loại hàng thành công")
+        );
       } else {
         next({
           status: 400,

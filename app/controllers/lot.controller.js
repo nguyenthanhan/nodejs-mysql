@@ -48,10 +48,8 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all lots from the database.
 exports.findAll = async (req, res, next) => {
-  const cus_name = req.query.cus_name;
-  let condition = cus_name
-    ? { cus_name: { [Op.like]: `%${cus_name}%` } }
-    : null;
+  const name = req.query.nameKeyword;
+  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Lot.findAll({ where: condition })
     .then((data) => {
@@ -107,7 +105,7 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(common.returnAPIData({}, "Cập nhật hoá đơn thành công"));
       } else {
         next({
           status: 400,

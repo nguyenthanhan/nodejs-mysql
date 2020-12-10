@@ -100,7 +100,7 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(common.returnAPIData({}, "Cập nhật kệ hàng thành công"));
       } else {
         next({
           status: 400,

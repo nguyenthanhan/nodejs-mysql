@@ -41,6 +41,7 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all exports from the database.
 exports.findAll = async (req, res, next) => {
+  //TODO: need find by other exp: accountName, not id
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
@@ -98,7 +99,9 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(
+          common.returnAPIData({}, "Cập nhật thông tin xuất hàng thành công")
+        );
       } else {
         next({
           status: 400,

@@ -3,10 +3,10 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
-const { raw } = require("body-parser");
+const _ = require("lodash");
 const Product = db.products;
 const Op = db.Sequelize.Op;
-
+const moment = require("moment");
 // Create and Save a new product
 exports.create = async (req, res, next) => {
   // Validate request
@@ -71,10 +71,29 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all products from the database.
 exports.findAll = async (req, res, next) => {
+  //pagination
   const limit = parseInt(req.query.per_page) || 10;
   const offset = (parseInt(req.query.page) - 1) * limit || 0;
 
-  const name = req.query.name;
+  //sort by createdAt
+  const sortByCreatedAt = common.checkValidSortString(req.query.sortByCreatedAt)
+    ? ["createdAt", req.query.sortByCreatedAt]
+    : null;
+
+  //sort by updatedAt
+  const sortByUpdatedAt = common.checkValidSortString(req.query.sortByUpdatedAt)
+    ? ["updatedAt", req.query.sortByUpdatedAt]
+    : null;
+
+  const defaultSort =
+    sortByCreatedAt || sortByUpdatedAt ? null : ["name", "ASC"];
+  //sort name product
+  const sortName = common.checkValidSortString(req.query.sortName)
+    ? ["name", req.query.sortName]
+    : defaultSort;
+
+  //search name products
+  const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Product.findAll({
@@ -82,10 +101,12 @@ exports.findAll = async (req, res, next) => {
     offset,
     where: condition,
     raw: true,
+    order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
   })
     .then((data) => {
+      const message = data.length === 0 ? "Không có sản phẩm nào" : "";
       res.send(
-        common.returnAPIData(data, "", {
+        common.returnAPIData(data, message, {
           page: parseInt(req.query.page),
           per_page: parseInt(req.query.per_page),
         })
@@ -148,7 +169,7 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(common.returnAPIData({}, "Cập nhật sản phẩm thành công"));
       } else {
         next({
           status: 400,

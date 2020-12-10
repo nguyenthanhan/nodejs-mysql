@@ -48,6 +48,13 @@ const returnMessage = (method, name, id) => {
   }
 };
 
+const checkValidSortString = (string) => {
+  if (string === "DESC" || string === "ASC") {
+    return true;
+  }
+  return false;
+};
+
 const randomString = (l) => {
   let s = "";
   let randomChar = function () {
@@ -71,4 +78,5 @@ module.exports = {
   randomString,
   createImageName,
   returnCustomError,
+  checkValidSortString,
 };

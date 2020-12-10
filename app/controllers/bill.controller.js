@@ -39,7 +39,7 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all bills from the database.
 exports.findAll = async (req, res, next) => {
-  const cus_name = req.query.cus_name;
+  const cus_name = req.query.cusNameKeyword;
   let condition = cus_name
     ? { cus_name: { [Op.like]: `%${cus_name}%` } }
     : null;

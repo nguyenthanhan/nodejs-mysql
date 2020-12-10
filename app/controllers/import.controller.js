@@ -43,6 +43,7 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all imports from the database.
 exports.findAll = async (req, res, next) => {
+  //TODO: need find by other exp: accountName, not id
   const mngID = req.query.mngID;
   let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
@@ -92,19 +93,13 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        if (data) {
-          res.send(common.returnAPIData(data));
-        } else {
-          next({
-            status: 400,
-            message: "Không tìm thấy thông tin nhập hàng",
-          });
-          return;
-        }
+        res.send(
+          common.returnAPIData({}, "Cập nhật thông tin nhập hàng thành công")
+        );
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật thông tin nhập hàng với id này. thông tin nhập hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật thông tin nhập hàng với id này. Thông tin nhập hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }

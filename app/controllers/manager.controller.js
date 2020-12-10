@@ -132,8 +132,26 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all managers from the database.
 exports.findAll = async (req, res, next) => {
-  const accountName = req.query.accountName;
-  let condition = accountName
+  console.log("req.quer", req.query);
+  //sort by createdAt
+  const sortByCreatedAt = common.checkValidSortString(req.query.sortByCreatedAt)
+    ? ["createdAt", req.query.sortByCreatedAt]
+    : null;
+
+  //sort by updatedAt
+  const sortByUpdatedAt = common.checkValidSortString(req.query.sortByUpdatedAt)
+    ? ["updatedAt", req.query.sortByUpdatedAt]
+    : null;
+
+  const defaultSort =
+    sortByCreatedAt || sortByUpdatedAt ? null : ["accountName", "ASC"];
+  //sort name product
+  const sortName = common.checkValidSortString(req.query.sortName)
+    ? ["accountName", req.query.sortName]
+    : defaultSort;
+
+  const accountName = req.query.accountKeyword;
+  const condition = accountName
     ? { accountName: { [Op.like]: `%${accountName}%` } }
     : null;
 
@@ -141,6 +159,7 @@ exports.findAll = async (req, res, next) => {
     where: condition,
     attributes: { exclude: ["password"] },
     raw: true,
+    order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
   })
     .then((data) => {
       res.send(common.returnAPIData(data));
@@ -286,7 +305,12 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(
+          common.returnAPIData(
+            {},
+            "Cập nhật thông tin người quản lí thành công"
+          )
+        );
       } else {
         next({
           status: 400,
