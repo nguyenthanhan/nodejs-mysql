@@ -48,18 +48,23 @@ if (!isDev && cluster.isMaster) {
 
   const db = require("./app/models/db");
 
-  db.sequelize.sync();
-  // // drop the table if it already exists
-  // db.sequelize.sync({ force: true }).then(() => {
-  //   db.manager.create({
-  //     FName: "Admin",
-  //     LName: "",
-  //     accountName: "admin",
-  //     password: "$2b$10$/vEpr7cQewqynPD38Om1yuvQflO5AfVNdIiRpqCSIVNxPfd/vogiG",
-  //     Address: "102 Xóm Chiếu",
-  //     managerType: "prime",
-  //   });
-  // });
+  //TODO
+  if (process.env.ENV === "dev") {
+    // drop the table if it already exists
+    db.sequelize.sync({ force: true }).then(() => {
+      db.manager.create({
+        FName: "Admin",
+        LName: "",
+        accountName: "admin",
+        password:
+          "$2b$10$/vEpr7cQewqynPD38Om1yuvQflO5AfVNdIiRpqCSIVNxPfd/vogiG",
+        Address: "102 Xóm Chiếu",
+        managerType: "prime",
+      });
+    });
+  } else {
+    db.sequelize.sync();
+  }
 
   // index
   app.get("/", (req, res, next) => {
