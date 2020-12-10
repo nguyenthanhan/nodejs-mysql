@@ -6,21 +6,30 @@ module.exports = (sequelize, Sequelize) => {
       MngID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       FName: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       LName: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       accountName: {
         type: Sequelize.STRING(80),
+        allowNull: false,
       },
       password: {
         type: Sequelize.TEXT,
+        allowNull: false,
       },
       Address: {
         type: Sequelize.STRING(80),
+        defaultValue: "",
       },
       BDay: {
         type: Sequelize.DATE,
@@ -40,13 +49,16 @@ module.exports = (sequelize, Sequelize) => {
       },
       date_start_working: {
         type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
       },
       managerType: {
         type: Sequelize.ENUM("normal", "prime"),
         defaultValue: "normal",
       },
       telephoneNumber: {
-        type: Sequelize.INTEGER(10),
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        defaultValue: "",
       },
       createdAt: {
         type: Sequelize.DATE,

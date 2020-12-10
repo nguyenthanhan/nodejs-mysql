@@ -6,54 +6,88 @@ module.exports = (sequelize, Sequelize) => {
       PID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       description: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       otherDetail: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       barcode: {
         type: Sequelize.STRING(40),
+        allowNull: false,
+        defaultValue: "",
       },
       img_url: {
         type: Sequelize.TEXT,
+        allowNull: false,
+        defaultValue: "",
       },
       W_curr_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       W_max_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       W_min_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       S_curr_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       S_max_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       S_min_qtt: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       qtt_per_unit: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
       },
       sell_price: {
         type: Sequelize.BIGINT(20),
+        allowNull: false,
+        defaultValue: 0,
       },
       import_price: {
         type: Sequelize.BIGINT(20),
+        allowNull: false,
+        defaultValue: 0,
       },
       brand: {
         type: Sequelize.STRING(80),
+        allowNull: false,
+        defaultValue: "",
       },
       catID: {
         type: Sequelize.BIGINT(20),
+        allowNull: false,
+        defaultValue: 0,
       },
       createdAt: {
         type: Sequelize.DATE,

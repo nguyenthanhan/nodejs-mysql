@@ -6,6 +6,8 @@ module.exports = (sequelize, Sequelize) => {
       BID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       cus_name: {
         type: Sequelize.STRING(80),

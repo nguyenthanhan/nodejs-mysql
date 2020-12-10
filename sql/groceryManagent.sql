@@ -10,9 +10,9 @@ CREATE TABLE `Manager` (
   `LName`                     varchar(80) NOT NULL default '',
   `accountName`               varchar(80) NOT NULL default '',
   `password`                  varchar(80) NOT NULL ,
-  `telephoneNumber`           int(10),
+  `telephoneNumber`           varchar(20),
   `Address`                   varchar(80) NOT NULL default '',
-  `BDay`                      DATETIME NOT NULL ,
+  `BDay`                      DATETIME,
   `gender`                    enum('male', 'female', 'other') default 'male',
   `email`                     varchar(80) default '',
   `salary`                    bigint(20),
@@ -30,7 +30,8 @@ DROP TABLE IF EXISTS Shelf;
 CREATE TABLE `Shelf` (
   `ShID`          bigint(20) NOT NULL auto_increment,
   `name`          varchar(80) NOT NULL default '',
-  `type`          enum('ware_house', 'store') default 'store',
+  `type`          enum('small', 'medium', 'large') default 'small',
+  `location`      enum('ware_house', 'store') default 'store',
   `state`         enum('full', 'available') NOT NULL default 'available',
   `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
@@ -45,7 +46,7 @@ CREATE TABLE `Category` (
   `img_url`             text NOT NULL,
   `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`CID`),
+  PRIMARY KEY  (`CID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
@@ -109,7 +110,7 @@ CREATE TABLE `Supplier` (
   `Address`           varchar(80) NOT NULL default '',
   `Tax_ID`            int(20) NOT NULL default '0',
   `Email`             varchar(40) NOT NULL default '',
-  `telephoneNumber`   int(10),
+  `telephoneNumber`   varchar(20),
   `createdAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`SupID`)

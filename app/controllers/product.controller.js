@@ -53,6 +53,7 @@ exports.create = async (req, res, next) => {
     import_price: req.body.import_price,
     brand: req.body.brand,
     catID: req.body.catID,
+    CategoryCID: req.body.CategoryCID,
   };
 
   // Save product in the database

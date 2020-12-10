@@ -6,12 +6,16 @@ module.exports = (sequelize, Sequelize) => {
       CID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(80),
+        allowNull: false,
       },
       img_url: {
         type: Sequelize.TEXT,
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -1,4 +1,5 @@
 "use strict";
+const cloudinary = require("../models/cloudinary.model");
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
@@ -52,7 +53,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Category.findAll({ where: condition })
+  Category.findAll({ where: condition, include: ["products"] })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })

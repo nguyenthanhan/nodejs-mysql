@@ -74,7 +74,7 @@ exports.create = async (req, res, next) => {
       accountName: req.body.accountName,
       password: hashPassword,
       Address: req.body.Address,
-      telephoneNumber: req.body.telephoneNumber,
+      telephoneNumber: req.body.telephoneNumber ? req.body.telephoneNumber : "",
       BDay: req.body.BDay ? moment(req.body.BDay) : "",
       gender: req.body.gender,
       email: req.body.email,

@@ -6,15 +6,19 @@ module.exports = (sequelize, Sequelize) => {
       ImID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       mngID: {
         type: Sequelize.BIGINT(20),
+        allowNull: false,
       },
       total: {
         type: Sequelize.BIGINT(20),
       },
       date: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.NOW,
       },
       state: {

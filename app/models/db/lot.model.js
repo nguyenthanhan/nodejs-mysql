@@ -6,16 +6,21 @@ module.exports = (sequelize, Sequelize) => {
       proID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING(80),
-        primaryKey: true,
+        allowNull: false,
+        defaultValue: "",
       },
       quantity: {
         type: Sequelize.STRING(80),
+        allowNull: false,
       },
       Exp: {
         type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
