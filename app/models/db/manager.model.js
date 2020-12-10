@@ -45,14 +45,8 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM("normal", "prime"),
         defaultValue: "normal",
       },
-      creatorID: {
-        type: Sequelize.BIGINT(20),
-      },
-      deleterID: {
-        type: Sequelize.BIGINT(20),
-      },
-      deletedDay: {
-        type: Sequelize.DATE,
+      telephoneNumber: {
+        type: Sequelize.INTEGER(10),
       },
       createdAt: {
         type: Sequelize.DATE,

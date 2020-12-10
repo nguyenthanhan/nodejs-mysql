@@ -40,6 +40,9 @@ module.exports = (sequelize, Sequelize) => {
       S_min_qtt: {
         type: Sequelize.INTEGER,
       },
+      qtt_per_unit: {
+        type: Sequelize.INTEGER,
+      },
       sell_price: {
         type: Sequelize.BIGINT(20),
       },
@@ -50,9 +53,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(80),
       },
       catID: {
-        type: Sequelize.BIGINT(20),
-      },
-      shID: {
         type: Sequelize.BIGINT(20),
       },
       createdAt: {

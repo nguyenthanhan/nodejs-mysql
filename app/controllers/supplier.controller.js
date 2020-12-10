@@ -8,12 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new supplier
 exports.create = async (req, res, next) => {
   // Validate request
-  if (
-    !req.body.name ||
-    !req.body.Address ||
-    !req.body.Tax_ID ||
-    !req.body.Email
-  ) {
+  if (!req.body.name || !req.body.Address || !req.body.telephoneNumber) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -27,6 +22,7 @@ exports.create = async (req, res, next) => {
     Address: req.body.Address,
     Tax_ID: req.body.Tax_ID,
     Email: req.body.Email,
+    telephoneNumber: req.body.telephoneNumber,
   };
 
   // Save supplier in the database

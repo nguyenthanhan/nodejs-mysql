@@ -2,7 +2,6 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const Logs = db.log;
-// const Manager = db.manager;
 // const Op = db.Sequelize.Op;
 
 // Retrieve all logs from the database.
@@ -54,12 +53,19 @@ exports.getAll = async (req, res, next) => {
     });
 };
 
-exports.log = async (userID, action, tableOfAction, idOfAffectedObject) => {
+exports.log = async ({
+  MngID,
+  action,
+  tableOfAction,
+  affectedRowID,
+  nameInRow,
+}) => {
   const createLogs = {
-    MngID: userID,
+    MngID,
     action,
     tableOfAction,
-    idOfAffectedObject,
+    nameInRow,
+    affectedRowID,
   };
   Logs.create(createLogs).catch((err) => console.log("Write log fail: ", err));
 };

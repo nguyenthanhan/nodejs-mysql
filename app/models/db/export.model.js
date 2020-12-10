@@ -10,6 +10,12 @@ module.exports = (sequelize, Sequelize) => {
       mngID: {
         type: Sequelize.BIGINT(20),
       },
+      state: {
+        type: Sequelize.ENUM("ready", "executed", "close"),
+      },
+      urgent_level: {
+        type: Sequelize.ENUM("normal", "prior"),
+      },
       date: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,

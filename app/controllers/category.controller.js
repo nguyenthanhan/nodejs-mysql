@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new Category
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.name || !req.body.shelfID) {
+  if (!req.body.name) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -16,10 +16,18 @@ exports.create = async (req, res, next) => {
     return;
   }
 
+  let convertImageResult = {};
+  if (req.file) {
+    convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "category"
+    );
+  }
+
   // Create a Category
   const category = {
     name: req.body.name,
-    shelfID: req.body.shelfID,
+    img_url: convertImageResult.url ? convertImageResult.url : "",
   };
 
   // Save category in the database
@@ -91,7 +99,17 @@ exports.findOne = async (req, res, next) => {
 // Update a category by the id in the request
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  const newBody = { ...req.body, updatedAt: new Date() };
+  let body = { ...req.body, updatedAt: new Date() };
+
+  if (req.file) {
+    const convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "category"
+    );
+    if (convertImageResult.url) {
+      body = { ...body, img_url: convertImageResult.url };
+    }
+  }
 
   Category.update(newBody, {
     where: { CID: id },

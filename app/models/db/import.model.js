@@ -20,6 +20,15 @@ module.exports = (sequelize, Sequelize) => {
       state: {
         type: Sequelize.ENUM("ready", "executed", "close"),
       },
+      urgent_level: {
+        type: Sequelize.ENUM("normal", "prior"),
+      },
+      checkerID: {
+        type: Sequelize.BIGINT(20),
+      },
+      bonus: {
+        type: Sequelize.TEXT,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

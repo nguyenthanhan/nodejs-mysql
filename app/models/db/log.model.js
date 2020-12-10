@@ -11,22 +11,25 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT(20),
       },
       action: {
-        type: Sequelize.ENUM("add", "edit", "delete"),
+        type: Sequelize.ENUM("Thêm", "Sửa", "Xoá"),
       },
       tableOfAction: {
         type: Sequelize.ENUM(
-          "bill",
-          "category",
-          "export",
-          "import",
-          "lot",
-          "manager",
-          "product",
-          "shelf",
-          "supplier"
+          "Hoá đơn",
+          "Loại hàng",
+          "Xuất hàng",
+          "Nhập hàng",
+          "Lô hàng",
+          "Quản lý",
+          "Sản phẩm",
+          "Kệ hàng",
+          "Nhà cung cấp"
         ),
       },
-      idOfAffectedObject: {
+      nameInRow: {
+        type: Sequelize.STRING(80),
+      },
+      affectedRowID: {
         type: Sequelize.BIGINT(20),
       },
       createdAt: {

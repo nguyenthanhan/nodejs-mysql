@@ -10,8 +10,8 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING(80),
       },
-      shelfID: {
-        type: Sequelize.BIGINT(20),
+      img_url: {
+        type: Sequelize.TEXT,
       },
       createdAt: {
         type: Sequelize.DATE,

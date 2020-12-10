@@ -4,9 +4,9 @@ const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
-const Product = db.products;
+const Product = db.product;
 const Op = db.Sequelize.Op;
-const moment = require("moment");
+
 // Create and Save a new product
 exports.create = async (req, res, next) => {
   // Validate request
@@ -18,6 +18,7 @@ exports.create = async (req, res, next) => {
     !req.body.S_curr_qtt ||
     !req.body.S_max_qtt ||
     !req.body.S_min_qtt ||
+    !req.body.qtt_per_unit ||
     !req.body.sell_price ||
     !req.body.import_price ||
     !req.body.brand
@@ -31,7 +32,10 @@ exports.create = async (req, res, next) => {
 
   let convertImageResult = {};
   if (req.file) {
-    convertImageResult = await cloudinary.uploadSingle(req.file.path);
+    convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "product"
+    );
   }
 
   // Create a product
@@ -49,7 +53,6 @@ exports.create = async (req, res, next) => {
     import_price: req.body.import_price,
     brand: req.body.brand,
     catID: req.body.catID,
-    shID: req.body.shID,
   };
 
   // Save product in the database
@@ -158,7 +161,10 @@ exports.update = async (req, res, next) => {
   let body = { ...req.body, updatedAt: new Date() };
 
   if (req.file) {
-    const convertImageResult = await cloudinary.uploadSingle(req.file.path);
+    const convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "product"
+    );
     if (convertImageResult.url) {
       body = { ...body, img_url: convertImageResult.url };
     }

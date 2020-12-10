@@ -1,6 +1,5 @@
-const uploadMulter = require("../models/multer.model");
-
 module.exports = (app) => {
+  const uploadMulter = require("../models/multer.model");
   const products = require("../controllers/product.controller.js");
   const { authJwt } = require("../middleware/");
 

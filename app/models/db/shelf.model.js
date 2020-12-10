@@ -11,13 +11,16 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(80),
       },
       type: {
-        type: Sequelize.ENUM("ware_house", "store"),
+        type: Sequelize.ENUM("small", "medium", "large"),
+        defaultValue: "small",
       },
-      capacity: {
-        type: Sequelize.BIGINT(20),
+      location: {
+        type: Sequelize.ENUM("wareHouse", "store"),
+        defaultValue: "wareHouse",
       },
       state: {
         type: Sequelize.ENUM("full", "available"),
+        defaultValue: "available",
       },
       createdAt: {
         type: Sequelize.DATE,

@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new import
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.mngID || !req.body.date || !req.body.state) {
+  if (!req.body.mngID || !req.body.total) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -17,15 +17,18 @@ exports.create = async (req, res, next) => {
   }
 
   // Create a import
-  const _import = {
+  const newImport = {
     mngID: req.body.mngID,
-    date: req.body.date,
+    date: req.body.date ? moment(req.body.date) : new Date(),
     total: req.body.total,
-    state: req.body.state,
+    state: req.body.state ? req.body.state : "ready",
+    urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
+    checkerID: req.body.checkerID,
+    bonus: req.body.bonus,
   };
 
   // Save import in the database
-  Import.create(_import)
+  Import.create(newImport)
     .then((data) => {
       res.send(common.returnAPIData({}, ""));
     })

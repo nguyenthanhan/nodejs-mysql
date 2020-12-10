@@ -16,6 +16,9 @@ module.exports = (sequelize, Sequelize) => {
       Tax_ID: {
         type: Sequelize.INTEGER(20),
       },
+      telephoneNumber: {
+        type: Sequelize.INTEGER(10),
+      },
       Email: {
         type: Sequelize.STRING(40),
       },

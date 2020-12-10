@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new Shelf
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.name || !req.body.capacity || !req.body.state) {
+  if (!req.body.name) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -19,9 +19,9 @@ exports.create = async (req, res, next) => {
   // Create a shelf
   const shelf = {
     name: req.body.name,
-    type: req.body.type ? req.body.type : "store",
-    capacity: req.body.capacity,
-    state: req.body.state,
+    type: req.body.type ? req.body.type : "small",
+    type: req.body.state ? req.body.state : "available",
+    type: req.body.location ? req.body.location : "wareHouse",
   };
 
   // Save shelf in the database

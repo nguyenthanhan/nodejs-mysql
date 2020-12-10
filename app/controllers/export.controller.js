@@ -8,7 +8,7 @@ const Op = db.Sequelize.Op;
 // Create and Save a new export
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.mngID || !req.body.date) {
+  if (!req.body.mngID) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -19,7 +19,9 @@ exports.create = async (req, res, next) => {
   // Create a export
   const _export = {
     mngID: req.body.mngID,
-    date: req.body.date,
+    date: req.body.date ? moment(req.body.date) : new Date(),
+    state: req.body.state ? req.body.state : "ready",
+    urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
   };
 
   // Save export in the database

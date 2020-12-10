@@ -74,15 +74,15 @@ exports.create = async (req, res, next) => {
       accountName: req.body.accountName,
       password: hashPassword,
       Address: req.body.Address,
-      BDay: moment(req.body.BDay),
+      telephoneNumber: req.body.telephoneNumber,
+      BDay: req.body.BDay ? moment(req.body.BDay) : "",
       gender: req.body.gender,
       email: req.body.email,
       salary: req.body.salary,
-      // avt_url: req.body.avt_url,
-      date_start_working: moment(req.body.BDay),
-      createdDay: moment(req.body.BDay),
+      date_start_working: req.body.date_start_working
+        ? moment(req.body.date_start_working)
+        : "",
       managerType: req.body.managerType,
-      creatorID: req.body.creatorID,
     };
 
     // Save manager in the database
@@ -132,7 +132,6 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all managers from the database.
 exports.findAll = async (req, res, next) => {
-  console.log("req.quer", req.query);
   //sort by createdAt
   const sortByCreatedAt = common.checkValidSortString(req.query.sortByCreatedAt)
     ? ["createdAt", req.query.sortByCreatedAt]
@@ -298,6 +297,7 @@ exports.update = async (req, res, next) => {
   const newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : "",
+    updatedAt: new Date(),
   };
 
   Manager.update(newBody, {
