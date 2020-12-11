@@ -53,6 +53,7 @@ exports.create = async (req, res, next) => {
     import_price: req.body.import_price,
     brand: req.body.brand,
     categoryId: req.body.categoryId,
+    lotId: req.body.lotId,
     otherDetail: req.body.otherDetail,
     description: req.body.description,
   };
@@ -60,7 +61,7 @@ exports.create = async (req, res, next) => {
   // Save product in the database
   Product.create(product)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData({}, "Tạo sản phẩm thành công"));
     })
     .catch((err) => {
       next({
@@ -105,9 +106,9 @@ exports.findAll = async (req, res, next) => {
     limit,
     offset,
     where: condition,
-    raw: true,
+    // raw: true,
     order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
-    include: ["category"],
+    include: ["category", "lots"],
   })
     .then((data) => {
       const message = data.length === 0 ? "Không có sản phẩm nào" : "";

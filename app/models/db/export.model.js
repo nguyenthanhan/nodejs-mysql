@@ -9,10 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      mngID: {
-        type: Sequelize.BIGINT(20),
-        allowNull: false,
-      },
       state: {
         type: Sequelize.ENUM("ready", "executed", "close"),
       },

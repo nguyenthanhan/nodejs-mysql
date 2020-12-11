@@ -22,9 +22,10 @@ module.exports = (sequelize, Sequelize) => {
       accountName: {
         type: Sequelize.STRING(80),
         allowNull: false,
+        unique: true,
       },
       password: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING(64),
         allowNull: false,
       },
       Address: {
@@ -43,6 +44,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       email: {
         type: Sequelize.STRING(80),
+        validate: { isEmail: true },
       },
       avt_url: {
         type: Sequelize.TEXT,

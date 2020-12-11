@@ -30,10 +30,54 @@ db.export = require("./export.model.js")(sequelize, Sequelize);
 db.lot = require("./lot.model.js")(sequelize, Sequelize);
 db.log = require("./log.model.js")(sequelize, Sequelize);
 
+//Associations
+//one to one
+db.import.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
+
+//one to many
+db.lot.hasMany(db.product, { foreignKey: "lotId", as: "product" });
+db.product.belongsTo(db.lot, { foreignKey: "lotId", as: "lots" });
+
 db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
 db.product.belongsTo(db.category, {
   foreignKey: "categoryId",
   as: "category",
+});
+
+// db.manager.hasMany(db.bill, {
+//   foreignKey: "MngID",
+//   as: "bills",
+// });
+db.bill.belongsTo(db.manager, {
+  foreignKey: "MngID",
+  as: "manager",
+});
+
+// db.manager.hasMany(db.import, {
+//   foreignKey: "mngID",
+//   as: "imports",
+// });
+db.import.belongsTo(db.manager, {
+  foreignKey: "mngID",
+  as: "manager",
+});
+
+// db.manager.hasMany(db.export, {
+//   foreignKey: "mngID",
+//   as: "exports",
+// });
+db.export.belongsTo(db.manager, {
+  foreignKey: "mngID",
+  as: "manager",
+});
+
+//many to many
+// db.import.belongsToMany(db.product, { through: "ImportProduct" });
+// db.product.belongsToMany(db.import, { through: "ImportProduct" });
+//hook
+db.lot.afterUpdate(async (lot, options) => {
+  console.log("update lot");
+  //check quantity ==0 delete
 });
 
 module.exports = db;

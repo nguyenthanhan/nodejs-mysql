@@ -1,6 +1,7 @@
 module.exports = (app) => {
   const lots = require("../controllers/lot.controller.js");
   const { authJwt } = require("../middleware/");
+  const multer = require("multer");
 
   let router = require("express").Router();
 
@@ -11,6 +12,8 @@ module.exports = (app) => {
     );
     next();
   });
+
+  app.use(multer().array());
 
   router.post("/", [authJwt.verifyToken], lots.create);
 

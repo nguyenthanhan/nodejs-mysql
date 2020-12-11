@@ -6,6 +6,8 @@ module.exports = (sequelize, Sequelize) => {
       id: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
       },
       MngID: {
         type: Sequelize.BIGINT(20),

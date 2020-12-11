@@ -7,8 +7,6 @@ const moment = require("moment");
 
 // Create and Save a new Discount
 exports.create = async (req, res, next) => {
-  console.log(req.body);
-
   // Validate request
   if (
     !req.body.rate ||
@@ -24,6 +22,14 @@ exports.create = async (req, res, next) => {
     return;
   }
 
+  if (parseInt(req.body.rate) > 0 && parseInt(req.body.rate) <= 100) {
+    next({
+      status: 400,
+      message: "NHập sai phần trăm giảm giá",
+    });
+    return;
+  }
+
   // Create a Discount
   const discount = {
     rate: req.body.rate,
@@ -33,10 +39,11 @@ exports.create = async (req, res, next) => {
     end_date: moment(req.body.end_date),
     discount_code: req.body.discountCode,
   };
+
   // Save discount in the database
   Discount.create(discount)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData({}, "Tạo mã giảm giá thành công"));
     })
     .catch((err) => {
       next({
@@ -48,4 +55,20 @@ exports.create = async (req, res, next) => {
       });
       return;
     });
+};
+
+exports.deleteExpiresDiscount = async (arrayIds) => {
+  try {
+    const discounts = await Discount.findAll();
+    console.log(discounts);
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: "delete",
+      name: "giảm giá",
+      id: 0,
+    });
+    return;
+  }
 };

@@ -8,6 +8,7 @@ const Op = db.Sequelize.Op;
 
 // Create and Save a new Category
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (!req.body.name) {
     next({

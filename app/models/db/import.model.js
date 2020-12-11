@@ -9,10 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      mngID: {
-        type: Sequelize.BIGINT(20),
-        allowNull: false,
-      },
       total: {
         type: Sequelize.BIGINT(20),
       },
@@ -26,9 +22,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       urgent_level: {
         type: Sequelize.ENUM("normal", "prior"),
-      },
-      checkerID: {
-        type: Sequelize.BIGINT(20),
       },
       bonus: {
         type: Sequelize.TEXT,

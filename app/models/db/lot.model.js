@@ -3,7 +3,7 @@ module.exports = (sequelize, Sequelize) => {
   const Lots = sequelize.define(
     "Lot",
     {
-      proID: {
+      lotID: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
         allowNull: false,
@@ -20,7 +20,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       Exp: {
         type: Sequelize.DATE,
-        allowNull: false,
       },
     },
     {

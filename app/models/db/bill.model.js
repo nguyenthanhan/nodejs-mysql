@@ -15,9 +15,6 @@ module.exports = (sequelize, Sequelize) => {
       total: {
         type: Sequelize.BIGINT(20),
       },
-      M_ID: {
-        type: Sequelize.BIGINT(20),
-      },
     },
     {
       timestamps: true,

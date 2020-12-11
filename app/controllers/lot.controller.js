@@ -7,13 +7,9 @@ const Op = db.Sequelize.Op;
 
 // Create and Save a new lot
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
-  if (
-    !req.body.proID ||
-    !req.body.name ||
-    !req.body.quantity ||
-    !req.body.Exp
-  ) {
+  if (!req.body.name || !req.body.quantity || !req.body.Exp) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -23,7 +19,6 @@ exports.create = async (req, res, next) => {
 
   // Create a lot
   const lot = {
-    proID: req.body.proID,
     name: req.body.name,
     quantity: req.body.quantity,
     Exp: req.body.Exp,
@@ -32,7 +27,7 @@ exports.create = async (req, res, next) => {
   // Save lot in the database
   Lot.create(lot)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData({}));
     })
     .catch((err) => {
       next({
@@ -51,7 +46,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Lot.findAll({ where: condition })
+  Lot.findAll({ where: condition, include: ["product"] })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })

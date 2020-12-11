@@ -3,12 +3,15 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const Import = db.import;
+const Manager = db.manager;
 const Op = db.Sequelize.Op;
+const moment = require("moment");
+const _ = require("lodash");
 
 // Create and Save a new import
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.mngID || !req.body.total) {
+  if (!req.body.total) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -18,13 +21,13 @@ exports.create = async (req, res, next) => {
 
   // Create a import
   const newImport = {
-    mngID: req.body.mngID,
     date: req.body.date ? moment(req.body.date) : new Date(),
     total: req.body.total,
     state: req.body.state ? req.body.state : "ready",
     urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
-    checkerID: req.body.checkerID,
+    checkerId: req.body.checkerId,
     bonus: req.body.bonus,
+    mngID: req.userId,
   };
 
   // Save import in the database
@@ -47,10 +50,24 @@ exports.create = async (req, res, next) => {
 // Retrieve all imports from the database.
 exports.findAll = async (req, res, next) => {
   //TODO: need find by other exp: accountName, not id
-  const mngID = req.query.mngID;
-  let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
+  // const mngID = req.query.mngID;
+  // let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
-  Import.findAll({ where: condition })
+  Import.findAll({
+    // where: condition,
+    include: [
+      {
+        model: Manager,
+        as: "checker",
+        attributes: ["accountName", "LName", "FName"],
+      },
+      {
+        model: Manager,
+        as: "manager",
+        attributes: ["accountName", "LName", "FName"],
+      },
+    ],
+  })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })

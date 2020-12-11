@@ -16,6 +16,7 @@ module.exports = (sequelize, Sequelize) => {
       rate: {
         type: Sequelize.INTEGER(5),
         allowNull: false,
+        validate: { min: 1, max: 100 },
       },
       description: {
         type: Sequelize.TEXT,

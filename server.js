@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const multer = require("multer");
 const common = require("./app/utils/common");
 const lang = require("./app/lang/index");
 const cluster = require("cluster");
@@ -47,8 +46,6 @@ if (!isDev && cluster.isMaster) {
 
   // parse requests of content-type - application/x-www-form-urlencoded
   app.use(bodyParser.urlencoded({ extended: true }));
-
-  app.use(multer().array());
 
   const db = require("./app/models/db");
 

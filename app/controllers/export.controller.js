@@ -3,22 +3,24 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const Export = db.export;
+const Manager = db.manager;
 const Op = db.Sequelize.Op;
+const moment = require("moment");
 
 // Create and Save a new export
 exports.create = async (req, res, next) => {
   // Validate request
-  if (!req.body.mngID) {
-    next({
-      status: 400,
-      message: lang.general.error._400,
-    });
-    return;
-  }
+  // if (!req.body.mngID) {
+  //   next({
+  //     status: 400,
+  //     message: lang.general.error._400,
+  //   });
+  //   return;
+  // }
 
   // Create a export
   const _export = {
-    mngID: req.body.mngID,
+    mngID: req.userId,
     date: req.body.date ? moment(req.body.date) : new Date(),
     state: req.body.state ? req.body.state : "ready",
     urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
@@ -44,10 +46,19 @@ exports.create = async (req, res, next) => {
 // Retrieve all exports from the database.
 exports.findAll = async (req, res, next) => {
   //TODO: need find by other exp: accountName, not id
-  const mngID = req.query.mngID;
-  let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
+  // const mngID = req.query.mngID;
+  // let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
-  Export.findAll({ where: condition })
+  Export.findAll({
+    // where: condition,
+    include: [
+      {
+        model: Manager,
+        as: "manager",
+        attributes: ["accountName", "LName", "FName"],
+      },
+    ],
+  })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

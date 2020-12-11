@@ -3,6 +3,7 @@ const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
 const Bill = db.bill;
+const Manager = db.manager;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new bill
@@ -17,13 +18,13 @@ exports.create = async (req, res, next) => {
   const bill = {
     cus_name: req.body.cus_name,
     total: req.body.total,
-    M_ID: req.userId,
+    MngID: req.userId,
   };
 
   // Save bill in the database
   Bill.create(bill)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData({}));
     })
     .catch((err) => {
       next({
@@ -44,7 +45,16 @@ exports.findAll = async (req, res, next) => {
     ? { cus_name: { [Op.like]: `%${cus_name}%` } }
     : null;
 
-  Bill.findAll({ where: condition })
+  Bill.findAll({
+    where: condition,
+    include: [
+      {
+        model: Manager,
+        as: "manager",
+        attributes: ["accountName", "FName", "LName"],
+      },
+    ],
+  })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
