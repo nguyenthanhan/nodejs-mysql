@@ -46,7 +46,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Lot.findAll({ where: condition, include: ["product"] })
+  Lot.findAll({ where: CSSConditionRule })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })

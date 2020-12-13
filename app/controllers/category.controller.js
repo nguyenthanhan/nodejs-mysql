@@ -3,14 +3,17 @@ const cloudinary = require("../models/cloudinary.model");
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Category = db.category;
+// const Category = db.category;
+// const Product = db.product;
+// const Shelf = db.shelf;
+const { category: Category, product: Product, shelf: Shelf } = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Category
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.name) {
+  if (!req.body.name && !req.body.shelfId) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -31,6 +34,7 @@ exports.create = async (req, res, next) => {
 
   // Create a Category
   const category = {
+    shelfId: req.body.shelfId,
     name: req.body.name,
     img_url: convertImageResult.url ? convertImageResult.url : "",
   };
@@ -57,7 +61,20 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Category.findAll({ where: condition })
+  Category.findAll({
+    where: condition,
+    include: [
+      // {
+      //   model: Product,
+      //   as: "products",
+      //   attributes: ["PID", "name"],
+      // },
+      {
+        model: Shelf,
+        as: "shelf",
+      },
+    ],
+  })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -77,7 +94,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Category.findByPk(id, { include: ["products"] })
+  Category.findByPk(id, { include: ["products", "shelf"] })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

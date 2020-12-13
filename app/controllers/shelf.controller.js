@@ -7,6 +7,7 @@ const Op = db.Sequelize.Op;
 
 // Create and Save a new Shelf
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (!req.body.name) {
     next({
@@ -20,8 +21,8 @@ exports.create = async (req, res, next) => {
   const shelf = {
     name: req.body.name,
     type: req.body.type ? req.body.type : "small",
-    type: req.body.state ? req.body.state : "available",
-    type: req.body.location ? req.body.location : "wareHouse",
+    state: req.body.state ? req.body.state : "available",
+    location: req.body.location ? req.body.location : "wareHouse",
   };
 
   // Save shelf in the database
@@ -46,7 +47,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Shelf.findAll({ where: condition })
+  Shelf.findAll({ where: condition, includes: ["categories"] })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -66,7 +67,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Shelf.findByPk(id)
+  Shelf.findByPk(id, { includes: ["categories"] })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

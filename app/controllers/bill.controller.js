@@ -2,12 +2,39 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Bill = db.bill;
-const Manager = db.manager;
+const { bill: Bill, manager: Manager, product: Product } = db;
 const Op = db.Sequelize.Op;
+const _ = require("lodash");
+
+const updateProductsInStore = async (sellProducts) => {
+  const oldProducts = await Product.findAll({
+    where: {
+      PID: {
+        [Op.or]: sellProducts.map((sellProduct) => sellProduct.PID),
+      },
+    },
+    raw: true,
+  });
+
+  oldProducts.map(async (oldProduct) => {
+    const foundSellProduct = sellProducts.filter(
+      (sellProduct) => sellProduct.PID === oldProduct.PID
+    );
+
+    if (sellProduct.length > 0) {
+      await Product.update(
+        { S_curr_qtt: oldProduct.S_curr_qtt - foundSellProduct[0].quantity },
+        {
+          where: { PID: oldProduct.PID },
+        }
+      );
+    }
+  });
+};
 
 // Create and Save a new bill
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (!req.body.cus_name || !req.body.total) {
     next({ status: 400, message: lang.general.error._400 });
@@ -24,7 +51,8 @@ exports.create = async (req, res, next) => {
   // Save bill in the database
   Bill.create(bill)
     .then((data) => {
-      res.send(common.returnAPIData({}));
+      res.send(common.returnAPIData({}, "Tạo thành công đơn hàng"));
+      updateProductsInStore(req.body.sellProducts);
     })
     .catch((err) => {
       next({

@@ -35,8 +35,14 @@ db.log = require("./log.model.js")(sequelize, Sequelize);
 db.import.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
 
 //one to many
-db.lot.hasMany(db.product, { foreignKey: "lotId", as: "product" });
-db.product.belongsTo(db.lot, { foreignKey: "lotId", as: "lots" });
+db.shelf.hasMany(db.category, { foreignKey: "shelfId", as: "categories" });
+db.category.belongsTo(db.shelf, {
+  foreignKey: "shelfId",
+  as: "shelf",
+});
+
+// db.lot.hasMany(db.product, { foreignKey: "lotId", as: "product" });
+// db.product.belongsTo(db.lot, { foreignKey: "lotId", as: "lots" });
 
 db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
 db.product.belongsTo(db.category, {
@@ -72,8 +78,37 @@ db.export.belongsTo(db.manager, {
 });
 
 //many to many
-// db.import.belongsToMany(db.product, { through: "ImportProduct" });
-// db.product.belongsToMany(db.import, { through: "ImportProduct" });
+const ProductOnBill = sequelize.define(
+  "ProductOnBill",
+  {
+    quantity: {
+      type: Sequelize.INTEGER(20),
+    },
+    // ProductId: {
+    //   type: Sequelize.BIGINT(20),
+    //   references: {
+    //     model: db.product,
+    //     key: "PID",
+    //   },
+    // },
+    // BillId: {
+    //   type: Sequelize.BIGINT(20),
+    //   references: {
+    //     model: db.bill,
+    //     key: "BID",
+    //   },
+    // },
+  },
+  {
+    timestamps: true,
+    updatedAt: false,
+    freezeTableName: true,
+  }
+);
+db.bill.belongsToMany(db.product, { through: ProductOnBill });
+db.product.belongsToMany(db.bill, { through: ProductOnBill });
+//-------
+
 //hook
 db.lot.afterUpdate(async (lot, options) => {
   console.log("update lot");

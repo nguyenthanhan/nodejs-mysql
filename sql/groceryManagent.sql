@@ -3,7 +3,7 @@
 -- CREATE DATABASE `depotManagementDB`;
 -- USE `depotManagementDB`;
 
-DROP TABLE IF EXISTS Manager;
+DROP TABLE IF EXISTS Manager; --done
 CREATE TABLE `Manager` (
   `MngID`                     bigint(20) NOT NULL auto_increment,
   `FName`                     varchar(80) NOT NULL default '',
@@ -26,7 +26,7 @@ CREATE TABLE `Manager` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Shelf;
+DROP TABLE IF EXISTS Shelf; --done
 CREATE TABLE `Shelf` (
   `ShID`          bigint(20) NOT NULL auto_increment,
   `name`          varchar(80) NOT NULL default '',
@@ -39,7 +39,7 @@ CREATE TABLE `Shelf` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Category;
+DROP TABLE IF EXISTS Category; --done
 CREATE TABLE `Category` (
   `CID`           bigint(20) NOT NULL auto_increment,
   `name`          varchar(80) NOT NULL default '',
@@ -50,7 +50,7 @@ CREATE TABLE `Category` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Product;
+DROP TABLE IF EXISTS Product; --done
 CREATE TABLE `Product` (
   `PID`               bigint(20) NOT NULL auto_increment,
   `name`              varchar(80) NOT NULL default '',
@@ -76,7 +76,7 @@ CREATE TABLE `Product` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Bill;
+DROP TABLE IF EXISTS Bill; --done
 CREATE TABLE `Bill` (
   `BID`           bigint(20) NOT NULL auto_increment,
   `cus_name`      varchar(80),
@@ -89,7 +89,7 @@ CREATE TABLE `Bill` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Discount;
+DROP TABLE IF EXISTS Discount; --done
 CREATE TABLE `Discount` (
   `DiscountID`              bigint(20) NOT NULL auto_increment,
   `discount_code`           varchar(10) NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE `Discount` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Supplier;
+DROP TABLE IF EXISTS Supplier; --done
 CREATE TABLE `Supplier` (
   `SupID`             bigint(20) NOT NULL auto_increment,
   `name`              varchar(80) NOT NULL default '',
@@ -118,7 +118,7 @@ CREATE TABLE `Supplier` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Import;
+DROP TABLE IF EXISTS Import; --done
 CREATE TABLE `Import` (
   `ImID`          bigint(20) NOT NULL auto_increment,
   `mngID`         bigint(20) NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE `Import` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Export;
+DROP TABLE IF EXISTS Export; --done
 CREATE TABLE `Export` (
   `ExID`          bigint(20) NOT NULL auto_increment,
   `mngID`         bigint(20) NOT NULL default '0',
@@ -150,7 +150,7 @@ CREATE TABLE `Export` (
 
 
 
-DROP TABLE IF EXISTS Lot;
+DROP TABLE IF EXISTS Lot; --not yet
 CREATE TABLE `Lot` (
   `proID`         bigint(20) NOT NULL default '0',
   `name`          varchar(80) NOT NULL default '',
@@ -164,7 +164,7 @@ CREATE TABLE `Lot` (
 
 
 
-DROP TABLE IF EXISTS ProductStoreAtShelf;
+DROP TABLE IF EXISTS ProductStoreAtShelf; --done
 CREATE TABLE `ProductStoreAtShelf` (
   `proID`         bigint(20) NOT NULL default '0',
   `shID`          bigint(20) NOT NULL default '0',
@@ -176,7 +176,7 @@ CREATE TABLE `ProductStoreAtShelf` (
 
 
 
-DROP TABLE IF EXISTS ProductOnBill;
+DROP TABLE IF EXISTS ProductOnBill; --
 CREATE TABLE `ProductOnBill` (
   `proID`        bigint(20) NOT NULL default '0',
   `bID`          bigint(20) NOT NULL default '0',
@@ -201,7 +201,7 @@ CREATE TABLE `ProductOnDiscount` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS CatOwnShelf;
+DROP TABLE IF EXISTS CatOwnShelf; --done
 CREATE TABLE `CatOwnShelf` (
   `catID`         bigint(20) NOT NULL default '0',
   `shID`          bigint(20) NOT NULL default '0',
@@ -239,7 +239,7 @@ CREATE TABLE `ProductInImport` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Logs;
+DROP TABLE IF EXISTS Logs; --done
 CREATE TABLE `Logs` (
   `id`            bigint(20) NOT NULL auto_increment,
   `MngID`         bigint(20) NOT NULL,    

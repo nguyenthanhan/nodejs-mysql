@@ -9,7 +9,6 @@ const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
 const PORT = process.env.PORT || 5000;
 // const axios = require('axios');
-const resetDB = process.env.RESET_DB || true;
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
@@ -49,7 +48,7 @@ if (!isDev && cluster.isMaster) {
 
   const db = require("./app/models/db");
 
-  if (process.env.ENV === "dev" && resetDB) {
+  if (process.env.RESET_DB === "true") {
     // drop the table if it already exists
     db.sequelize.sync({ force: true }).then(() => {
       db.manager.create({

@@ -4,7 +4,7 @@ const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
-const Product = db.product;
+const { product: Product, category: Category } = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new product
@@ -38,6 +38,10 @@ exports.create = async (req, res, next) => {
     );
   }
 
+  const imageMessage = convertImageResult.url
+    ? ""
+    : "nhưng không có hình ảnh sản phẩm";
+
   // Create a product
   const product = {
     name: req.body.name,
@@ -61,7 +65,9 @@ exports.create = async (req, res, next) => {
   // Save product in the database
   Product.create(product)
     .then((data) => {
-      res.send(common.returnAPIData({}, "Tạo sản phẩm thành công"));
+      res.send(
+        common.returnAPIData({}, "Tạo sản phẩm thành công " + imageMessage)
+      );
     })
     .catch((err) => {
       next({
@@ -106,9 +112,13 @@ exports.findAll = async (req, res, next) => {
     limit,
     offset,
     where: condition,
-    // raw: true,
     order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
-    include: ["category", "lots"],
+    include: [
+      {
+        model: Category,
+        as: "category",
+      },
+    ],
   })
     .then((data) => {
       const message = data.length === 0 ? "Không có sản phẩm nào" : "";
@@ -135,7 +145,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Product.findByPk(id)
+  Product.findByPk(id, { include: ["category"] })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));
@@ -179,7 +189,7 @@ exports.update = async (req, res, next) => {
   })
     .then((num) => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, "Cập nhật sản phẩm thành công"));
+        res.send(common.returnAPIData({}, "Cập nhật sản phẩm thành công "));
       } else {
         next({
           status: 400,
