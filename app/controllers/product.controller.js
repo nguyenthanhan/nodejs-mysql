@@ -120,14 +120,16 @@ exports.findAll = async (req, res, next) => {
       },
       {
         model: Discount,
-        as: "discount",
+        as: "discounts",
       },
     ],
   })
     .then((data) => {
-      const message = data.length === 0 ? "Không có sản phẩm nào" : "";
+      const newData = data.map((el) => el.get({ plain: true }));
+      const message = newData.length === 0 ? "Không có sản phẩm nào" : "";
+
       res.send(
-        common.returnAPIData(data, message, {
+        common.returnAPIData(newData, message, {
           page: parseInt(req.query.page),
           per_page: parseInt(req.query.per_page),
         })

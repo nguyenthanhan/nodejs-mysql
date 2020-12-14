@@ -70,7 +70,7 @@ exports.findOne = async (req, res, next) => {
   Shelf.findByPk(id, { includes: ["categories"] })
     .then((data) => {
       if (data) {
-        res.send(common.returnAPIData(data));
+        res.send(common.returnAPIData(data, "Tạo kệ hàng thành công"));
       } else {
         next({
           status: 400,

@@ -107,12 +107,41 @@ db.product.belongsToMany(db.bill, {
   foreignKey: "productId",
 });
 
-db.discount.hasMany(db.product, { foreignKey: "discountId", as: "products" });
-db.product.belongsTo(db.discount, {
-  foreignKey: "discountId",
-  as: "discount",
-});
+//----------
+
+// db.discount.hasMany(db.product, { foreignKey: "discountId", as: "products" });
+// db.product.belongsTo(db.discount, {
+//   foreignKey: "discountId",
+//   as: "discount",
+// });
+
 //-------
+const ProductOnDiscount = sequelize.define(
+  "ProductOnDiscount",
+  {
+    requirementQuantity: {
+      type: Sequelize.BIGINT(20),
+    },
+  },
+  {
+    timestamps: true,
+    updatedAt: false,
+    freezeTableName: true,
+  }
+);
+
+db.productOnDiscount = ProductOnDiscount;
+db.discount.belongsToMany(db.product, {
+  through: ProductOnDiscount,
+  as: "products",
+  foreignKey: "discountId",
+});
+db.product.belongsToMany(db.discount, {
+  through: ProductOnDiscount,
+  as: "discounts",
+  foreignKey: "productId",
+});
+//----------
 
 //hook
 db.lot.afterUpdate(async (lot, options) => {

@@ -2,7 +2,7 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Discount = db.discount;
+const { discount: Discount, productOnDiscount: ProductOnDiscount } = db;
 const moment = require("moment");
 
 // Create and Save a new Discount
@@ -39,31 +39,57 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  // Create a Discount
-  const discount = {
-    rate: req.body.rate,
-    title: req.body.title,
-    description: req.body.description,
-    start_date: moment(req.body.start_date),
-    end_date: moment(req.body.end_date),
-    discount_code: req.body.discountCode,
-  };
+  try {
+    // Create a Discount
+    const discount = {
+      rate: req.body.rate,
+      title: req.body.title,
+      description: req.body.description,
+      start_date: moment(req.body.start_date),
+      end_date: moment(req.body.end_date),
+      discount_code: req.body.discountCode,
+    };
+    // Save discount in the database
+    await Discount.create(discount);
 
-  // Save discount in the database
-  Discount.create(discount)
-    .then((data) => {
-      res.send(common.returnAPIData({}, "Tạo mã giảm giá thành công"));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "post",
-        name: "giảm giá",
-        id: 0,
-      });
-      return;
+    // applyProducts
+    const createdDiscount = await Discount.findOne(discount);
+    if (createdDiscount && createdDiscount.discountId) {
+      const newDiscountsWithProduct = await createDiscountsWithProduct(
+        req.body.applyProducts,
+        createdDiscount.discountId
+      );
+
+      if (newDiscountsWithProduct) {
+        res.send(common.returnAPIData({}, "Tạo mã giảm giá thành công"));
+      }
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: "post",
+      name: "giảm giá",
+      id: 0,
     });
+    return;
+  }
+};
+
+const asyncUpdateItemProductOnDiscount = (discountProduct, discountId) => {
+  return ProductOnDiscount.create({
+    productId: discountProduct.productId,
+    requirementQuantity: discountProduct.requirementQuantity,
+    discountId: discountId,
+  });
+};
+
+const createDiscountsWithProduct = async (discountProducts, discountId) => {
+  return Promise.all(
+    discountProducts.map((discountProduct) =>
+      asyncUpdateItemProductOnDiscount(discountProduct, discountId)
+    )
+  );
 };
 
 exports.update = async (req, res, next) => {
