@@ -7,6 +7,7 @@ const moment = require("moment");
 
 // Create and Save a new Discount
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (
     !req.body.rate ||
@@ -22,7 +23,15 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (parseInt(req.body.rate) > 0 && parseInt(req.body.rate) <= 100) {
+  if (!moment(req.body.end_date).isAfter(req.body.start_date)) {
+    next({
+      status: 400,
+      message: "Ngày bắt đầu và kết thúc không đúng!",
+    });
+    return;
+  }
+
+  if (parseInt(req.body.rate) < 0 && parseInt(req.body.rate) >= 100) {
     next({
       status: 400,
       message: "NHập sai phần trăm giảm giá",
@@ -52,6 +61,38 @@ exports.create = async (req, res, next) => {
         method: "post",
         name: "giảm giá",
         id: 0,
+      });
+      return;
+    });
+};
+
+exports.update = async (req, res, next) => {
+  const id = req.params.id;
+  let body = { ...req.body, updatedAt: new Date() };
+
+  Discount.update(body, {
+    where: { discountId: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.send(
+          common.returnAPIData({}, "Cập nhật sản phẩm giảm giá thành công")
+        );
+      } else {
+        next({
+          status: 400,
+          message: `Không thể cập nhật sản phẩm giảm giá với id này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
+        });
+        return;
+      }
+    })
+    .catch((err) => {
+      next({
+        status: 400,
+        message: err.message,
+        method: "put",
+        name: "sản phẩm giảm giá",
+        id: id,
       });
       return;
     });

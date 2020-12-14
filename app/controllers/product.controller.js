@@ -4,7 +4,7 @@ const db = require("../models/db");
 const lang = require("../lang");
 const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
-const { product: Product, category: Category } = db;
+const { product: Product, category: Category, discount: Discount } = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new product
@@ -117,6 +117,10 @@ exports.findAll = async (req, res, next) => {
       {
         model: Category,
         as: "category",
+      },
+      {
+        model: Discount,
+        as: "discount",
       },
     ],
   })

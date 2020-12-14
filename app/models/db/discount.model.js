@@ -3,7 +3,7 @@ module.exports = (sequelize, Sequelize) => {
   const Discount = sequelize.define(
     "Discount",
     {
-      DiscountID: {
+      discountId: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
         allowNull: false,

@@ -50,28 +50,16 @@ db.product.belongsTo(db.category, {
   as: "category",
 });
 
-// db.manager.hasMany(db.bill, {
-//   foreignKey: "MngID",
-//   as: "bills",
-// });
 db.bill.belongsTo(db.manager, {
   foreignKey: "MngID",
   as: "manager",
 });
 
-// db.manager.hasMany(db.import, {
-//   foreignKey: "mngID",
-//   as: "imports",
-// });
 db.import.belongsTo(db.manager, {
   foreignKey: "mngID",
   as: "manager",
 });
 
-// db.manager.hasMany(db.export, {
-//   foreignKey: "mngID",
-//   as: "exports",
-// });
 db.export.belongsTo(db.manager, {
   foreignKey: "mngID",
   as: "manager",
@@ -105,8 +93,25 @@ const ProductOnBill = sequelize.define(
     freezeTableName: true,
   }
 );
-db.bill.belongsToMany(db.product, { through: ProductOnBill });
-db.product.belongsToMany(db.bill, { through: ProductOnBill });
+
+db.productOnBill = ProductOnBill;
+
+db.bill.belongsToMany(db.product, {
+  through: ProductOnBill,
+  as: "products",
+  foreignKey: "billId",
+});
+db.product.belongsToMany(db.bill, {
+  through: ProductOnBill,
+  as: "bills",
+  foreignKey: "productId",
+});
+
+db.discount.hasMany(db.product, { foreignKey: "discountId", as: "products" });
+db.product.belongsTo(db.discount, {
+  foreignKey: "discountId",
+  as: "discount",
+});
 //-------
 
 //hook

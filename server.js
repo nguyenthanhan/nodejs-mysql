@@ -48,7 +48,7 @@ if (!isDev && cluster.isMaster) {
 
   const db = require("./app/models/db");
 
-  if (process.env.RESET_DB === "true") {
+  if (process.env.RESET_DB === "false") {
     // drop the table if it already exists
     db.sequelize.sync({ force: true }).then(() => {
       db.manager.create({

@@ -176,14 +176,14 @@ CREATE TABLE `ProductStoreAtShelf` (
 
 
 
-DROP TABLE IF EXISTS ProductOnBill; --
+DROP TABLE IF EXISTS ProductOnBill; --done
 CREATE TABLE `ProductOnBill` (
   `proID`        bigint(20) NOT NULL default '0',
   `bID`          bigint(20) NOT NULL default '0',
   `quantity`     int(20) NOT NULL default '0',
   `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY (`bID`, `proID`),
-  FOREIGN KEY (`bID`) REFERENCES `Shelf` (`BID`),
+  FOREIGN KEY (`bID`) REFERENCES `Bill` (`BID`),
   FOREIGN KEY (`proID`) REFERENCES `Product` (`PID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
