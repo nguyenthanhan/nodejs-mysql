@@ -106,7 +106,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update kệ hàng này. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update kệ hàng này. Có thể kệ hàng không thể tìm thấy!`,
         });
         return;
       }

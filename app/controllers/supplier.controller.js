@@ -105,7 +105,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật nhà cung cấp này. nhà cung cấp không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật nhà cung cấp này. nhà cung cấp không thể tìm thấy!`,
         });
         return;
       }

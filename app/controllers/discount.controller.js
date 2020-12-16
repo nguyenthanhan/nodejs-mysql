@@ -197,17 +197,14 @@ exports.update = async (req, res, next) => {
     };
 
     const discountId = req.params.id;
-    console.log("discountId", discountId);
 
     // Update discount in the database
     const numbersUpdateOnDiscountTable = await Discount.update(discount, {
       where: { discountId: discountId },
-      // raw: true,
+      raw: true,
     });
-    console.log("numbersUpdateOnDiscountTable", numbersUpdateOnDiscountTable);
-    console.log(typeof numbersUpdateOnDiscountTable);
 
-    if (numbersUpdateOnDiscountTable === 1) {
+    if (parseInt(numbersUpdateOnDiscountTable, 10) !== 0) {
       let applyProductsInCategories = [];
 
       //check if have applyCategories
@@ -227,7 +224,6 @@ exports.update = async (req, res, next) => {
           ],
         });
         const categoriesJSON = categories.map((el) => el.get({ plain: true }));
-        console.log("categoriesJSON", categoriesJSON);
 
         categoriesJSON.forEach((category) => {
           const applyCategories = req.body.applyCategories.find(
@@ -244,7 +240,6 @@ exports.update = async (req, res, next) => {
             ...separateProducts,
           ];
         });
-        console.log("applyProductsInCategories", applyProductsInCategories);
 
         applyProductsInCategories = applyProductsInCategories.map(
           (applyProductsInCategory) => {
@@ -261,13 +256,15 @@ exports.update = async (req, res, next) => {
       } else {
         applyProductsInCategories = req.body.applyProducts;
       }
-      console.log("applyProductsInCategories final", applyProductsInCategories);
 
-      const updateDiscountsWithProduct = await updateDiscountsWithProduct(
+      const updateDiscountsWithProduct = await updateDiscountsWithProducts(
         applyProductsInCategories,
         discountId
       );
       console.log("updateDiscountsWithProduct", updateDiscountsWithProduct);
+      let numberRowUpdated = 0;
+      let numberRowNotUpdated = 0;
+      console.log(typeof updateDiscountsWithProduct);
       if (updateDiscountsWithProduct) {
         res.send(
           common.returnAPIData({}, "Cập nhật sản phẩm giảm giá thành công")
@@ -276,7 +273,7 @@ exports.update = async (req, res, next) => {
     } else {
       next({
         status: 400,
-        message: `Không thể cập nhật sản phẩm giảm giá này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
+        message: `Không thể cập nhật sản phẩm giảm giá này. Phân loại hàng không thể tìm thấy!`,
       });
       return;
     }
@@ -292,16 +289,22 @@ exports.update = async (req, res, next) => {
   }
 };
 
-const asyncUpdateItemProductOnDiscount = (discountProduct, discountId) => {
-  return ProductOnDiscount.update({
-    productId: discountProduct.productId,
-    requirementQuantity: discountProduct.requirementQuantity,
-    discountId: discountId,
-    updatedAt: moment(),
-  });
+const asyncUpdateItemProductOnDiscount = async (
+  discountProduct,
+  discountId
+) => {
+  return ProductOnDiscount.update(
+    {
+      requirementQuantity: discountProduct.requirementQuantity,
+    },
+    {
+      where: { discountId: discountId, productId: discountProduct.productId },
+      silent: true,
+    }
+  );
 };
 
-const updateDiscountsWithProduct = async (discountProducts, discountId) => {
+const updateDiscountsWithProducts = async (discountProducts, discountId) => {
   return Promise.all(
     discountProducts.map((discountProduct) =>
       asyncUpdateItemProductOnDiscount(discountProduct, discountId)

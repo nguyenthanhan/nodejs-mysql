@@ -208,7 +208,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật hoá đơn này. hoá đơn không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật hoá đơn này. hoá đơn không thể tìm thấy!`,
         });
         return;
       }

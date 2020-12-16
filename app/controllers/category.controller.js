@@ -144,7 +144,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật phân loại hàng này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật phân loại hàng này. Phân loại hàng không thể tìm thấy!`,
         });
         return;
       }

@@ -109,7 +109,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật thông tin xuất hàng này. thông tin xuất hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật thông tin xuất hàng này. thông tin xuất hàng không thể tìm thấy!`,
         });
         return;
       }

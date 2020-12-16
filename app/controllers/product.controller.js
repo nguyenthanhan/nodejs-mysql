@@ -201,7 +201,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update sản phẩm này. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update sản phẩm này. Có thể sản phẩm không thể tìm thấy!`,
         });
         return;
       }
