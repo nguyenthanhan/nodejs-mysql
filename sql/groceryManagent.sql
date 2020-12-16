@@ -43,7 +43,7 @@ DROP TABLE IF EXISTS Category; --done
 CREATE TABLE `Category` (
   `CID`           bigint(20) NOT NULL auto_increment,
   `name`          varchar(80) NOT NULL default '',
-  `img_url`             text NOT NULL,
+  `img_url`       text NOT NULL,
   `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`CID`)
@@ -68,6 +68,7 @@ CREATE TABLE `Product` (
   `sell_price`        bigint(20) NOT NULL default '0',
   `import_price`      bigint(20) NOT NULL default '0',
   `brand`             varchar(80) NOT NULL default '',
+  `vat`               int(2) NOT NULL default 10,
   `categoryId`        bigint(20) NOT NULL default '0',
   `createdAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
   `updatedAt`         DATETIME NOT NULL default CURRENT_TIMESTAMP,
@@ -78,12 +79,12 @@ CREATE TABLE `Product` (
 
 DROP TABLE IF EXISTS Bill; --done
 CREATE TABLE `Bill` (
-  `BID`           bigint(20) NOT NULL auto_increment,
-  `cus_name`      varchar(80),
-  `total`         bigint(20),
-  `M_ID`          bigint(20),
-  `createdAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
-  `updatedAt`     DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `BID`             bigint(20) NOT NULL auto_increment,
+  `cus_name`        varchar(80),
+  `total`           bigint(20),
+  `M_ID`            bigint(20),
+  `createdAt`       DATETIME NOT NULL default CURRENT_TIMESTAMP,
+  `updatedAt`       DATETIME NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`BID`),
   FOREIGN KEY (`M_ID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -188,7 +189,7 @@ CREATE TABLE `ProductOnBill` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS ProductOnDiscount;
+DROP TABLE IF EXISTS ProductOnDiscount; --done
 CREATE TABLE `ProductOnDiscount` (
   `proID`               bigint(20) NOT NULL default '0',
   `DiscountID`          bigint(20) NOT NULL default '0',

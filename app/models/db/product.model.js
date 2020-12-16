@@ -79,6 +79,9 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
+      vat: {
+        type: Sequelize.INTEGER(2),
+      },
       brand: {
         type: Sequelize.STRING(80),
         allowNull: false,

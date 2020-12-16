@@ -134,7 +134,7 @@ exports.findAll = async (req, res, next) => {
       {
         model: Product,
         as: "products",
-        // attributes: ["quantity"],
+        // attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   })

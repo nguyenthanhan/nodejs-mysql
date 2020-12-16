@@ -60,6 +60,7 @@ exports.create = async (req, res, next) => {
     lotId: req.body.lotId,
     otherDetail: req.body.otherDetail,
     description: req.body.description,
+    vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,
   };
 
   // Save product in the database
@@ -108,7 +109,14 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Product.findAll({
+  const countProducts = await Product.count({
+    // include: ...,
+    // where: ...,
+    distinct: true,
+    col: "PID",
+  });
+
+  Product.findAndCountAll({
     limit,
     offset,
     where: condition,
@@ -127,13 +135,17 @@ exports.findAll = async (req, res, next) => {
     ],
   })
     .then((data) => {
-      const newData = data.map((el) => el.get({ plain: true }));
-      const message = newData.length === 0 ? "Không có sản phẩm nào" : "";
+      // const newData = data.map((el) => el.get({ plain: true }));
+      const message = data.rows.length === 0 ? "Không có sản phẩm nào" : "";
 
       res.send(
-        common.returnAPIData(newData, message, {
+        common.returnAPIData(data.rows, message, {
           page: parseInt(req.query.page),
           per_page: parseInt(req.query.per_page),
+          total_page: Math.ceil(
+            parseInt(data.count) / parseInt(req.query.per_page)
+          ),
+          total_products: parseInt(data.count),
         })
       );
     })
