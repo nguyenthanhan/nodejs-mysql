@@ -239,7 +239,7 @@ CREATE TABLE `ProductInImport` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-DROP TABLE IF EXISTS Logs; --done
+DROP TABLE IF EXISTS Logs;
 CREATE TABLE `Logs` (
   `id`            bigint(20) NOT NULL auto_increment,
   `MngID`         bigint(20) NOT NULL,    

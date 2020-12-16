@@ -9,7 +9,7 @@ const db = require("../models/db");
 const lang = require("../lang");
 const Manager = db.manager;
 const Op = db.Sequelize.Op;
-const saltRounds = 10;
+const constants = require("../constants");
 
 // Create and Save a new manager
 exports.create = async (req, res, next) => {
@@ -65,7 +65,10 @@ exports.create = async (req, res, next) => {
 
   try {
     //hash password to store
-    const hashPassword = await bcrypt.hash(req.body.password, saltRounds);
+    const hashPassword = await bcrypt.hash(
+      req.body.password,
+      constants.SALT_ROUNDS
+    );
 
     // Create a manager
     const manager = {
@@ -86,38 +89,16 @@ exports.create = async (req, res, next) => {
     };
 
     // Save manager in the database
-    Manager.create(manager)
-      .then((data) => {
-        Manager.findOne({
-          where: {
-            accountName: req.body.accountName,
-          },
-          raw: true,
-        })
-          .then((data) => {
-            res.send(common.returnAPIData(_.omit(data, "password")));
-          })
-          .catch((err) => {
-            next({
-              status: 400,
-              message: err.message,
-              method: "post",
-              name: "người quản lí",
-              id: 0,
-            });
-            return;
-          });
-      })
-      .catch((err) => {
-        next({
-          status: 400,
-          message: err.message,
-          method: "post",
-          name: "người quản lí",
-          id: 0,
-        });
-        return;
-      });
+    const newManager = await Manager.create(manager);
+    const newManagerJSON = newManager.toJSON();
+    if (newManagerJSON) {
+      res.send(
+        common.returnAPIData(
+          _.omit(newManagerJSON, "password"),
+          "Tạo người quản lí thành công"
+        )
+      );
+    }
   } catch (err) {
     next({
       status: 400,
@@ -261,7 +242,7 @@ exports.updateMe = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật người quản lí với id này. người quản lí không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật người quản lí này. người quản lí không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -314,7 +295,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật người quản lí với id này. người quản lí không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật người quản lí này. người quản lí không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -344,7 +325,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá người quản lí với id này. Có thể không tìm thấy người quản lí!`,
+          message: `Không thể xoá người quản lí này. Có thể không tìm thấy người quản lí!`,
         });
         return;
       }

@@ -1,4 +1,5 @@
 const EXPIRES_TIME_OF_TOKEN = 86400; // 24 hours
+const SALT_ROUNDS = 10;
 
 const Table = {
   PRODUCT: "Sản phẩm",
@@ -23,4 +24,5 @@ module.exports = {
   EXPIRES_TIME_OF_TOKEN,
   Table,
   ActionOnTable,
+  SALT_ROUNDS,
 };

@@ -66,7 +66,7 @@ exports.create = async (req, res, next) => {
   Product.create(product)
     .then((data) => {
       res.send(
-        common.returnAPIData({}, "Tạo sản phẩm thành công " + imageMessage)
+        common.returnAPIData(data, "Tạo sản phẩm thành công " + imageMessage)
       );
     })
     .catch((err) => {
@@ -112,15 +112,17 @@ exports.findAll = async (req, res, next) => {
     limit,
     offset,
     where: condition,
-    order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
+    order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]), //remove null, false
     include: [
       {
         model: Category,
         as: "category",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
       {
         model: Discount,
         as: "discounts",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   })
@@ -199,7 +201,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update sản phẩm với id này. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update sản phẩm này. Có thể sản phẩm không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -229,7 +231,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá sản phẩm với id này. Có thể không tìm thấy sản phẩm!`,
+          message: `Không thể xoá sản phẩm này. Có thể không tìm thấy sản phẩm!`,
         });
         return;
       }

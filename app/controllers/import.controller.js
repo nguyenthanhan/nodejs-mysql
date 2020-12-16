@@ -33,7 +33,7 @@ exports.create = async (req, res, next) => {
   // Save import in the database
   Import.create(newImport)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData(data, "Tạo đơn nhập hàng thành công"));
     })
     .catch((err) => {
       next({
@@ -119,7 +119,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật thông tin nhập hàng với id này. Thông tin nhập hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật thông tin nhập hàng này. Thông tin nhập hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -149,7 +149,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá thông tin nhập hàng với id này. Có thể không tìm thấy thông tin nhập hàng!`,
+          message: `Không thể xoá thông tin nhập hàng này. Có thể không tìm thấy thông tin nhập hàng!`,
         });
         return;
       }

@@ -9,7 +9,6 @@ var validator = require("validator");
 var bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 const Manager = db.manager;
-const saltRounds = 10;
 
 exports.login = async (req, res, next) => {
   if (!req.body.account || !req.body.password) {
@@ -30,14 +29,6 @@ exports.login = async (req, res, next) => {
       next({ status: 404, message: lang.general.error.accountNotFound });
       return;
     }
-
-    //-----
-    // const hashPassword = await bcrypt.hash("password", saltRounds);
-    // console.log(
-    //   "remove comment below line to see password for admin",
-    //   hashPassword
-    // );
-    //-----
 
     const result = await bcrypt.compare(
       req.body.password,
@@ -106,7 +97,10 @@ exports.changePassword = async (req, res, next) => {
       next({ status: 401, message: lang.general.error.notSamePassword });
       return;
     } else {
-      const hashNewPassword = await bcrypt.hash(newPassword, saltRounds);
+      const hashNewPassword = await bcrypt.hash(
+        newPassword,
+        constants.SALT_ROUNDS
+      );
       const manager = {
         password: hashNewPassword,
         updatedAt: new Date(),

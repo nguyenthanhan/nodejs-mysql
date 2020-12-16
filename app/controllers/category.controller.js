@@ -3,9 +3,6 @@ const cloudinary = require("../models/cloudinary.model");
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-// const Category = db.category;
-// const Product = db.product;
-// const Shelf = db.shelf;
 const { category: Category, product: Product, shelf: Shelf } = db;
 const Op = db.Sequelize.Op;
 
@@ -30,7 +27,7 @@ exports.create = async (req, res, next) => {
   }
   const message = convertImageResult.url
     ? ""
-    : "Không tạo được url cho hình ảnh";
+    : "Tạo được loại hàng nhưng không có hình ảnh minh hoạ";
 
   // Create a Category
   const category = {
@@ -42,7 +39,7 @@ exports.create = async (req, res, next) => {
   // Save category in the database
   Category.create(category)
     .then((data) => {
-      res.send(common.returnAPIData({}, message));
+      res.send(common.returnAPIData(data, message));
     })
     .catch((err) => {
       next({
@@ -58,36 +55,39 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all shelves from the database.
 exports.findAll = async (req, res, next) => {
-  const name = req.query.nameKeyword;
-  let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  try {
+    const name = req.query.nameKeyword;
+    let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Category.findAll({
-    where: condition,
-    include: [
-      // {
-      //   model: Product,
-      //   as: "products",
-      //   attributes: ["PID", "name"],
-      // },
-      {
-        model: Shelf,
-        as: "shelf",
-      },
-    ],
-  })
-    .then((data) => {
-      res.send(common.returnAPIData(data));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "get",
-        name: "phân loại hàng",
-        id: 0,
-      });
-      return;
+    const categories = await Category.findAll({
+      where: condition,
+      include: [
+        {
+          model: Product,
+          as: "products",
+          attributes: ["PID", "name"],
+        },
+        {
+          model: Shelf,
+          as: "shelf",
+          // attributes: { exclude: ["createdAt", "updatedAt"] },
+        },
+      ],
     });
+
+    if (categories) {
+      res.send(common.returnAPIData(categories));
+    }
+  } catch (err) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "get",
+      name: "phân loại hàng",
+      id: 0,
+    });
+    return;
+  }
 };
 
 // Find a single category with an id
@@ -144,7 +144,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật phân loại hàng với id này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật phân loại hàng này. Phân loại hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -174,7 +174,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá phân loại hàng với id này. Có thể không tìm thấy phân loại hàng!`,
+          message: `Không thể xoá phân loại hàng này. Có thể không tìm thấy phân loại hàng!`,
         });
         return;
       }

@@ -91,17 +91,7 @@ exports.create = async (req, res, next) => {
     };
 
     // Save bill in the database
-    const createBill = await Bill.create(bill);
-
-    const currentBill = await Bill.findOne({
-      where: {
-        cus_name: cus_name,
-        total: total,
-        MngID: req.userId,
-        createdAt: date,
-      },
-      raw: true,
-    });
+    const currentBill = await Bill.create(bill, { raw: true });
 
     if (currentBill && currentBill.BID) {
       const createProductsOnBill = await updateProductsOnBill(
@@ -109,7 +99,7 @@ exports.create = async (req, res, next) => {
         currentBill.BID
       );
 
-      if (createBill && createProductsOnBill) {
+      if (createProductsOnBill) {
         res.send(common.returnAPIData({}, "Tạo thành công đơn hàng"));
         updateProductsInStore(req.body.sellProducts);
       }
@@ -218,7 +208,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật hoá đơn với id này. hoá đơn không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật hoá đơn này. hoá đơn không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -247,7 +237,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá hoá đơn với id này. Có thể không tìm thấy hoá đơn!`,
+          message: `Không thể xoá hoá đơn này. Có thể không tìm thấy hoá đơn!`,
         });
         return;
       }

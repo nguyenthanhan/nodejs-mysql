@@ -28,7 +28,7 @@ exports.create = async (req, res, next) => {
   // Save shelf in the database
   Shelf.create(shelf)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData(data, "Tạo kệ hàng thành công"));
     })
     .catch((err) => {
       next({
@@ -49,7 +49,8 @@ exports.findAll = async (req, res, next) => {
 
   Shelf.findAll({ where: condition, includes: ["categories"] })
     .then((data) => {
-      res.send(common.returnAPIData(data));
+      const message = data.length === 0 ? "Không có kệ hàng nào" : "";
+      res.send(common.returnAPIData(data, message));
     })
     .catch((err) => {
       next({
@@ -70,7 +71,7 @@ exports.findOne = async (req, res, next) => {
   Shelf.findByPk(id, { includes: ["categories"] })
     .then((data) => {
       if (data) {
-        res.send(common.returnAPIData(data, "Tạo kệ hàng thành công"));
+        res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,
@@ -105,7 +106,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể update kệ hàng với id này. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể update kệ hàng này. Có thể kệ hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }

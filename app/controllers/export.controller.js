@@ -9,15 +9,6 @@ const moment = require("moment");
 
 // Create and Save a new export
 exports.create = async (req, res, next) => {
-  // Validate request
-  // if (!req.body.mngID) {
-  //   next({
-  //     status: 400,
-  //     message: lang.general.error._400,
-  //   });
-  //   return;
-  // }
-
   // Create a export
   const _export = {
     mngID: req.userId,
@@ -29,7 +20,7 @@ exports.create = async (req, res, next) => {
   // Save export in the database
   Export.create(_export)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData(data, "Tạo đơn xuất hàng thành công!"));
     })
     .catch((err) => {
       next({
@@ -118,7 +109,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật thông tin xuất hàng với id này. thông tin xuất hàng không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật thông tin xuất hàng này. thông tin xuất hàng không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -148,7 +139,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá thông tin xuất hàng với id này. Có thể không tìm thấy thông tin xuất hàng!`,
+          message: `Không thể xoá thông tin xuất hàng này. Có thể không tìm thấy thông tin xuất hàng!`,
         });
         return;
       }

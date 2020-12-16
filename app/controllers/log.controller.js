@@ -67,5 +67,7 @@ exports.log = async ({
     nameInRow,
     affectedRowID,
   };
-  Logs.create(createLogs).catch((err) => console.log("Write log fail: ", err));
+  Logs.create(createLogs).catch((err) =>
+    console.log("--Write log fail: ", err)
+  );
 };

@@ -89,13 +89,10 @@ const ProductOnBill = sequelize.define(
   },
   {
     timestamps: true,
-    updatedAt: false,
     freezeTableName: true,
   }
 );
-
 db.productOnBill = ProductOnBill;
-
 db.bill.belongsToMany(db.product, {
   through: ProductOnBill,
   as: "products",
@@ -125,11 +122,9 @@ const ProductOnDiscount = sequelize.define(
   },
   {
     timestamps: true,
-    updatedAt: false,
     freezeTableName: true,
   }
 );
-
 db.productOnDiscount = ProductOnDiscount;
 db.discount.belongsToMany(db.product, {
   through: ProductOnDiscount,

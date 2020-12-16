@@ -27,7 +27,7 @@ exports.create = async (req, res, next) => {
   // Save lot in the database
   Lot.create(lot)
     .then((data) => {
-      res.send(common.returnAPIData({}));
+      res.send(common.returnAPIData(data));
     })
     .catch((err) => {
       next({
@@ -46,7 +46,7 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Lot.findAll({ where: CSSConditionRule })
+  Lot.findAll({ where: condition })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -104,7 +104,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật hoá đơn với id này. hoá đơn không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật hoá đơn này. hoá đơn không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -134,7 +134,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá hoá đơn với id này. Có thể không tìm thấy hoá đơn!`,
+          message: `Không thể xoá hoá đơn này. Có thể không tìm thấy hoá đơn!`,
         });
         return;
       }

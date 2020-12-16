@@ -28,7 +28,7 @@ exports.create = async (req, res, next) => {
   // Save supplier in the database
   Supplier.create(supplier)
     .then((data) => {
-      res.send(common.returnAPIData({}, ""));
+      res.send(common.returnAPIData(data, "Tạo nhà cung cấp thành công"));
     })
     .catch((err) => {
       next({
@@ -105,7 +105,7 @@ exports.update = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật nhà cung cấp với id này. nhà cung cấp không tìm thấy hoặc req.body trống!`,
+          message: `Không thể cập nhật nhà cung cấp này. nhà cung cấp không tìm thấy hoặc req.body trống!`,
         });
         return;
       }
@@ -135,7 +135,7 @@ exports.delete = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể xoá nhà cung cấp với id này. Có thể không tìm thấy nhà cung cấp!`,
+          message: `Không thể xoá nhà cung cấp này. Có thể không tìm thấy nhà cung cấp!`,
         });
         return;
       }

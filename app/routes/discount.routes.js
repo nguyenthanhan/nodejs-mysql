@@ -14,7 +14,11 @@ module.exports = (app) => {
 
   router.post("/", [authJwt.verifyToken], discount.create);
 
-  router.put("/", [authJwt.verifyToken], discount.update);
+  router.get("/", [authJwt.verifyToken], discount.findAll);
+
+  router.put("/:id", [authJwt.verifyToken], discount.update);
+
+  router.delete("/", [authJwt.verifyToken], discount.delete);
 
   app.use("/api/discounts", router);
 };

@@ -8,6 +8,9 @@ const logger = require("morgan");
 const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
 const PORT = process.env.PORT || 5000;
+var bcrypt = require("bcrypt");
+const constants = require("./app/constants/index");
+
 // const axios = require('axios');
 
 // Multi-process to utilize all CPU cores.
@@ -50,13 +53,13 @@ if (!isDev && cluster.isMaster) {
 
   if (process.env.RESET_DB === "true") {
     // drop the table if it already exists
-    db.sequelize.sync({ force: true }).then(() => {
+    db.sequelize.sync({ force: true }).then(async () => {
+      const hashPassword = await bcrypt.hash("password", constants.SALT_ROUNDS);
       db.manager.create({
         FName: "Admin",
         LName: "",
         accountName: "admin",
-        password:
-          "$2b$10$/vEpr7cQewqynPD38Om1yuvQflO5AfVNdIiRpqCSIVNxPfd/vogiG",
+        password: hashPassword,
         Address: "102 Xóm Chiếu",
         managerType: "prime",
       });
