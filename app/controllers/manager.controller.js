@@ -160,7 +160,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Manager.findByPk(id)
+  Manager.findByPk(id, { attributes: { exclude: ["password"] } })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));
@@ -187,10 +187,10 @@ exports.findOne = async (req, res, next) => {
 exports.findMe = async (req, res, next) => {
   const id = req.userId;
 
-  Manager.findByPk(id, { raw: true })
+  Manager.findByPk(id, { raw: true, attributes: { exclude: ["password"] } })
     .then((data) => {
       if (data) {
-        res.send(common.returnAPIData(_.omit(data, "password")));
+        res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,

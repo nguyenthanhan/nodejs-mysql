@@ -41,9 +41,6 @@ db.category.belongsTo(db.shelf, {
   as: "shelf",
 });
 
-// db.lot.hasMany(db.product, { foreignKey: "lotId", as: "product" });
-// db.product.belongsTo(db.lot, { foreignKey: "lotId", as: "lots" });
-
 db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
 db.product.belongsTo(db.category, {
   foreignKey: "categoryId",
@@ -60,12 +57,44 @@ db.import.belongsTo(db.manager, {
   as: "manager",
 });
 
+//----------
+const ProductInImport = sequelize.define(
+  "ProductInImport",
+  {
+    amount: {
+      type: Sequelize.INTEGER(20),
+    },
+  },
+  {
+    freezeTableName: true,
+  }
+);
+db.productInImport = ProductInImport;
+db.import.belongsToMany(db.product, {
+  through: ProductInImport,
+  as: "products",
+  foreignKey: "importId",
+});
+db.product.belongsToMany(db.import, {
+  through: ProductInImport,
+  as: "imports",
+  foreignKey: "productId",
+});
+//----------
+
+db.supplier.hasMany(db.import, { foreignKey: "supplierId", as: "imports" });
+db.import.belongsTo(db.supplier, {
+  foreignKey: "supplierId",
+  as: "supplier",
+});
+//----------
+
 db.export.belongsTo(db.manager, {
   foreignKey: "mngID",
   as: "manager",
 });
 
-//many to many
+//---------
 const ProductOnBill = sequelize.define(
   "ProductOnBill",
   {
@@ -88,7 +117,6 @@ const ProductOnBill = sequelize.define(
     // },
   },
   {
-    timestamps: true,
     freezeTableName: true,
   }
 );
@@ -105,14 +133,6 @@ db.product.belongsToMany(db.bill, {
 });
 
 //----------
-
-// db.discount.hasMany(db.product, { foreignKey: "discountId", as: "products" });
-// db.product.belongsTo(db.discount, {
-//   foreignKey: "discountId",
-//   as: "discount",
-// });
-
-//-------
 const ProductOnDiscount = sequelize.define(
   "ProductOnDiscount",
   {
@@ -121,7 +141,6 @@ const ProductOnDiscount = sequelize.define(
     },
   },
   {
-    timestamps: true,
     freezeTableName: true,
   }
 );

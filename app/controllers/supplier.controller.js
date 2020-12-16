@@ -2,7 +2,7 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Supplier = db.supplier;
+const { supplier: Supplier, import: Import } = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new supplier
@@ -47,7 +47,16 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.SupplierKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Supplier.findAll({ where: condition })
+  Supplier.findAll({
+    where: condition,
+    include: [
+      {
+        model: Import,
+        as: "imports",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
     .then((data) => {
       res.send(common.returnAPIData(data));
     })
@@ -67,7 +76,16 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Supplier.findByPk(id)
+  Supplier.findByPk(id, {
+    where: condition,
+    include: [
+      {
+        model: Import,
+        as: "imports",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

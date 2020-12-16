@@ -67,7 +67,6 @@ const updateProductsOnBill = (sellProducts, billId) => {
 
 // Create and Save a new bill
 exports.create = async (req, res, next) => {
-  console.log(req.body);
   // Validate request
   if (!req.body.cus_name || !req.body.total) {
     next({ status: 400, message: lang.general.error._400 });
@@ -167,7 +166,6 @@ exports.findOne = async (req, res, next) => {
       {
         model: Product,
         as: "products",
-        // attributes: ["quantity"],
       },
     ],
   })

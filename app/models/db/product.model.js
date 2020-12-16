@@ -71,7 +71,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       sell_price: {
         type: Sequelize.BIGINT(20),
-        allowNull: false,
         defaultValue: 0,
       },
       import_price: {
@@ -89,8 +88,6 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
-      timestamps: true,
-
       // don't delete database entries but set the newly added attribute deletedAt
       // to the current date (when deletion was done). paranoid will only work if
       // timestamps are enabled

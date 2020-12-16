@@ -109,13 +109,6 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.nameKeyword;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  const countProducts = await Product.count({
-    // include: ...,
-    // where: ...,
-    distinct: true,
-    col: "PID",
-  });
-
   Product.findAndCountAll({
     limit,
     offset,
@@ -165,7 +158,20 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Product.findByPk(id, { include: ["category"] })
+  Product.findByPk(id, {
+    include: [
+      {
+        model: Category,
+        as: "category",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      {
+        model: Discount,
+        as: "discounts",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));

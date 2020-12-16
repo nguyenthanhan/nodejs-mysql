@@ -59,6 +59,7 @@ exports.create = async (req, res, next) => {
 
     // Save discount in the database
     const createDiscount = await Discount.create(discount, { raw: true });
+    console.log("createDiscount", createDiscount);
 
     if (createDiscount && createDiscount.discountId) {
       let applyProductsInCategories = [];
@@ -79,6 +80,7 @@ exports.create = async (req, res, next) => {
             },
           ],
         });
+        console.log("categories", categories);
         const categoriesJSON = categories.map((el) => el.get({ plain: true }));
 
         categoriesJSON.forEach((category) => {
@@ -109,14 +111,20 @@ exports.create = async (req, res, next) => {
             return applyProductsInCategory;
           }
         );
+        console.log("applyProductsInCategories", applyProductsInCategories);
       } else {
         applyProductsInCategories = req.body.applyProducts;
+        console.log(
+          "applyProductsInCategories else ",
+          applyProductsInCategories
+        );
       }
 
       const newDiscountsWithProduct = await createDiscountsWithProduct(
         applyProductsInCategories,
         createDiscount.discountId
       );
+      console.log("newDiscountsWithProduct", newDiscountsWithProduct);
 
       if (newDiscountsWithProduct) {
         res.send(common.returnAPIData({}, "Tạo mã giảm giá thành công"));
@@ -263,13 +271,23 @@ exports.update = async (req, res, next) => {
       );
       console.log("updateDiscountsWithProduct", updateDiscountsWithProduct);
       let numberRowUpdated = 0;
-      let numberRowNotUpdated = 0;
+      let numberRowNotUpdate = 0;
       console.log(typeof updateDiscountsWithProduct);
-      if (updateDiscountsWithProduct) {
-        res.send(
-          common.returnAPIData({}, "Cập nhật sản phẩm giảm giá thành công")
-        );
-      }
+
+      updateDiscountsWithProduct.forEach((updateDiscounts) => {
+        if (parseInt(updateDiscounts, 10) === 1) {
+          numberRowUpdated = numberRowUpdated + 1;
+        } else {
+          numberRowNotUpdate = numberRowNotUpdate + 1;
+        }
+      });
+
+      res.send(
+        common.returnAPIData(
+          { numberRowUpdated, numberRowNotUpdate },
+          `Cập nhật mã sản phẩm giảm giá thành công`
+        )
+      );
     } else {
       next({
         status: 400,
@@ -296,6 +314,7 @@ const asyncUpdateItemProductOnDiscount = async (
   return ProductOnDiscount.update(
     {
       requirementQuantity: discountProduct.requirementQuantity,
+      updatedAt: moment(),
     },
     {
       where: { discountId: discountId, productId: discountProduct.productId },
@@ -321,13 +340,18 @@ exports.delete = async (req, res, next) => {
     });
 
     if (deleteProductOnDiscount) {
-      const numberDelete = await Discount.destroy({
+      const deletedCount = await Discount.destroy({
         where: { discountId: { [Op.or]: arrayIds } },
       });
 
       res.send(
-        common.returnAPIData({}, `${numberDelete} mã giảm giá đã bị xoá!`)
+        common.returnAPIData(
+          { deletedCount: deletedCount },
+          `${numberDelete} mã giảm giá đã bị xoá!`
+        )
       );
+    } else {
+      common.returnAPIData({}, `Không có phiếu nhập bị xoá!`);
     }
   } catch (error) {
     next({

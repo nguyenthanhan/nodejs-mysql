@@ -17,7 +17,6 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
-      timestamps: true,
       freezeTableName: true,
     }
   );

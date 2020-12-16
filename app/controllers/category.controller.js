@@ -94,7 +94,20 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Category.findByPk(id, { include: ["products", "shelf"] })
+  Category.findByPk(id, {
+    include: [
+      {
+        model: Product,
+        as: "products",
+        attributes: ["PID", "name"],
+      },
+      {
+        model: Shelf,
+        as: "shelf",
+        // attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
     .then((data) => {
       if (data) {
         res.send(common.returnAPIData(data));
