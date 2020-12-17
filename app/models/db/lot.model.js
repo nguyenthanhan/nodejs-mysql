@@ -11,15 +11,22 @@ module.exports = (sequelize, Sequelize) => {
       },
       name: {
         type: Sequelize.STRING(80),
-        allowNull: false,
-        defaultValue: "",
       },
-      quantity: {
+      number_of_products_remaining: {
         type: Sequelize.STRING(80),
         allowNull: false,
       },
-      Exp: {
+      expires: {
         type: Sequelize.DATE,
+      },
+      sell_price_product: {
+        type: Sequelize.BIGINT(20),
+      },
+      import_price_product: {
+        type: Sequelize.BIGINT(20),
+      },
+      import_price_lot: {
+        type: Sequelize.BIGINT(20),
       },
     },
     {

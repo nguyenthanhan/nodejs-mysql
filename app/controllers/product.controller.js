@@ -12,15 +12,15 @@ exports.create = async (req, res, next) => {
   // Validate request
   if (
     !req.body.name ||
-    !req.body.W_curr_qtt ||
+    // !req.body.W_curr_qtt ||
     !req.body.W_max_qtt ||
     !req.body.W_min_qtt ||
-    !req.body.S_curr_qtt ||
+    // !req.body.S_curr_qtt ||
     !req.body.S_max_qtt ||
     !req.body.S_min_qtt ||
     !req.body.qtt_per_unit ||
-    !req.body.sell_price ||
-    !req.body.import_price ||
+    // !req.body.sell_price ||
+    // !req.body.import_price ||
     !req.body.brand
   ) {
     next({
@@ -53,8 +53,8 @@ exports.create = async (req, res, next) => {
     S_curr_qtt: req.body.S_curr_qtt,
     S_max_qtt: req.body.S_max_qtt,
     S_min_qtt: req.body.S_min_qtt,
-    sell_price: req.body.sell_price,
-    import_price: req.body.import_price,
+    // sell_price: req.body.sell_price,
+    // import_price: req.body.import_price,
     brand: req.body.brand,
     categoryId: req.body.categoryId,
     lotId: req.body.lotId,

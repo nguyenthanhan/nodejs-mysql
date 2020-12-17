@@ -15,8 +15,14 @@ const _ = require("lodash");
 
 // Create and Save a new import
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
-  if (!req.body.total && !req.body.checkerId) {
+  if (
+    !req.body.total &&
+    !req.body.checkerId &&
+    !req.body.import_number &&
+    !req.body.total_cost
+  ) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -27,9 +33,12 @@ exports.create = async (req, res, next) => {
   try {
     // Create a import
     const newImport = {
-      date: req.body.date ? moment(req.body.date) : new Date(),
-      total: req.body.total,
-      state: req.body.state ? req.body.state : "ready",
+      import_action_date: req.body.import_action_date
+        ? moment(req.body.import_action_date)
+        : new Date(),
+      import_number: req.body.import_number,
+      total_cost: req.body.total,
+      state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
       checkerId: req.body.checkerId,
       bonus: req.body.bonus ? req.body.bonus : "",
@@ -90,7 +99,11 @@ exports.create = async (req, res, next) => {
 const asyncCreateItemProductOnImport = (importProduct, importId) => {
   return ProductInImport.create({
     productId: importProduct.productId,
-    amount: importProduct.amount,
+    total_unit: importProduct.total_unit,
+    expires: moment(importProduct.expires),
+    unit_name: importProduct.unit_name,
+    conversionRate: importProduct.conversionRate,
+    import_price_unit: importProduct.import_price_unit,
     importId: importId,
   });
 };
@@ -251,7 +264,13 @@ exports.update = async (req, res, next) => {
 const asyncUpdateItemProductOnImport = (importProduct, importId) => {
   return ProductInImport.update(
     {
-      amount: importProduct.amount,
+      productId: importProduct.productId,
+      total_unit: importProduct.total_unit,
+      expires: moment(importProduct.expires),
+      unit_name: importProduct.unit_name,
+      conversionRate: importProduct.conversionRate,
+      import_price_unit: importProduct.import_price_unit,
+      importId: importId,
       updatedAt: moment(),
     },
     {

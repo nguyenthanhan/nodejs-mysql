@@ -14,6 +14,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "",
       },
+
       description: {
         type: Sequelize.TEXT,
         allowNull: false,
@@ -34,22 +35,12 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "",
       },
-      W_curr_qtt: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
       W_max_qtt: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
       W_min_qtt: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      S_curr_qtt: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -64,19 +55,20 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
+      W_curr_qtt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      S_curr_qtt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       qtt_per_unit: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 1,
-      },
-      sell_price: {
-        type: Sequelize.BIGINT(20),
-        defaultValue: 0,
-      },
-      import_price: {
-        type: Sequelize.BIGINT(20),
-        allowNull: false,
-        defaultValue: 0,
       },
       vat: {
         type: Sequelize.INTEGER(2),

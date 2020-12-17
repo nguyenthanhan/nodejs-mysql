@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
   const lot = {
     name: req.body.name,
     quantity: req.body.quantity,
-    Exp: req.body.Exp,
+    expires: req.body.expires,
   };
 
   // Save lot in the database

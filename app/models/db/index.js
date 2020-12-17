@@ -64,6 +64,23 @@ const ProductInImport = sequelize.define(
     amount: {
       type: Sequelize.INTEGER(20),
     },
+    total_unit: {
+      type: Sequelize.INTEGER(20),
+      allowNull: false,
+    },
+    expires: {
+      type: Sequelize.DATE,
+    },
+    unit_name: {
+      type: Sequelize.STRING(20),
+    },
+    conversionRate: {
+      type: Sequelize.INTEGER(20),
+    },
+    import_price_unit: {
+      type: Sequelize.BIGINT(20),
+      allowNull: false,
+    },
   },
   {
     freezeTableName: true,

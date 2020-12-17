@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
       },
       state: {
-        type: Sequelize.ENUM("ready", "executed", "close"),
+        type: Sequelize.ENUM("request", "executed", "close"),
       },
       urgent_level: {
         type: Sequelize.ENUM("normal", "prior"),

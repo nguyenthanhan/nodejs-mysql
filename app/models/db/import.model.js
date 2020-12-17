@@ -9,19 +9,22 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      total: {
+      import_number: {
+        type: Sequelize.STRING(40),
+      },
+      total_cost: {
         type: Sequelize.BIGINT(20),
       },
-      date: {
+      import_action_date: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
       state: {
-        type: Sequelize.ENUM("ready", "executed", "close"),
+        type: Sequelize.ENUM("request", "executed", "close"),
+        defaultValue: "request",
       },
       urgent_level: {
         type: Sequelize.ENUM("normal", "prior"),
+        defaultValue: "normal",
       },
       bonus: {
         type: Sequelize.TEXT,
