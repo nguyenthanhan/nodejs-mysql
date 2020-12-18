@@ -37,7 +37,7 @@ exports.create = async (req, res, next) => {
         ? moment(req.body.import_action_date)
         : new Date(),
       import_number: req.body.import_number,
-      total_cost: req.body.total,
+      total_cost: req.body.total_cost,
       state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
       checkerId: req.body.checkerId,
@@ -99,7 +99,8 @@ exports.create = async (req, res, next) => {
 const asyncCreateItemProductOnImport = (importProduct, importId) => {
   return ProductInImport.create({
     productId: importProduct.productId,
-    total_unit: importProduct.total_unit,
+    request_total_unit: importProduct.request_total_unit,
+    real_total_unit: importProduct.real_total_unit,
     expires: moment(importProduct.expires),
     unit_name: importProduct.unit_name,
     conversionRate: importProduct.conversionRate,
@@ -138,7 +139,7 @@ exports.findAll = async (req, res, next) => {
       {
         model: Supplier,
         as: "supplier",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["SupID", "createdAt", "updatedAt"] },
       },
       {
         model: Product,
@@ -181,7 +182,7 @@ exports.findOne = async (req, res, next) => {
       {
         model: Supplier,
         as: "supplier",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["SupID", "createdAt", "updatedAt"] },
       },
       {
         model: Product,
@@ -264,12 +265,7 @@ exports.update = async (req, res, next) => {
 const asyncUpdateItemProductOnImport = (importProduct, importId) => {
   return ProductInImport.update(
     {
-      productId: importProduct.productId,
-      total_unit: importProduct.total_unit,
-      expires: moment(importProduct.expires),
-      unit_name: importProduct.unit_name,
-      conversionRate: importProduct.conversionRate,
-      import_price_unit: importProduct.import_price_unit,
+      ...importProduct,
       importId: importId,
       updatedAt: moment(),
     },

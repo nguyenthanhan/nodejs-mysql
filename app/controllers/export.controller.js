@@ -13,9 +13,13 @@ exports.create = async (req, res, next) => {
   try {
     const _export = {
       mngID: req.userId,
-      date: req.body.date ? moment(req.body.date) : new Date(),
-      state: req.body.state ? req.body.state : "ready",
+      export_number: req.body.export_number,
+      export_action_date: req.body.export_action_date
+        ? moment(req.body.export_action_date)
+        : new Date(),
+      state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
+      checkerId: req.body.checkerId
     };
 
     // Save export in the database

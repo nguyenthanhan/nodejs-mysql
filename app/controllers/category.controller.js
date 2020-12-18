@@ -10,7 +10,7 @@ const Op = db.Sequelize.Op;
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.name && !req.body.shelfId) {
+  if (!req.body.name) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -31,7 +31,6 @@ exports.create = async (req, res, next) => {
 
   // Create a Category
   const category = {
-    shelfId: req.body.shelfId,
     name: req.body.name,
     img_url: convertImageResult.url ? convertImageResult.url : "",
   };
@@ -69,7 +68,7 @@ exports.findAll = async (req, res, next) => {
         },
         {
           model: Shelf,
-          as: "shelf",
+          as: "shelves",
           // attributes: { exclude: ["createdAt", "updatedAt"] },
         },
       ],

@@ -313,7 +313,7 @@ const asyncUpdateItemProductOnDiscount = async (
 ) => {
   return ProductOnDiscount.update(
     {
-      requirementQuantity: discountProduct.requirementQuantity,
+      ...discountProduct,
       updatedAt: moment(),
     },
     {

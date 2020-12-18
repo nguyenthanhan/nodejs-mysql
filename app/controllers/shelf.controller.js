@@ -23,6 +23,7 @@ exports.create = async (req, res, next) => {
     type: req.body.type ? req.body.type : "small",
     state: req.body.state ? req.body.state : "available",
     location: req.body.location ? req.body.location : "wareHouse",
+    categoryId: req.body.categoryId,
   };
 
   // Save shelf in the database

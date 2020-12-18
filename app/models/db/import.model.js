@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: "request",
       },
       urgent_level: {
-        type: Sequelize.ENUM("normal", "prior"),
+        type: Sequelize.ENUM("normal", "priority"),
         defaultValue: "normal",
       },
       bonus: {
