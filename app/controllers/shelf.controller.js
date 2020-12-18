@@ -2,7 +2,7 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const Shelf = db.shelf;
+const { shelf: Shelf, category: Category } = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Shelf
@@ -17,30 +17,30 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  // Create a shelf
-  const shelf = {
-    name: req.body.name,
-    type: req.body.type ? req.body.type : "small",
-    state: req.body.state ? req.body.state : "available",
-    location: req.body.location ? req.body.location : "wareHouse",
-    categoryId: req.body.categoryId,
-  };
+  try {
+    // Create a shelf
+    const shelf = {
+      name: req.body.name,
+      type: req.body.type ? req.body.type : "small",
+      state: req.body.state ? req.body.state : "available",
+      location: req.body.location === "store" ? "store" : "warehouse",
+    };
 
-  // Save shelf in the database
-  Shelf.create(shelf)
-    .then((data) => {
-      res.send(common.returnAPIData(data, "Tạo kệ hàng thành công"));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "post",
-        name: "kệ hàng",
-        id: 0,
-      });
-      return;
+    // Save shelf in the database
+    const shelfQuery = Shelf.create(shelf);
+    if (shelfQuery) {
+      res.send(common.returnAPIData(shelfQuery, "Tạo kệ hàng thành công"));
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "post",
+      name: "kệ hàng",
+      id: 0,
     });
+    return;
+  }
 };
 
 // Retrieve all shelves from the database.
@@ -48,7 +48,16 @@ exports.findAll = async (req, res, next) => {
   const name = req.query.name;
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
-  Shelf.findAll({ where: condition, includes: ["categories"] })
+  Shelf.findAll({
+    where: condition,
+    include: [
+      {
+        model: Category,
+        as: "categories",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  })
     .then((data) => {
       const message = data.length === 0 ? "Không có kệ hàng nào" : "";
       res.send(common.returnAPIData(data, message));

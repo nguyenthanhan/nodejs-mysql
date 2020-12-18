@@ -12,12 +12,12 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING(80),
       },
-      number_of_products_remaining: {
+      number_of_products: {
         type: Sequelize.STRING(80),
         allowNull: false,
       },
       expires: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       sell_price_product: {
         type: Sequelize.BIGINT(20),

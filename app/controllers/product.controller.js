@@ -9,6 +9,7 @@ const Op = db.Sequelize.Op;
 
 // Create and Save a new product
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (
     !req.body.name ||
@@ -19,13 +20,29 @@ exports.create = async (req, res, next) => {
     !req.body.S_max_qtt ||
     !req.body.S_min_qtt ||
     !req.body.qtt_per_unit ||
-    // !req.body.sell_price ||
-    // !req.body.import_price ||
     !req.body.brand
   ) {
     next({
       status: 400,
       message: lang.general.error._400,
+    });
+    return;
+  }
+
+  if (req.body.W_max_qtt > req.body.W_min_qtt) {
+    next({
+      status: 400,
+      message:
+        "Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu",
+    });
+    return;
+  }
+
+  if (req.body.S_max_qtt > req.body.S_min_qtt) {
+    next({
+      status: 400,
+      message:
+        "Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu",
     });
     return;
   }
@@ -47,17 +64,20 @@ exports.create = async (req, res, next) => {
     name: req.body.name,
     barcode: req.body.barcode,
     img_url: convertImageResult.url ? convertImageResult.url : "",
-    W_curr_qtt: req.body.W_curr_qtt,
-    W_max_qtt: req.body.W_max_qtt,
-    W_min_qtt: req.body.W_min_qtt,
-    S_curr_qtt: req.body.S_curr_qtt,
-    S_max_qtt: req.body.S_max_qtt,
-    S_min_qtt: req.body.S_min_qtt,
+    W_curr_qtt: parseInt(req.body.W_curr_qtt)
+      ? parseInt(req.body.W_curr_qtt)
+      : 0,
+    W_max_qtt: parseInt(req.body.W_max_qtt),
+    W_min_qtt: parseInt(req.body.W_min_qtt),
+    S_curr_qtt: parseInt(req.body.S_curr_qtt)
+      ? parseInt(req.body.S_curr_qtt)
+      : 0,
+    S_max_qtt: parseInt(req.body.S_max_qtt),
+    S_min_qtt: parseInt(req.body.S_min_qtt),
     // sell_price: req.body.sell_price,
     // import_price: req.body.import_price,
     brand: req.body.brand,
-    categoryId: req.body.categoryId,
-    lotId: req.body.lotId,
+    categoryId: parseInt(req.body.categoryId),
     otherDetail: req.body.otherDetail,
     description: req.body.description,
     vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,

@@ -37,11 +37,6 @@ db.import.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
 db.export.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
 
 //one to many
-db.category.hasMany(db.shelf, { foreignKey: "categoryId", as: "category" });
-db.shelf.belongsTo(db.category, {
-  foreignKey: "categoryId",
-  as: "shelves",
-});
 
 db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
 db.product.belongsTo(db.category, {
@@ -60,6 +55,25 @@ db.import.belongsTo(db.manager, {
 });
 
 //----------
+db.categoryShelf = sequelize.define(
+  "CategoryShelf",
+  {},
+  {
+    freezeTableName: true,
+  }
+);
+
+db.shelf.belongsToMany(db.category, {
+  through: db.categoryShelf,
+  as: "categories",
+  foreignKey: "shelfId",
+});
+db.category.belongsToMany(db.shelf, {
+  through: db.categoryShelf,
+  as: "shelves",
+  foreignKey: "categoryId",
+});
+
 const ProductInImport = sequelize.define(
   "ProductInImport",
   {
@@ -81,6 +95,10 @@ const ProductInImport = sequelize.define(
       type: Sequelize.INTEGER(20),
     },
     import_price_unit: {
+      type: Sequelize.BIGINT(20),
+      allowNull: false,
+    },
+    import_price_product: {
       type: Sequelize.BIGINT(20),
       allowNull: false,
     },

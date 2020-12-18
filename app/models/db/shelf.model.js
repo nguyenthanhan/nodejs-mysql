@@ -19,8 +19,8 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: "small",
       },
       location: {
-        type: Sequelize.ENUM("wareHouse", "store"),
-        defaultValue: "wareHouse",
+        type: Sequelize.ENUM("warehouse", "store"),
+        defaultValue: "warehouse",
       },
       state: {
         type: Sequelize.ENUM("full", "available"),

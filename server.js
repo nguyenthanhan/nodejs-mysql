@@ -8,8 +8,7 @@ const logger = require("morgan");
 const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
 const PORT = process.env.PORT || 5000;
-var bcrypt = require("bcrypt");
-const constants = require("./app/constants/index");
+const faker = require("./faker");
 
 // const axios = require('axios');
 
@@ -54,15 +53,12 @@ if (!isDev && cluster.isMaster) {
   if (process.env.RESET_DB === "true") {
     // drop the table if it already exists
     db.sequelize.sync({ force: true }).then(async () => {
-      const hashPassword = await bcrypt.hash("password", constants.SALT_ROUNDS);
-      db.manager.create({
-        FName: "Admin",
-        LName: "",
-        accountName: "admin",
-        password: hashPassword,
-        Address: "102 Xóm Chiếu",
-        managerType: "prime",
-      });
+      const admin = await faker.admin();
+      await db.category.bulkCreate(faker.categories);
+      await db.shelf.bulkCreate(faker.shelves);
+      await db.categoryShelf.bulkCreate(faker.categoriesShelves);
+      await db.supplier.bulkCreate(faker.suppliers);
+      await db.manager.create(admin);
     });
   } else {
     db.sequelize.sync();

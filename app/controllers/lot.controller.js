@@ -4,6 +4,7 @@ const db = require("../models/db");
 const lang = require("../lang");
 const Lot = db.lot;
 const Op = db.Sequelize.Op;
+const moment = require("moment");
 
 // Create and Save a new lot
 exports.create = async (req, res, next) => {
@@ -20,8 +21,8 @@ exports.create = async (req, res, next) => {
   // Create a lot
   const lot = {
     name: req.body.name,
-    quantity: req.body.quantity,
-    expires: req.body.expires,
+    quantity: parseInt(req.query.quantity),
+    expires: moment(req.body.expires),
   };
 
   // Save lot in the database

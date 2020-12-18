@@ -18,22 +18,22 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  let convertImageResult = {};
+  // Create a Category
+  let category = {
+    name: req.body.name,
+  };
+  let message = "Tạo được loại hàng nhưng không có hình ảnh minh hoạ";
+
   if (req.file) {
-    convertImageResult = await cloudinary.uploadSingle(
+    const convertImageResult = await cloudinary.uploadSingle(
       req.file.path,
       "category"
     );
+    if (convertImageResult && convertImageResult.url) {
+      category = { ...category, img_url: convertImageResult.url };
+      message = "Đã tạo loại hàng";
+    }
   }
-  const message = convertImageResult.url
-    ? ""
-    : "Tạo được loại hàng nhưng không có hình ảnh minh hoạ";
-
-  // Create a Category
-  const category = {
-    name: req.body.name,
-    img_url: convertImageResult.url ? convertImageResult.url : "",
-  };
 
   // Save category in the database
   Category.create(category)
@@ -69,7 +69,7 @@ exports.findAll = async (req, res, next) => {
         {
           model: Shelf,
           as: "shelves",
-          // attributes: { exclude: ["createdAt", "updatedAt"] },
+          attributes: { exclude: ["createdAt", "updatedAt"] },
         },
       ],
     });
@@ -102,8 +102,8 @@ exports.findOne = async (req, res, next) => {
       },
       {
         model: Shelf,
-        as: "shelf",
-        // attributes: { exclude: ["createdAt", "updatedAt"] },
+        as: "shelves",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   })

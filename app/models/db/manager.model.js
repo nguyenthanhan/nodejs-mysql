@@ -33,7 +33,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: "",
       },
       BDay: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       gender: {
         type: Sequelize.ENUM("male", "female", "other"),

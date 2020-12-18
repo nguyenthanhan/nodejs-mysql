@@ -15,7 +15,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       img_url: {
         type: Sequelize.TEXT,
-        allowNull: false,
       },
     },
     {

@@ -195,7 +195,7 @@ exports.update = async (req, res, next) => {
   try {
     // Create a Discount
     const discount = {
-      rate: req.body.rate,
+      rate: parseInt(req.query.rate),
       title: req.body.title,
       description: req.body.description,
       start_date: moment(req.body.start_date),

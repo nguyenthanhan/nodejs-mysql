@@ -40,10 +40,10 @@ exports.create = async (req, res, next) => {
       total_cost: req.body.total_cost,
       state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
-      checkerId: req.body.checkerId,
+      checkerId: parseInt(req.query.checkerId),
       bonus: req.body.bonus ? req.body.bonus : "",
       mngID: req.userId,
-      supplierId: req.body.supplierId,
+      supplierId: parseInt(req.query.supplierId),
     };
 
     // Save import in the database
@@ -97,15 +97,17 @@ exports.create = async (req, res, next) => {
 };
 
 const asyncCreateItemProductOnImport = (importProduct, importId) => {
+  const { import_price_unit, conversionRate } = importProduct;
   return ProductInImport.create({
     productId: importProduct.productId,
     request_total_unit: importProduct.request_total_unit,
     real_total_unit: importProduct.real_total_unit,
     expires: moment(importProduct.expires),
     unit_name: importProduct.unit_name,
-    conversionRate: importProduct.conversionRate,
-    import_price_unit: importProduct.import_price_unit,
+    conversionRate: conversionRate,
+    import_price_unit: import_price_unit,
     importId: importId,
+    import_price_product: Math.ceil(import_price_unit / conversionRate),
   });
 };
 
