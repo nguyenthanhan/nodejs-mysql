@@ -40,14 +40,14 @@ exports.create = async (req, res, next) => {
       total_cost: req.body.total_cost,
       state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
-      checkerId: parseInt(req.query.checkerId),
+      checkerId: parseInt(req.body.checkerId),
       bonus: req.body.bonus ? req.body.bonus : "",
       mngID: req.userId,
-      supplierId: parseInt(req.query.supplierId),
+      supplierId: parseInt(req.body.supplierId),
     };
 
     // Save import in the database
-    const excImport = await Import.create(newImport);
+    const excImport = await Import.create(newImport, { raw: true });
 
     if (excImport && excImport.ImID) {
       if (
@@ -59,13 +59,15 @@ exports.create = async (req, res, next) => {
           req.body.importProducts,
           excImport.ImID
         );
+
+        console.log("createProductsInImport", createProductsInImport);
         const productsInImport = createProductsInImport.map((el) =>
           el.get({ plain: true })
         );
         if (!_.isEmpty(productsInImport)) {
           res.send(
             common.returnAPIData(
-              { excImport, productsInImport },
+              { ...excImport, productsInImport },
               "Tạo đơn nhập hàng thành công"
             )
           );
@@ -96,27 +98,23 @@ exports.create = async (req, res, next) => {
   }
 };
 
-const asyncCreateItemProductOnImport = (importProduct, importId) => {
-  const { import_price_unit, conversionRate } = importProduct;
-  return ProductInImport.create({
-    productId: importProduct.productId,
-    request_total_unit: importProduct.request_total_unit,
-    real_total_unit: importProduct.real_total_unit,
-    expires: moment(importProduct.expires),
-    unit_name: importProduct.unit_name,
-    conversionRate: conversionRate,
-    import_price_unit: import_price_unit,
-    importId: importId,
-    import_price_product: Math.ceil(import_price_unit / conversionRate),
-  });
-};
-
 const createItemsWithProducts = async (importProducts, importId) => {
-  return Promise.all(
-    importProducts.map((importProduct) =>
-      asyncCreateItemProductOnImport(importProduct, importId)
-    )
-  );
+  const configImportProducts = importProducts.map((importProduct) => {
+    const { import_price_unit, conversionRate } = importProduct;
+    return {
+      productId: importProduct.productId,
+      request_total_unit: importProduct.request_total_unit,
+      real_total_unit: importProduct.real_total_unit,
+      expires: moment(importProduct.expires),
+      unit_name: importProduct.unit_name,
+      conversionRate: conversionRate,
+      import_price_unit: import_price_unit,
+      importId: importId,
+      import_price_product: Math.ceil(import_price_unit / conversionRate),
+    };
+  });
+
+  return ProductInImport.bulkCreate(configImportProducts, { raw: true });
 };
 
 // Retrieve all imports from the database.

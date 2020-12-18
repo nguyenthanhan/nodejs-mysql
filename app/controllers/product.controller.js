@@ -47,23 +47,10 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  let convertImageResult = {};
-  if (req.file) {
-    convertImageResult = await cloudinary.uploadSingle(
-      req.file.path,
-      "product"
-    );
-  }
-
-  const imageMessage = convertImageResult.url
-    ? ""
-    : "nhưng không có hình ảnh sản phẩm";
-
   // Create a product
-  const product = {
+  let product = {
     name: req.body.name,
     barcode: req.body.barcode,
-    img_url: convertImageResult.url ? convertImageResult.url : "",
     W_curr_qtt: parseInt(req.body.W_curr_qtt)
       ? parseInt(req.body.W_curr_qtt)
       : 0,
@@ -83,12 +70,24 @@ exports.create = async (req, res, next) => {
     vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,
   };
 
+  let imageMessage = "Tạo sản phẩm thành công nhưng không có hình ảnh sản phẩm";
+
+  if (req.file) {
+    const convertImageResult = await cloudinary.uploadSingle(
+      req.file.path,
+      "product"
+    );
+
+    if (convertImageResult && convertImageResult.url) {
+      product = { ...product, img_url: convertImageResult.url };
+      imageMessage = "Tạo sản phẩm thành công";
+    }
+  }
+
   // Save product in the database
   Product.create(product)
     .then((data) => {
-      res.send(
-        common.returnAPIData(data, "Tạo sản phẩm thành công " + imageMessage)
-      );
+      res.send(common.returnAPIData(data, imageMessage));
     })
     .catch((err) => {
       next({

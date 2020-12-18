@@ -19,7 +19,7 @@ exports.create = async (req, res, next) => {
         : new Date(),
       state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
-      checkerId: parseInt(req.query.checkerId),
+      checkerId: parseInt(req.body.checkerId),
     };
 
     // Save export in the database

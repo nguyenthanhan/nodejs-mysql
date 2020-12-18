@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
   // Create a lot
   const lot = {
     name: req.body.name,
-    quantity: parseInt(req.query.quantity),
+    quantity: parseInt(req.body.quantity),
     expires: moment(req.body.expires),
   };
 
