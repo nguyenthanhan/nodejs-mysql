@@ -8,9 +8,7 @@ const logger = require("morgan");
 const numCPUs = require("os").cpus().length;
 const isDev = process.env.NODE_ENV !== "prod";
 const PORT = process.env.PORT || 5000;
-const faker = require("./faker");
-
-// const axios = require('axios');
+const faker = require("./app/faker");
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
@@ -29,17 +27,18 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
 
-  let corsOptions = {
-    origin: "http://localhost:5000",
-    allowedHeaders: ["sessionId", "Content-Type"],
-    exposedHeaders: ["sessionId"],
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-  };
+  if (!isDev) {
+    let corsOptions = {
+      origin: "http://localhost:3000",
+      allowedHeaders: ["sessionId", "Content-Type"],
+      exposedHeaders: ["sessionId"],
+      origin: "*",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+    };
 
-  app.use(cors(corsOptions));
-
+    app.use(cors(corsOptions));
+  }
   app.use(logger("dev"));
 
   // parse requests of content-type - application/json
@@ -65,18 +64,12 @@ if (!isDev && cluster.isMaster) {
   }
 
   // index
-  app.get("/", (req, res, next) => {
+  app.get("/api", (req, res, next) => {
     res.json({
       title: lang.general.app,
       ...common.returnAPIData({}, ""),
     });
   });
-
-  // app.get('/users', (req, res, next) => {
-  //   axios.get('https://randomuser.me/api/?page=1&results=10').then(response => {
-  //     res.send(response.data);
-  //   });
-  // });
 
   // Answer API requests.
   require("./app/routes/auth.routes")(app);

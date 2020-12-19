@@ -1,7 +1,7 @@
 "use strict";
-const lang = require("../app/lang");
+const lang = require("../lang");
 var bcrypt = require("bcrypt");
-const constants = require("../app/constants");
+const constants = require("../constants");
 
 const admin = async () => {
   const hashPassword = await bcrypt.hash("password", constants.SALT_ROUNDS);
