@@ -27,9 +27,9 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
 
-  if (!isDev) {
+  if (isDev) {
     let corsOptions = {
-      origin: "http://localhost:3000",
+      origin: "http://localhost:5000",
       allowedHeaders: ["sessionId", "Content-Type"],
       exposedHeaders: ["sessionId"],
       origin: "*",
