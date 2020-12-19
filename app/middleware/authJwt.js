@@ -8,7 +8,7 @@ verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
 
   if (!token) {
-    next({ status: 400, message: "Thiếu mã truy cập (token)!" });
+    next({ status: 401, message: "Thiếu mã truy cập (token)!" });
     return;
   }
 

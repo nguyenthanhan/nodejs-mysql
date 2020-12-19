@@ -18,6 +18,7 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
+      paranoid: true,
       freezeTableName: true,
     }
   );

@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
     !req.body.total &&
     !req.body.checkerId &&
     !req.body.import_number &&
-    !req.body.total_cost
+    !req.body.supplierId
   ) {
     next({
       status: 400,
@@ -30,14 +30,28 @@ exports.create = async (req, res, next) => {
     return;
   }
 
+  if (_.isEmpty(req.body.importProducts)) {
+    next({
+      status: 400,
+      message: "Không có sản phẩm được nhập vào!",
+    });
+    return;
+  }
+
   try {
+    const total_cost = req.body.importProducts.reduce((sum, importProduct) => {
+      return (
+        sum + importProduct.real_total_unit * importProduct.import_price_unit
+      );
+    }, 0);
+
     // Create a import
     const newImport = {
       import_action_date: req.body.import_action_date
         ? moment(req.body.import_action_date)
         : new Date(),
       import_number: req.body.import_number,
-      total_cost: req.body.total_cost,
+      total_cost: total_cost,
       state: req.body.state ? req.body.state : "request",
       urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
       checkerId: parseInt(req.body.checkerId),
@@ -47,7 +61,8 @@ exports.create = async (req, res, next) => {
     };
 
     // Save import in the database
-    const excImport = await Import.create(newImport, { raw: true });
+    const tExcImport = await Import.create(newImport);
+    const excImport = tExcImport.get({ plain: true });
 
     if (excImport && excImport.ImID) {
       if (
@@ -60,14 +75,39 @@ exports.create = async (req, res, next) => {
           excImport.ImID
         );
 
-        console.log("createProductsInImport", createProductsInImport);
+        const updateProducts = await Promise.all(
+          req.body.importProducts.map(async (importProduct) => {
+            const { conversionRate, real_total_unit } = importProduct;
+
+            const oldProduct = await Product.findByPk(importProduct.productId);
+            const newUpdate = await Product.update(
+              {
+                W_curr_qtt:
+                  oldProduct.W_curr_qtt + real_total_unit * conversionRate,
+              },
+              {
+                where: { PID: importProduct.productId },
+              }
+            );
+            return parseInt(newUpdate);
+          })
+        );
+        console.log("updateProducts", updateProducts);
+
         const productsInImport = createProductsInImport.map((el) =>
           el.get({ plain: true })
         );
         if (!_.isEmpty(productsInImport)) {
           res.send(
             common.returnAPIData(
-              { ...excImport, productsInImport },
+              {
+                ...excImport,
+                productsInImport,
+                updateProductNumbers: updateProducts.reduce(
+                  (acum, number) => acum + number,
+                  0
+                ),
+              },
               "Tạo đơn nhập hàng thành công"
             )
           );
@@ -114,53 +154,52 @@ const createItemsWithProducts = async (importProducts, importId) => {
     };
   });
 
-  return ProductInImport.bulkCreate(configImportProducts, { raw: true });
+  return ProductInImport.bulkCreate(configImportProducts);
 };
 
 // Retrieve all imports from the database.
 exports.findAll = async (req, res, next) => {
-  //TODO: need find by other exp: accountName, not id
-  // const mngID = req.query.mngID;
-  // let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
+  try {
+    // const mngID = req.query.mngID;
+    // let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
-  Import.findAll({
-    // where: condition,
-    include: [
-      {
-        model: Manager,
-        as: "checker",
-        attributes: ["accountName", "LName", "FName"],
-      },
-      {
-        model: Manager,
-        as: "manager",
-        attributes: ["accountName", "LName", "FName"],
-      },
-      {
-        model: Supplier,
-        as: "supplier",
-        attributes: { exclude: ["SupID", "createdAt", "updatedAt"] },
-      },
-      {
-        model: Product,
-        as: "products",
-        // attributes: { exclude: ["createdAt", "updatedAt"] },
-      },
-    ],
-  })
-    .then((data) => {
-      res.send(common.returnAPIData(data));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "get",
-        name: "thông tin nhập hàng",
-        id: 0,
-      });
-      return;
+    const data = await Import.findAll({
+      // where: condition,
+      include: [
+        {
+          model: Manager,
+          as: "checker",
+          attributes: ["MngID", "accountName", "LName", "FName"],
+        },
+        {
+          model: Manager,
+          as: "manager",
+          attributes: ["MngID", "accountName", "LName", "FName"],
+        },
+        {
+          model: Supplier,
+          as: "supplier",
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+        },
+        {
+          model: Product,
+          as: "products",
+          attributes: ["PID", "W_curr_qtt", "S_curr_qtt"],
+        },
+      ],
     });
+
+    res.send(common.returnAPIData(data));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: "get",
+      name: "thông tin nhập hàng",
+      id: 0,
+    });
+    return;
+  }
 };
 
 // Find a single import with an id
@@ -172,21 +211,22 @@ exports.findOne = async (req, res, next) => {
       {
         model: Manager,
         as: "checker",
-        attributes: ["accountName", "LName", "FName"],
+        attributes: ["MngID", "accountName", "LName", "FName"],
       },
       {
         model: Manager,
         as: "manager",
-        attributes: ["accountName", "LName", "FName"],
+        attributes: ["MngID", "accountName", "LName", "FName"],
       },
       {
         model: Supplier,
         as: "supplier",
-        attributes: { exclude: ["SupID", "createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
       {
         model: Product,
         as: "products",
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   })
@@ -208,7 +248,9 @@ exports.findOne = async (req, res, next) => {
 // Update a import by the id in the request
 exports.update = async (req, res, next) => {
   try {
-    const newBody = { ...req.body, updatedAt: new Date() };
+    const { import_number, supplierId, ...body } = req.body;
+
+    const newBody = { ...body, updatedAt: new Date() };
 
     const numbersUpdateImport = await Import.update(newBody, {
       where: { ImID: req.params.id },

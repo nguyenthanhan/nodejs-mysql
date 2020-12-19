@@ -142,20 +142,15 @@ exports.create = async (req, res, next) => {
   }
 };
 
-const asyncCreateItemProductOnDiscount = (discountProduct, discountId) => {
-  return ProductOnDiscount.create({
-    productId: discountProduct.productId,
-    requirementQuantity: discountProduct.requirementQuantity,
-    discountId: discountId,
-  });
-};
-
 const createDiscountsWithProduct = async (discountProducts, discountId) => {
-  return Promise.all(
-    discountProducts.map((discountProduct) =>
-      asyncCreateItemProductOnDiscount(discountProduct, discountId)
-    )
-  );
+  const newDiscountProducts = discountProducts.map((discountProduct) => {
+    return {
+      productId: discountProduct.productId,
+      requirementQuantity: discountProduct.requirementQuantity,
+      discountId: discountId,
+    };
+  });
+  return ProductOnDiscount.bulkCreate(newDiscountProducts);
 };
 
 exports.findAll = async (req, res, next) => {

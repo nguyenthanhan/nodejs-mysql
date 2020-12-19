@@ -13,13 +13,11 @@ exports.create = async (req, res, next) => {
   // Validate request
   if (
     !req.body.name ||
-    // !req.body.W_curr_qtt ||
     !req.body.W_max_qtt ||
     !req.body.W_min_qtt ||
-    // !req.body.S_curr_qtt ||
     !req.body.S_max_qtt ||
     !req.body.S_min_qtt ||
-    !req.body.qtt_per_unit ||
+    // !req.body.qtt_per_unit ||
     !req.body.brand
   ) {
     next({
@@ -29,23 +27,23 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (req.body.W_max_qtt > req.body.W_min_qtt) {
-    next({
-      status: 400,
-      message:
-        "Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu",
-    });
-    return;
-  }
+  // if (req.body.W_max_qtt > req.body.W_min_qtt) {
+  //   next({
+  //     status: 400,
+  //     message:
+  //       "Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu",
+  //   });
+  //   return;
+  // }
 
-  if (req.body.S_max_qtt > req.body.S_min_qtt) {
-    next({
-      status: 400,
-      message:
-        "Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu",
-    });
-    return;
-  }
+  // if (req.body.S_max_qtt > req.body.S_min_qtt) {
+  //   next({
+  //     status: 400,
+  //     message:
+  //       "Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu",
+  //   });
+  //   return;
+  // }
 
   // Create a product
   let product = {
@@ -137,12 +135,12 @@ exports.findAll = async (req, res, next) => {
       {
         model: Category,
         as: "category",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        // attributes: { exclude: ["createdAt", "updatedAt"] },
       },
       {
         model: Discount,
         as: "discounts",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        // attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   })

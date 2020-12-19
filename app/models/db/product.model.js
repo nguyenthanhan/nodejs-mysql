@@ -65,11 +65,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
-      qtt_per_unit: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
-      },
+      // qtt_per_unit: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   defaultValue: 1,
+      // },
       vat: {
         type: Sequelize.INTEGER(2),
       },
@@ -80,11 +80,7 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
-      // don't delete database entries but set the newly added attribute deletedAt
-      // to the current date (when deletion was done). paranoid will only work if
-      // timestamps are enabled
-      // paranoid: true,
-
+      paranoid: true,
       freezeTableName: true,
       // tableName: "my_very_custom_table_name",
     }
