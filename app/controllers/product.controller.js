@@ -6,6 +6,7 @@ const cloudinary = require("../models/cloudinary.model");
 const _ = require("lodash");
 const { product: Product, category: Category, discount: Discount } = db;
 const Op = db.Sequelize.Op;
+const LogController = require("./log.controller");
 
 // Create and Save a new product
 exports.create = async (req, res, next) => {
@@ -86,6 +87,13 @@ exports.create = async (req, res, next) => {
   Product.create(product)
     .then((data) => {
       res.send(common.returnAPIData(data, imageMessage));
+      LogController.createLog({
+        MngID: req.userId,
+        action: "Thêm",
+        tableOfAction: "Sản phẩm",
+        affectedRowID: data.PID,
+        nameInRow: data.name,
+      });
     })
     .catch((err) => {
       next({
@@ -285,23 +293,31 @@ exports.delete = async (req, res, next) => {
 
 // Delete all products from the database.
 exports.deleteAll = async (req, res, next) => {
-  Product.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums) => {
-      res
-        .status(200)
-        .send(common.returnAPIData({}, `${nums} sản phẩm đã bị xoá!`));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message || "Xảy ra lỗi khi xoá tất cả sản phẩm",
-        method: "delete",
-        name: "sản phẩm",
-        id: 0,
-      });
-      return;
+  try {
+    const deleteProductOnBill = await ProductOnBill.destroy({
+      where: { productId: { [Op.or]: arrayIds } },
     });
+    const deleteProduct = await Product.destroy({
+      where: {},
+      truncate: false,
+    });
+
+    res.send(
+      common.returnAPIData(
+        {
+          deleteProduct: parseInt(deleteProduct),
+          deleteProductOnBill: parseInt(deleteProductOnBill),
+        },
+        `${parseInt(deleteProduct)} sản phẩm đã bị xoá!`
+      )
+    );
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message || "Xảy ra lỗi khi xoá tất cả sản phẩm",
+      method: "delete",
+      name: "sản phẩm",
+      id: 0,
+    });
+  }
 };

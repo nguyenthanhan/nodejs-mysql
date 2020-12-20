@@ -73,6 +73,7 @@ db.category.belongsToMany(db.shelf, {
   as: "shelves",
   foreignKey: "categoryId",
 });
+//--------
 
 const ProductInImport = sequelize.define(
   "ProductInImport",

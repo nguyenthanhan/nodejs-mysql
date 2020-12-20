@@ -3,7 +3,12 @@ const cloudinary = require("../models/cloudinary.model");
 const common = require("../utils/common");
 const db = require("../models/db");
 const lang = require("../lang");
-const { category: Category, product: Product, shelf: Shelf } = db;
+const {
+  category: Category,
+  product: Product,
+  shelf: Shelf,
+  categoryShelf: CategoryShelf,
+} = db;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Category
@@ -18,38 +23,51 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  // Create a Category
-  let category = {
-    name: req.body.name,
-  };
-  let message = "Tạo được loại hàng nhưng không có hình ảnh minh hoạ";
+  try {
+    // Create a Category
+    let category = {
+      name: req.body.name,
+    };
+    let message = "Tạo được ngành hàng nhưng không có hình ảnh minh hoạ";
 
-  if (req.file) {
-    const convertImageResult = await cloudinary.uploadSingle(
-      req.file.path,
-      "category"
-    );
-    if (convertImageResult && convertImageResult.url) {
-      category = { ...category, img_url: convertImageResult.url };
-      message = "Đã tạo loại hàng";
+    if (req.file) {
+      const convertImageResult = await cloudinary.uploadSingle(
+        req.file.path,
+        "category"
+      );
+      if (convertImageResult && convertImageResult.url) {
+        category = { ...category, img_url: convertImageResult.url };
+        message = "Đã tạo ngành hàng";
+      }
     }
-  }
 
-  // Save category in the database
-  Category.create(category)
-    .then((data) => {
-      res.send(common.returnAPIData(data, message));
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "post",
-        name: "phân loại hàng",
-        id: 0,
-      });
-      return;
+    // Save category in the database
+    const newCategory = await Category.create(category);
+
+    if (!_.isEmpty(newCategory) && newCategory.CID) {
+      const newBulkCreate = req.body.shelfIds.map((id) => ({
+        shelfId: id,
+        categoryId: newCategory.CID,
+      }));
+
+      const newCategoryShelf = await CategoryShelf.bulkCreate.create(
+        newBulkCreate
+      );
+
+      res.send(
+        common.returnAPIData({ ...newCategory, newCategoryShelf }, message)
+      );
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "post",
+      name: "phân ngành hàng",
+      id: 0,
     });
+    return;
+  }
 };
 
 // Retrieve all shelves from the database.
@@ -82,7 +100,7 @@ exports.findAll = async (req, res, next) => {
       status: 400,
       message: err.message,
       method: "get",
-      name: "phân loại hàng",
+      name: "phân ngành hàng",
       id: 0,
     });
     return;
@@ -123,7 +141,7 @@ exports.findOne = async (req, res, next) => {
         status: 400,
         message: err.message,
         method: "get",
-        name: "phân loại hàng",
+        name: "phân ngành hàng",
         id: id,
       });
       return;
@@ -151,12 +169,12 @@ exports.update = async (req, res, next) => {
     .then((num) => {
       if (num == 1) {
         res.send(
-          common.returnAPIData({}, "Cập nhật phân loại hàng thành công")
+          common.returnAPIData({}, "Cập nhật phân ngành hàng thành công")
         );
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật phân loại hàng này. Phân loại hàng không thể tìm thấy!`,
+          message: `Không thể cập nhật phân ngành hàng này. Phân ngành hàng không thể tìm thấy!`,
         });
         return;
       }
@@ -166,7 +184,7 @@ exports.update = async (req, res, next) => {
         status: 400,
         message: err.message,
         method: "put",
-        name: "phân loại hàng",
+        name: "phân ngành hàng",
         id: id,
       });
       return;
@@ -175,30 +193,36 @@ exports.update = async (req, res, next) => {
 
 // Delete a category with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const { arrayIds = [] } = req.body;
+  try {
+    const { arrayIds = [] } = req.body;
 
-  Category.destroy({
-    where: { CID: { [Op.or]: arrayIds } },
-  })
-    .then((num) => {
-      if (num > 0) {
-        res.send(common.returnAPIData({}, `${num} phân loại hàng đã bị xoá!`));
-      } else {
-        next({
-          status: 400,
-          message: `Không thể xoá phân loại hàng này. Có thể không tìm thấy phân loại hàng!`,
-        });
-        return;
-      }
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "delete",
-        name: "phân loại hàng",
-        id: id,
-      });
-      return;
+    const deleteCategoryInShelf = await CategoryShelf.destroy({
+      where: { categoryId: { [Op.or]: arrayIds } },
+      raw: true,
     });
+
+    const deleteCategory = await Category.destroy({
+      where: { CID: { [Op.or]: arrayIds } },
+      raw: true,
+    });
+
+    res.send(
+      common.returnAPIData(
+        {
+          deleteCategory: parseInt(deleteCategory),
+          deleteCategoryInShelf: parseInt(deleteCategoryInShelf),
+        },
+        `${parseInt(deleteCategory)} phân loại hàng đã bị xoá!`
+      )
+    );
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "delete",
+      name: "phân ngành hàng",
+      id: id,
+    });
+    return;
+  }
 };

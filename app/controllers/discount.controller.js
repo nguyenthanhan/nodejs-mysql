@@ -179,7 +179,7 @@ exports.findAll = async (req, res, next) => {
         status: 400,
         message: err.message,
         method: "get",
-        name: "phân loại hàng",
+        name: "phân ngành hàng",
         id: 0,
       });
       return;
@@ -286,7 +286,7 @@ exports.update = async (req, res, next) => {
     } else {
       next({
         status: 400,
-        message: `Không thể cập nhật sản phẩm giảm giá này. Phân loại hàng không thể tìm thấy!`,
+        message: `Không thể cập nhật sản phẩm giảm giá này. Phân ngành hàng không thể tìm thấy!`,
       });
       return;
     }
@@ -353,7 +353,7 @@ exports.delete = async (req, res, next) => {
       status: 400,
       message: error.message,
       method: "delete",
-      name: "phân loại hàng",
+      name: "phân ngành hàng",
       id: 0,
     });
     return;

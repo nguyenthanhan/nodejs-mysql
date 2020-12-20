@@ -226,12 +226,22 @@ exports.update = async (req, res, next) => {
 // Delete a bill with the specified id in the request
 exports.delete = async (req, res, next) => {
   const { arrayIds = [] } = req.body;
+
+  const deleteProductOnBill = await ProductOnBill.destroy({
+    where: { billId: { [Op.or]: arrayIds } },
+  });
+
   Bill.destroy({
     where: { BID: { [Op.or]: arrayIds } },
   })
     .then((num) => {
       if (num > 0) {
-        res.send(common.returnAPIData({}, `${num} hoá đơn đã bị xoá!`));
+        res.send(
+          common.returnAPIData(
+            { deleteProductOnBill: parseInt(deleteProductOnBill) },
+            `${num} hoá đơn đã bị xoá!`
+          )
+        );
       } else {
         next({
           status: 400,

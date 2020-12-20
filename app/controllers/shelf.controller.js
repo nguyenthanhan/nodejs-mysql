@@ -135,30 +135,35 @@ exports.update = async (req, res, next) => {
 
 // Delete a Shelf with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const { arrayIds = [] } = req.body;
+  try {
+    const { arrayIds = [] } = req.body;
 
-  Shelf.destroy({
-    where: { ShID: { [Op.or]: arrayIds } },
-  })
-    .then((num) => {
-      if (num >= 1) {
-        res.send(common.returnAPIData({}, `${num} kệ hàng đã bị xoá!`));
-      } else {
-        next({
-          status: 400,
-          message: `Không thể xoá kệ hàng. Có thể không tìm thấy kệ hàng!`,
-        });
-        return;
-      }
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "delete",
-        name: "kệ hàng",
-        id: id,
-      });
-      return;
+    const deleteCategoryInShelf = await CategoryShelf.destroy({
+      where: { categoryId: { [Op.or]: arrayIds } },
+      raw: true,
     });
+
+    const deleteShelf = await Shelf.destroy({
+      where: { ShID: { [Op.or]: arrayIds } },
+    });
+
+    res.send(
+      common.returnAPIData(
+        {
+          deleteShelf: parseInt(deleteShelf),
+          deleteCategoryInShelf: parseInt(deleteCategoryInShelf),
+        },
+        `${deleteShelf} kệ hàng đã bị xoá!`
+      )
+    );
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "delete",
+      name: "kệ hàng",
+      id: id,
+    });
+    return;
+  }
 };

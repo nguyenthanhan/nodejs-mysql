@@ -2,58 +2,47 @@
 const common = require("../utils/common");
 const db = require("../models/db");
 const Logs = db.log;
+const _ = require("lodash");
 // const Op = db.Sequelize.Op;
 
 // Retrieve all logs from the database.
 exports.getAll = async (req, res, next) => {
-  const per_page = parseInt(req.query.per_page) || 10;
-  const page = parseInt(req.query.page) || 1;
+  try {
+    const per_page = parseInt(req.query.per_page) || 10;
+    const page = parseInt(req.query.page) || 1;
 
-  const limit = per_page;
-  const offset = (per_page - 1) * limit;
+    const limit = per_page;
+    const offset = (per_page - 1) * limit;
 
-  //Find by account
-  // const accountName = req.query.accountName;
-  // const findByAccountCondition = accountName
-  //   ? { accountName: { [Op.like]: `%${accountName}%` } }
-  //   : null;
-
-  // const managerData = await Manager.findOne({findByAccountCondition});
-
-  // if (_.isEmpty(managerData)) {
-
-  // }
-
-  // const id = managerData.MngID;
-  // let condition = name ? { id: { [Op.like]: `%${id}%` } } : null;
-
-  Logs.findAll({
-    limit,
-    offset,
-    // where: condition,
-    raw: true,
-  })
-    .then((data) => {
-      res.send(
-        common.returnAPIData(data, "", {
-          page: page,
-          per_page: per_page,
-        })
-      );
-    })
-    .catch((err) => {
-      next({
-        status: 400,
-        message: err.message,
-        method: "get",
-        name: "bản ghi",
-        id: 0,
-      });
-      return;
+    const getLogs = await Logs.findAll({
+      // limit,
+      // offset,
+      // where: condition,
+      raw: true,
     });
+    if (getLogs) {
+      const message = getLogs.length > 0 ? "" : "Không có bản ghi nào!";
+      res.send(common.returnAPIData(getLogs, message));
+      // res.send(
+      //   common.returnAPIData(getLogs, message, {
+      //     page: page,
+      //     per_page: per_page,
+      //   })
+      // );
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: "get",
+      name: "bản ghi",
+      id: 0,
+    });
+    return;
+  }
 };
 
-exports.log = async ({
+exports.createLog = ({
   MngID,
   action,
   tableOfAction,

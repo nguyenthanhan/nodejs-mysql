@@ -335,17 +335,19 @@ exports.delete = async (req, res, next) => {
       where: { importId: { [Op.or]: arrayIds } },
     });
 
-    if (deleteProductInImport) {
-      const numberDelete = await Import.destroy({
-        where: { ImID: { [Op.or]: arrayIds } },
-      });
+    const numberDelete = await Import.destroy({
+      where: { ImID: { [Op.or]: arrayIds } },
+    });
 
-      res.send(
-        common.returnAPIData({}, `${numberDelete} phiếu nhập đã bị xoá!`)
-      );
-    } else {
-      common.returnAPIData({}, `Không có phiếu nhập bị xoá!`);
-    }
+    res.send(
+      common.returnAPIData(
+        {
+          numberDelete: parseInt(numberDelete),
+          deleteProductInImport: parseInt(deleteProductInImport),
+        },
+        `${parseInt(numberDelete)} phiếu nhập đã bị xoá!`
+      )
+    );
   } catch (error) {
     next({
       status: 400,
