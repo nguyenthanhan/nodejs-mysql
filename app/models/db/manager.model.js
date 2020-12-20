@@ -50,7 +50,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
       },
       date_start_working: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         defaultValue: Sequelize.NOW,
       },
       managerType: {

@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM("normal", "priority"),
       },
       export_action_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
     },
     {

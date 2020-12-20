@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT(20),
       },
       import_action_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       state: {
         type: Sequelize.ENUM("request", "executed", "close"),

@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
       },
       start_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       title: {
@@ -30,7 +30,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       end_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
     },
