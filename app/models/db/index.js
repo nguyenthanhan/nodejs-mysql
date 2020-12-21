@@ -37,7 +37,6 @@ db.import.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
 db.export.belongsTo(db.manager, { foreignKey: "checkerId", as: "checker" });
 
 //one to many
-
 db.category.hasMany(db.product, { foreignKey: "categoryId", as: "products" });
 db.product.belongsTo(db.category, {
   foreignKey: "categoryId",
@@ -120,6 +119,13 @@ db.product.belongsToMany(db.import, {
   foreignKey: "productId",
 });
 
+//-------
+db.product.hasMany(db.lot, { foreignKey: "productId", as: "lots" });
+// db.lot.belongsTo(db.product, {
+//   foreignKey: "productId",
+//   as: "product",
+// });
+
 // //----------
 // const ProductInExport = sequelize.define(
 //   "ProductInExport",
@@ -161,6 +167,7 @@ db.product.belongsToMany(db.import, {
 //   as: "imports",
 //   foreignKey: "productId",
 // });
+
 // //----------
 
 db.supplier.hasMany(db.import, { foreignKey: "supplierId", as: "imports" });

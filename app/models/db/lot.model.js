@@ -3,33 +3,21 @@ module.exports = (sequelize, Sequelize) => {
   const Lots = sequelize.define(
     "Lot",
     {
-      lotID: {
+      lotId: {
         type: Sequelize.BIGINT(20),
         primaryKey: true,
         allowNull: false,
         autoIncrement: true,
       },
-      name: {
-        type: Sequelize.STRING(80),
+      qttLotProductInWarehouse: {
+        type: Sequelize.INTEGER(20),
       },
-      number_of_products: {
-        type: Sequelize.STRING(80),
-        allowNull: false,
-      },
-      expires: {
-        type: Sequelize.DATEONLY,
-      },
-      sell_price_product: {
-        type: Sequelize.BIGINT(20),
-      },
-      import_price_product: {
-        type: Sequelize.BIGINT(20),
-      },
-      import_price_lot: {
+      importId: {
         type: Sequelize.BIGINT(20),
       },
     },
     {
+      paranoid: true,
       freezeTableName: true,
     }
   );

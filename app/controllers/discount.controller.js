@@ -120,14 +120,19 @@ exports.create = async (req, res, next) => {
         );
       }
 
-      const newDiscountsWithProduct = await createDiscountsWithProduct(
+      const discountsWithProduct = await createDiscountsWithProduct(
         applyProductsInCategories,
         createDiscount.discountId
       );
-      console.log("newDiscountsWithProduct", newDiscountsWithProduct);
+      console.log("newDiscountsWithProduct", discountsWithProduct);
 
-      if (newDiscountsWithProduct) {
-        res.send(common.returnAPIData({}, "Tạo mã giảm giá thành công"));
+      if (discountsWithProduct) {
+        res.send(
+          common.returnAPIData(
+            { ...createDiscount, discountsWithProduct },
+            "Tạo mã giảm giá thành công"
+          )
+        );
       }
     }
   } catch (error) {

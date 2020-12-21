@@ -44,7 +44,7 @@ exports.create = async (req, res, next) => {
     // Save category in the database
     const newCategory = await Category.create(category);
 
-    if (!_.isEmpty(newCategory) && newCategory.CID) {
+    if (newCategory && newCategory.CID) {
       const newBulkCreate = req.body.shelfIds.map((id) => ({
         shelfId: id,
         categoryId: newCategory.CID,
@@ -87,7 +87,7 @@ exports.findAll = async (req, res, next) => {
         {
           model: Shelf,
           as: "shelves",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
       ],
     });
@@ -121,7 +121,7 @@ exports.findOne = async (req, res, next) => {
       {
         model: Shelf,
         as: "shelves",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       },
     ],
   })

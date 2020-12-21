@@ -8,6 +8,7 @@ const {
   product: Product,
   productInImport: ProductInImport,
   supplier: Supplier,
+  lot: Lot,
 } = db;
 const Op = db.Sequelize.Op;
 const moment = require("moment");
@@ -70,11 +71,13 @@ exports.create = async (req, res, next) => {
         _.isArray(req.body.importProducts) &&
         req.body.importProducts.length > 0
       ) {
-        const createProductsInImport = await createItemsWithProducts(
+        const productsInImport = await createItemsWithProducts(
           req.body.importProducts,
           excImport.ImID
         );
+        console.log("productsInImport", productsInImport);
 
+        // update W_curr_qtt in product
         const updateProducts = await Promise.all(
           req.body.importProducts.map(async (importProduct) => {
             const { conversionRate, real_total_unit } = importProduct;
@@ -94,16 +97,13 @@ exports.create = async (req, res, next) => {
         );
         console.log("updateProducts", updateProducts);
 
-        const productsInImport = createProductsInImport.map((el) =>
-          el.get({ plain: true })
-        );
-        if (!_.isEmpty(productsInImport)) {
+        if (productsInImport) {
           res.send(
             common.returnAPIData(
               {
                 ...excImport,
                 productsInImport,
-                updateProductNumbers: updateProducts.reduce(
+                countUpdatedProducts: updateProducts.reduce(
                   (acum, number) => acum + number,
                   0
                 ),
@@ -138,23 +138,49 @@ exports.create = async (req, res, next) => {
   }
 };
 
-const createItemsWithProducts = async (importProducts, importId) => {
-  const configImportProducts = importProducts.map((importProduct) => {
-    const { import_price_unit, conversionRate } = importProduct;
-    return {
-      productId: importProduct.productId,
-      request_total_unit: importProduct.request_total_unit,
-      real_total_unit: importProduct.real_total_unit,
-      expires: moment(importProduct.expires),
-      unit_name: importProduct.unit_name,
-      conversionRate: conversionRate,
-      import_price_unit: import_price_unit,
-      importId: importId,
-      import_price_product: Math.ceil(import_price_unit / conversionRate),
-    };
-  });
+const createItemsWithProducts = (importProducts, importId) => {
+  return Promise.all(
+    importProducts.map(async (importProduct) => {
+      const {
+        import_price_unit,
+        conversionRate,
+        real_total_unit,
+        productId,
+      } = importProduct;
 
-  return ProductInImport.bulkCreate(configImportProducts);
+      const _productInImport = await ProductInImport.create({
+        productId: productId,
+        request_total_unit: importProduct.request_total_unit,
+        real_total_unit: real_total_unit,
+        expires: moment(importProduct.expires),
+        unit_name: importProduct.unit_name,
+        conversionRate: conversionRate,
+        import_price_unit: import_price_unit,
+        importId: importId,
+        import_price_product: Math.ceil(import_price_unit / conversionRate),
+      });
+
+      const productInImport = _productInImport.get({ plain: true });
+
+      const _createLot = await Lot.create({
+        qttLotProductInWarehouse: real_total_unit * conversionRate,
+        importId: importId,
+        productId: productId,
+      });
+
+      let isCreateLot = false;
+      const createLot = _createLot.get({ plain: true });
+      if (!_.isEmpty(createLot)) {
+        console.log("createLot", createLot);
+        isCreateLot = true;
+      }
+
+      return {
+        productInImport,
+        isCreateLot,
+      };
+    })
+  );
 };
 
 // Retrieve all imports from the database.
@@ -179,12 +205,12 @@ exports.findAll = async (req, res, next) => {
         {
           model: Supplier,
           as: "supplier",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
         {
           model: Product,
           as: "products",
-          attributes: ["PID", "W_curr_qtt", "S_curr_qtt"],
+          attributes: ["PID", "W_curr_qtt"],
         },
       ],
     });
@@ -221,12 +247,12 @@ exports.findOne = async (req, res, next) => {
       {
         model: Supplier,
         as: "supplier",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       },
       {
         model: Product,
         as: "products",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: ["PID", "W_curr_qtt"],
       },
     ],
   })

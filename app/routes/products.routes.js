@@ -33,7 +33,7 @@ module.exports = (app) => {
 
   router.delete("/", [authJwt.verifyToken], products.delete);
 
-  router.delete("/", [authJwt.verifyToken], products.deleteAll);
+  // router.delete("/", [authJwt.verifyToken], products.deleteAll);
 
   app.use("/api/products", router);
 };

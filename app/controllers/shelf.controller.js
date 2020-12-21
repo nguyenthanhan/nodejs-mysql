@@ -54,7 +54,7 @@ exports.findAll = async (req, res, next) => {
       {
         model: Category,
         as: "categories",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       },
     ],
   })

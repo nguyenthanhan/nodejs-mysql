@@ -264,7 +264,7 @@ exports.update = async (req, res, next) => {
   const id = req.params.id;
   let convertImageResult = {};
 
-  if (!_.isEmpty(req.file)) {
+  if (req.file) {
     convertImageResult = await cloudinary.uploadSingle(
       req.file.path,
       "avatar",

@@ -10,7 +10,11 @@ const moment = require("moment");
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.name || !req.body.quantity || !req.body.Exp) {
+  if (
+    !req.body.qttLotProductInWarehouse ||
+    !req.body.importId ||
+    !req.body.productId
+  ) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -20,9 +24,9 @@ exports.create = async (req, res, next) => {
 
   // Create a lot
   const lot = {
-    name: req.body.name,
-    quantity: parseInt(req.body.quantity),
-    expires: moment(req.body.expires),
+    qttLotProductInWarehouse: req.body.qttLotProductInWarehouse,
+    importId: req.body.importId,
+    productId: req.body.productId,
   };
 
   // Save lot in the database
@@ -94,7 +98,10 @@ exports.findOne = async (req, res, next) => {
 // Update a lot by the id in the request
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  const newBody = { ...req.body, updatedAt: new Date() };
+  const newBody = {
+    qttLotProductInWarehouse: req.body.qttLotProductInWarehouse,
+    updatedAt: new Date(),
+  };
 
   Lot.update(newBody, {
     where: { BID: id },

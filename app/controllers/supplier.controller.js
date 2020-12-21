@@ -53,7 +53,7 @@ exports.findAll = async (req, res, next) => {
       {
         model: Import,
         as: "imports",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       },
     ],
   })
@@ -82,7 +82,7 @@ exports.findOne = async (req, res, next) => {
       {
         model: Import,
         as: "imports",
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       },
     ],
   })

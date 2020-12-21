@@ -19,9 +19,9 @@ module.exports = (app) => {
 
   router.get("/", [authJwt.verifyToken], lots.findAll);
 
-  router.get("/:id", [authJwt.verifyToken], lots.findOne);
+  // router.get("/:id", [authJwt.verifyToken], lots.findOne);
 
-  router.put("/:id", [authJwt.verifyToken], lots.update);
+  // router.put("/:id", [authJwt.verifyToken], lots.update);
 
   router.delete("/", [authJwt.verifyToken], lots.delete);
 
