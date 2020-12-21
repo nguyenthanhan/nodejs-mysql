@@ -127,36 +127,23 @@ db.product.hasMany(db.lot, { foreignKey: 'productId', as: 'lots' });
 // });
 
 // //----------
-// const ProductInExport = sequelize.define(
-//   "ProductInExport",
-//   {
-//     request_total_unit: {
-//       type: Sequelize.INTEGER(20),
-//       allowNull: false,
-//     },
-//     real_total_unit: {
-//       type: Sequelize.INTEGER(20),
-//       allowNull: false,
-//     },
-//     expires: {
-//       type: Sequelize.DATE,
-//     },
-//     unit_name: {
-//       type: Sequelize.STRING(20),
-//     },
-//     conversionRate: {
-//       type: Sequelize.INTEGER(20),
-//     },
-//     import_price_unit: {
-//       type: Sequelize.BIGINT(20),
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     freezeTableName: true,
-//   }
-// );
-// db.productInImport = ProductInImport;
+const ProductInExport = sequelize.define(
+  'ProductInExport',
+  {
+    request_total_product: {
+      type: Sequelize.INTEGER(20),
+      allowNull: false,
+    },
+    real_total_product: {
+      type: Sequelize.INTEGER(20),
+      allowNull: false,
+    },
+  },
+  {
+    freezeTableName: true,
+  }
+);
+db.productInExport = ProductInExport;
 // db.import.belongsToMany(db.product, {
 //   through: ProductInImport,
 //   as: "products",

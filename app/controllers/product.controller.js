@@ -192,7 +192,7 @@ exports.findAll = async (req, res, next) => {
 
       return {
         ...newProduct,
-        lots: newLots,
+        lots: common.sortedByDate(newLots, true),
       };
     });
     console.log('newProductList', newProductList);
@@ -275,7 +275,7 @@ exports.findOne = async (req, res, next) => {
     res.send(
       common.returnAPIData({
         ...newProduct,
-        lots: newLots,
+        lots: common.sortedByDate(newLots, true),
       })
     );
   } catch (error) {

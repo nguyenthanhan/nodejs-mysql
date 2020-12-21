@@ -66,10 +66,17 @@ const createImageName = originalName => {
   return imageName;
 };
 
+const sortedByDate = (array, isUp) => {
+  return array.sort((a, b) =>
+    isUp ? new Date(a.expires) - new Date(b.expires) : new Date(b.expires) - new Date(a.expires)
+  );
+};
+
 module.exports = {
   returnAPIData,
   randomString,
   createImageName,
   returnCustomError,
   checkValidSortString,
+  sortedByDate,
 };
