@@ -1,7 +1,7 @@
-"use strict";
-const common = require("../utils/common");
-const db = require("../models/db");
-const lang = require("../lang");
+'use strict';
+const common = require('../utils/common');
+const db = require('../models/db');
+const lang = require('../lang');
 const { shelf: Shelf, category: Category } = db;
 const Op = db.Sequelize.Op;
 
@@ -21,22 +21,22 @@ exports.create = async (req, res, next) => {
     // Create a shelf
     const shelf = {
       name: req.body.name,
-      type: req.body.type ? req.body.type : "small",
-      state: req.body.state ? req.body.state : "available",
-      location: req.body.location === "store" ? "store" : "warehouse",
+      type: req.body.type ? req.body.type : 'small',
+      state: req.body.state ? req.body.state : 'available',
+      location: req.body.location === 'store' ? 'store' : 'warehouse',
     };
 
     // Save shelf in the database
     const shelfQuery = Shelf.create(shelf);
     if (shelfQuery) {
-      res.send(common.returnAPIData(shelfQuery, "Tạo kệ hàng thành công"));
+      res.send(common.returnAPIData(shelfQuery, 'Tạo kệ hàng thành công'));
     }
   } catch (error) {
     next({
       status: 400,
       message: err.message,
-      method: "post",
-      name: "kệ hàng",
+      method: 'post',
+      name: 'kệ hàng',
       id: 0,
     });
     return;
@@ -53,21 +53,21 @@ exports.findAll = async (req, res, next) => {
     include: [
       {
         model: Category,
-        as: "categories",
-        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        as: 'categories',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
       },
     ],
   })
-    .then((data) => {
-      const message = data.length === 0 ? "Không có kệ hàng nào" : "";
+    .then(data => {
+      const message = data.length === 0 ? 'Không có kệ hàng nào' : '';
       res.send(common.returnAPIData(data, message));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "kệ hàng",
+        method: 'get',
+        name: 'kệ hàng',
         id: 0,
       });
       return;
@@ -78,24 +78,24 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Shelf.findByPk(id, { includes: ["categories"] })
-    .then((data) => {
+  Shelf.findByPk(id, { includes: ['categories'] })
+    .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,
-          message: "Không tìm thấy thông tin kệ hàng",
+          message: 'Không tìm thấy thông tin kệ hàng',
         });
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "kệ hàng",
+        method: 'get',
+        name: 'kệ hàng',
         id: id,
       });
       return;
@@ -110,9 +110,9 @@ exports.update = async (req, res, next) => {
   Shelf.update(newBody, {
     where: { ShID: id },
   })
-    .then((num) => {
+    .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, "Cập nhật kệ hàng thành công"));
+        res.send(common.returnAPIData({}, 'Cập nhật kệ hàng thành công'));
       } else {
         next({
           status: 400,
@@ -121,12 +121,12 @@ exports.update = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "put",
-        name: "kệ hàng",
+        method: 'put',
+        name: 'kệ hàng',
         id: id,
       });
       return;
@@ -160,8 +160,8 @@ exports.delete = async (req, res, next) => {
     next({
       status: 400,
       message: err.message,
-      method: "delete",
-      name: "kệ hàng",
+      method: 'delete',
+      name: 'kệ hàng',
       id: id,
     });
     return;

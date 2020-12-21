@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Export = sequelize.define(
-    "Export",
+    'Export',
     {
       ExID: {
         type: Sequelize.BIGINT(20),
@@ -13,10 +13,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(40),
       },
       state: {
-        type: Sequelize.ENUM("request", "executed", "close"),
+        type: Sequelize.ENUM('request', 'executed', 'close'),
       },
       urgent_level: {
-        type: Sequelize.ENUM("normal", "priority"),
+        type: Sequelize.ENUM('normal', 'priority'),
       },
       export_action_date: {
         type: Sequelize.DATEONLY,

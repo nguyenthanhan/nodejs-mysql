@@ -1,11 +1,11 @@
-"use strict";
-const common = require("../utils/common");
-const db = require("../models/db");
-const lang = require("../lang");
+'use strict';
+const common = require('../utils/common');
+const db = require('../models/db');
+const lang = require('../lang');
 const Export = db.export;
 const Manager = db.manager;
 const Op = db.Sequelize.Op;
-const moment = require("moment");
+const moment = require('moment');
 
 // Create and Save a new export
 exports.create = async (req, res, next) => {
@@ -14,11 +14,9 @@ exports.create = async (req, res, next) => {
     const _export = {
       mngID: req.userId,
       export_number: req.body.export_number,
-      export_action_date: req.body.export_action_date
-        ? moment(req.body.export_action_date)
-        : new Date(),
-      state: req.body.state ? req.body.state : "request",
-      urgent_level: req.body.urgent_level ? req.body.urgent_level : "normal",
+      export_action_date: req.body.export_action_date ? moment(req.body.export_action_date) : new Date(),
+      state: req.body.state ? req.body.state : 'request',
+      urgent_level: req.body.urgent_level ? req.body.urgent_level : 'normal',
       checkerId: parseInt(req.body.checkerId),
     };
 
@@ -26,14 +24,14 @@ exports.create = async (req, res, next) => {
     const createExport = await Export.create(_export);
 
     if (createExport && createExport.ExID) {
-      res.send(common.returnAPIData(data, "Tạo đơn xuất hàng thành công!"));
+      res.send(common.returnAPIData(data, 'Tạo đơn xuất hàng thành công!'));
     }
   } catch (error) {
     next({
       status: 400,
       message: err.message,
-      method: "post",
-      name: "thông tin xuất hàng",
+      method: 'post',
+      name: 'thông tin xuất hàng',
       id: 0,
     });
     return;
@@ -51,28 +49,28 @@ exports.findAll = async (req, res, next) => {
     include: [
       {
         model: Manager,
-        as: "manager",
-        attributes: ["accountName", "LName", "FName"],
+        as: 'manager',
+        attributes: ['accountName', 'LName', 'FName'],
       },
     ],
   })
-    .then((data) => {
+    .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,
-          message: "Không tìm thấy thông tin xuất hàng",
+          message: 'Không tìm thấy thông tin xuất hàng',
         });
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "thông tin xuất hàng",
+        method: 'get',
+        name: 'thông tin xuất hàng',
         id: 0,
       });
       return;
@@ -84,15 +82,15 @@ exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Export.findByPk(id)
-    .then((data) => {
+    .then(data => {
       res.send(common.returnAPIData(data));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "thông tin xuất hàng",
+        method: 'get',
+        name: 'thông tin xuất hàng',
         id: id,
       });
       return;
@@ -110,9 +108,7 @@ exports.update = async (req, res, next) => {
     });
 
     if (createExport && createExport.ExID) {
-      res.send(
-        common.returnAPIData({}, "Cập nhật thông tin xuất hàng thành công")
-      );
+      res.send(common.returnAPIData({}, 'Cập nhật thông tin xuất hàng thành công'));
     } else {
       next({
         status: 400,
@@ -124,8 +120,8 @@ exports.update = async (req, res, next) => {
     next({
       status: 400,
       message: error.message,
-      method: "put",
-      name: "thông tin xuất hàng",
+      method: 'put',
+      name: 'thông tin xuất hàng',
       id: id,
     });
     return;
@@ -139,7 +135,7 @@ exports.delete = async (req, res, next) => {
   Export.destroy({
     where: { ExID: { [Op.or]: arrayIds } },
   })
-    .then((num) => {
+    .then(num => {
       if (num > 0) {
         res.send(common.returnAPIData({}, `${num} phiếu xuất đã bị xoá!`));
       } else {
@@ -150,12 +146,12 @@ exports.delete = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "delete",
-        name: "thông tin xuất hàng",
+        method: 'delete',
+        name: 'thông tin xuất hàng',
         id: id,
       });
       return;

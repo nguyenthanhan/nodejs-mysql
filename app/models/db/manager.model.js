@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Managers = sequelize.define(
-    "Manager",
+    'Manager',
     {
       MngID: {
         type: Sequelize.BIGINT(20),
@@ -12,12 +12,12 @@ module.exports = (sequelize, Sequelize) => {
       FName: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       LName: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       accountName: {
         type: Sequelize.STRING(80),
@@ -30,14 +30,14 @@ module.exports = (sequelize, Sequelize) => {
       },
       Address: {
         type: Sequelize.STRING(80),
-        defaultValue: "",
+        defaultValue: '',
       },
       BDay: {
         type: Sequelize.DATEONLY,
       },
       gender: {
-        type: Sequelize.ENUM("male", "female", "other"),
-        defaultValue: "male",
+        type: Sequelize.ENUM('male', 'female', 'other'),
+        defaultValue: 'male',
       },
       salary: {
         type: Sequelize.BIGINT(20),
@@ -54,13 +54,13 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.NOW,
       },
       managerType: {
-        type: Sequelize.ENUM("normal", "prime"),
-        defaultValue: "normal",
+        type: Sequelize.ENUM('normal', 'prime'),
+        defaultValue: 'normal',
       },
       telephoneNumber: {
         type: Sequelize.STRING(20),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
     },
     {

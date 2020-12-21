@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Logs = sequelize.define(
-    "Logs",
+    'Logs',
     {
       id: {
         type: Sequelize.BIGINT(20),
@@ -13,19 +13,19 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT(20),
       },
       action: {
-        type: Sequelize.ENUM("Thêm", "Sửa", "Xoá"),
+        type: Sequelize.ENUM('Thêm', 'Sửa', 'Xoá'),
       },
       tableOfAction: {
         type: Sequelize.ENUM(
-          "Hoá đơn",
-          "Loại hàng",
-          "Xuất hàng",
-          "Nhập hàng",
-          "Lô hàng",
-          "Quản lý",
-          "Sản phẩm",
-          "Kệ hàng",
-          "Nhà cung cấp"
+          'Hoá đơn',
+          'Loại hàng',
+          'Xuất hàng',
+          'Nhập hàng',
+          'Lô hàng',
+          'Quản lý',
+          'Sản phẩm',
+          'Kệ hàng',
+          'Nhà cung cấp'
         ),
       },
       nameInRow: {

@@ -1,7 +1,7 @@
-"use strict";
-const lang = require("../lang");
+'use strict';
+const lang = require('../lang');
 
-const returnAPIData = (data, message = "", props) => {
+const returnAPIData = (data, message = '', props) => {
   return {
     status: 200,
     success: true,
@@ -11,10 +11,9 @@ const returnAPIData = (data, message = "", props) => {
   };
 };
 
-const returnCustomError = (error) => {
-  const { method = "", name = "", id = 0, status = 500 } = error;
-  const _message =
-    error && error.message ? error.message : returnMessage(method, name, id);
+const returnCustomError = error => {
+  const { method = '', name = '', id = 0, status = 500 } = error;
+  const _message = error && error.message ? error.message : returnMessage(method, name, id);
 
   return {
     status,
@@ -25,38 +24,32 @@ const returnCustomError = (error) => {
 
 const returnMessage = (method, name, id) => {
   switch (method) {
-    case "put":
-      return lang.general.error.update
-        .replace(`%{name}`, name)
-        .replace(`%{id}`, id);
-    case "post":
+    case 'put':
+      return lang.general.error.update.replace(`%{name}`, name).replace(`%{id}`, id);
+    case 'post':
       return lang.general.error.create.replace(`%{name}`, name);
-    case "get":
+    case 'get':
       return id === 0
         ? lang.general.error.getAll.replace(`%{name}`, name)
-        : lang.general.error.getId
-            .replace(`%{name}`, name)
-            .replace(`%{id}`, id);
-    case "delete":
+        : lang.general.error.getId.replace(`%{name}`, name).replace(`%{id}`, id);
+    case 'delete':
       return id === 0
         ? lang.general.error.deleteAll.replace(`%{name}`, name)
-        : lang.general.error.delete
-            .replace(`%{name}`, name)
-            .replace(`%{id}`, id);
+        : lang.general.error.delete.replace(`%{name}`, name).replace(`%{id}`, id);
     default:
       break;
   }
 };
 
-const checkValidSortString = (string) => {
-  if (string === "DESC" || string === "ASC") {
+const checkValidSortString = string => {
+  if (string === 'DESC' || string === 'ASC') {
     return true;
   }
   return false;
 };
 
-const randomString = (l) => {
-  let s = "";
+const randomString = l => {
+  let s = '';
   let randomChar = function () {
     let n = Math.floor(Math.random() * 62);
     if (n < 10) return n; //1-10
@@ -67,9 +60,9 @@ const randomString = (l) => {
   return s;
 };
 
-const createImageName = (originalName) => {
-  const array = originalName.split(".");
-  const imageName = randomString(40) + "." + array[array.length - 1];
+const createImageName = originalName => {
+  const array = originalName.split('.');
+  const imageName = randomString(40) + '.' + array[array.length - 1];
   return imageName;
 };
 

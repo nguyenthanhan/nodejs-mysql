@@ -1,4 +1,4 @@
-let cloudinary = require("cloudinary").v2;
+let cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,19 +7,19 @@ cloudinary.config({
 });
 
 let self = (module.exports = {
-  uploadSingle: (file, folder = "singleV1.0.0", width = 500, height = 500) => {
-    return new Promise((resolve) => {
+  uploadSingle: (file, folder = 'singleV1.0.0', width = 500, height = 500) => {
+    return new Promise(resolve => {
       cloudinary.uploader
         .upload(file, {
           folder: folder,
           width: width,
           height: height,
-          crop: "pad",
-          quality: "auto",
+          crop: 'pad',
+          quality: 'auto',
         })
-        .then((result) => {
+        .then(result => {
           if (result) {
-            const fs = require("fs");
+            const fs = require('fs');
             fs.unlinkSync(file);
             resolve({
               url: result.secure_url,
@@ -28,15 +28,15 @@ let self = (module.exports = {
         });
     });
   },
-  uploadMultiple: (file) => {
-    return new Promise((resolve) => {
+  uploadMultiple: file => {
+    return new Promise(resolve => {
       cloudinary.uploader
         .upload(file, {
-          folder: "home",
+          folder: 'home',
         })
-        .then((result) => {
+        .then(result => {
           if (result) {
-            const fs = require("fs");
+            const fs = require('fs');
             fs.unlinkSync(file);
             resolve({
               url: result.secure_url,
@@ -53,7 +53,7 @@ let self = (module.exports = {
     return cloudinary.url(id, {
       height: h,
       width: w,
-      crop: "scale",
+      crop: 'scale',
     });
   },
 });

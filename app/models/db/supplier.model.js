@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Supplier = sequelize.define(
-    "Supplier",
+    'Supplier',
     {
       SupID: {
         type: Sequelize.BIGINT(20),
@@ -12,12 +12,12 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       Address: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       Tax_ID: {
         type: Sequelize.INTEGER(20),
@@ -27,12 +27,12 @@ module.exports = (sequelize, Sequelize) => {
       telephoneNumber: {
         type: Sequelize.STRING(20),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       Email: {
         type: Sequelize.STRING(40),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
     },
     {

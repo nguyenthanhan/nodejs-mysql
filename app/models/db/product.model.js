@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Products = sequelize.define(
-    "Product",
+    'Product',
     {
       PID: {
         type: Sequelize.BIGINT(20),
@@ -12,28 +12,28 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
 
       description: {
         type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       otherDetail: {
         type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       barcode: {
         type: Sequelize.STRING(40),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       img_url: {
         type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
       W_max_qtt: {
         type: Sequelize.INTEGER,
@@ -76,7 +76,7 @@ module.exports = (sequelize, Sequelize) => {
       brand: {
         type: Sequelize.STRING(80),
         allowNull: false,
-        defaultValue: "",
+        defaultValue: '',
       },
     },
     {

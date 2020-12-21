@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Category = sequelize.define(
-    "Category",
+    'Category',
     {
       CID: {
         type: Sequelize.BIGINT(20),

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 module.exports = (sequelize, Sequelize) => {
   const Discount = sequelize.define(
-    "Discount",
+    'Discount',
     {
       discountId: {
         type: Sequelize.BIGINT(20),

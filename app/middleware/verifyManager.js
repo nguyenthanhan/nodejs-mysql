@@ -1,8 +1,8 @@
-const db = require("../models/db");
+const db = require('../models/db');
 const ROLES = db.ROLES;
 const Manager = db.manager;
-const common = require("../utils/common");
-const lang = require("../lang");
+const common = require('../utils/common');
+const lang = require('../lang');
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
   // Username
@@ -10,7 +10,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     where: {
       accountName: req.body.accountName,
     },
-  }).then((user) => {
+  }).then(user => {
     if (user) {
       next({
         status: 400,
@@ -25,7 +25,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
         where: {
           email: req.body.email,
         },
-      }).then((user) => {
+      }).then(user => {
         if (user) {
           next({
             status: 400,

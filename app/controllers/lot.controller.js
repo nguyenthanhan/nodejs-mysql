@@ -1,20 +1,16 @@
-"use strict";
-const common = require("../utils/common");
-const db = require("../models/db");
-const lang = require("../lang");
+'use strict';
+const common = require('../utils/common');
+const db = require('../models/db');
+const lang = require('../lang');
 const Lot = db.lot;
 const Op = db.Sequelize.Op;
-const moment = require("moment");
+const moment = require('moment');
 
 // Create and Save a new lot
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (
-    !req.body.qttLotProductInWarehouse ||
-    !req.body.importId ||
-    !req.body.productId
-  ) {
+  if (!req.body.qttLotProductInWarehouse || !req.body.importId || !req.body.productId) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -31,15 +27,15 @@ exports.create = async (req, res, next) => {
 
   // Save lot in the database
   Lot.create(lot)
-    .then((data) => {
+    .then(data => {
       res.send(common.returnAPIData(data));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "post",
-        name: "hoá đơn",
+        method: 'post',
+        name: 'hoá đơn',
         id: 0,
       });
       return;
@@ -52,15 +48,15 @@ exports.findAll = async (req, res, next) => {
   let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   Lot.findAll({ where: condition })
-    .then((data) => {
+    .then(data => {
       res.send(common.returnAPIData(data));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "hoá đơn",
+        method: 'get',
+        name: 'hoá đơn',
         id: 0,
       });
       return;
@@ -72,23 +68,23 @@ exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Lot.findByPk(id)
-    .then((data) => {
+    .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,
-          message: "Không tìm thấy thông tin lô hàng",
+          message: 'Không tìm thấy thông tin lô hàng',
         });
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "hoá đơn",
+        method: 'get',
+        name: 'hoá đơn',
         id: id,
       });
       return;
@@ -106,9 +102,9 @@ exports.update = async (req, res, next) => {
   Lot.update(newBody, {
     where: { BID: id },
   })
-    .then((num) => {
+    .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, "Cập nhật hoá đơn thành công"));
+        res.send(common.returnAPIData({}, 'Cập nhật hoá đơn thành công'));
       } else {
         next({
           status: 400,
@@ -117,12 +113,12 @@ exports.update = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "put",
-        name: "hoá đơn",
+        method: 'put',
+        name: 'hoá đơn',
         id: id,
       });
       return;
@@ -136,7 +132,7 @@ exports.delete = async (req, res, next) => {
   Lot.destroy({
     where: { proID: { [Op.or]: arrayIds } },
   })
-    .then((num) => {
+    .then(num => {
       if (num >= 1) {
         res.send(common.returnAPIData({}, `${num} lô hàng đã bị xoá!`));
       } else {
@@ -147,12 +143,12 @@ exports.delete = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "delete",
-        name: "hoá đơn",
+        method: 'delete',
+        name: 'hoá đơn',
         id: id,
       });
       return;

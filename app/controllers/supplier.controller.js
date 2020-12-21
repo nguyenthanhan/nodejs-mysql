@@ -1,7 +1,7 @@
-"use strict";
-const common = require("../utils/common");
-const db = require("../models/db");
-const lang = require("../lang");
+'use strict';
+const common = require('../utils/common');
+const db = require('../models/db');
+const lang = require('../lang');
 const { supplier: Supplier, import: Import } = db;
 const Op = db.Sequelize.Op;
 
@@ -27,15 +27,15 @@ exports.create = async (req, res, next) => {
 
   // Save supplier in the database
   Supplier.create(supplier)
-    .then((data) => {
-      res.send(common.returnAPIData(data, "Tạo nhà cung cấp thành công"));
+    .then(data => {
+      res.send(common.returnAPIData(data, 'Tạo nhà cung cấp thành công'));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "post",
-        name: "nhà cung cấp",
+        method: 'post',
+        name: 'nhà cung cấp',
         id: 0,
       });
       return;
@@ -52,20 +52,20 @@ exports.findAll = async (req, res, next) => {
     include: [
       {
         model: Import,
-        as: "imports",
-        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        as: 'imports',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
       },
     ],
   })
-    .then((data) => {
+    .then(data => {
       res.send(common.returnAPIData(data));
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "nhà cung cấp",
+        method: 'get',
+        name: 'nhà cung cấp',
         id: 0,
       });
       return;
@@ -81,28 +81,28 @@ exports.findOne = async (req, res, next) => {
     include: [
       {
         model: Import,
-        as: "imports",
-        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        as: 'imports',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
       },
     ],
   })
-    .then((data) => {
+    .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));
       } else {
         next({
           status: 400,
-          message: "Không tìm thấy thông tin nhà cung cấp",
+          message: 'Không tìm thấy thông tin nhà cung cấp',
         });
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "get",
-        name: "nhà cung cấp",
+        method: 'get',
+        name: 'nhà cung cấp',
         id: id,
       });
       return;
@@ -117,9 +117,9 @@ exports.update = async (req, res, next) => {
   Supplier.update(newBody, {
     where: { SupID: id },
   })
-    .then((num) => {
+    .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, "Cập nhật nhà cung cấp thành công"));
+        res.send(common.returnAPIData({}, 'Cập nhật nhà cung cấp thành công'));
       } else {
         next({
           status: 400,
@@ -128,12 +128,12 @@ exports.update = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "put",
-        name: "nhà cung cấp",
+        method: 'put',
+        name: 'nhà cung cấp',
         id: id,
       });
       return;
@@ -147,7 +147,7 @@ exports.delete = async (req, res, next) => {
   Supplier.destroy({
     where: { SupID: { [Op.or]: arrayIds } },
   })
-    .then((num) => {
+    .then(num => {
       if (num >= 1) {
         res.send(common.returnAPIData({}));
       } else {
@@ -158,12 +158,12 @@ exports.delete = async (req, res, next) => {
         return;
       }
     })
-    .catch((err) => {
+    .catch(err => {
       next({
         status: 400,
         message: err.message,
-        method: "delete",
-        name: "nhà cung cấp",
+        method: 'delete',
+        name: 'nhà cung cấp',
         id: id,
       });
       return;
