@@ -9,17 +9,21 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      export_number: {
-        type: Sequelize.STRING(40),
-      },
       state: {
         type: Sequelize.ENUM('request', 'executed', 'close'),
       },
       urgent_level: {
         type: Sequelize.ENUM('normal', 'priority'),
       },
-      export_action_date: {
+      export_date: {
         type: Sequelize.DATEONLY,
+      },
+      request_export_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: false,
+      },
+      bonus: {
+        type: Sequelize.TEXT,
       },
     },
     {

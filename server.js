@@ -80,7 +80,6 @@ if (!isDev && cluster.isMaster) {
   require('./app/routes/supplier.routes')(app);
   require('./app/routes/import.routes')(app);
   require('./app/routes/export.routes')(app);
-  require('./app/routes/lot.routes')(app);
   require('./app/routes/log.routes')(app);
 
   // Catch 404 Errors and forward them to error handler

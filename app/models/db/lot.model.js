@@ -9,11 +9,32 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      qttLotProductInWarehouse: {
+      qttLotInWarehouse: {
         type: Sequelize.INTEGER(20),
+      },
+      qttProductInStore: {
+        type: Sequelize.INTEGER(20),
+        defaultValue: 0,
       },
       importId: {
         type: Sequelize.BIGINT(20),
+      },
+      expires: {
+        type: Sequelize.DATE,
+      },
+      unit_name: {
+        type: Sequelize.STRING(20),
+      },
+      conversionRate: {
+        type: Sequelize.INTEGER(20),
+      },
+      import_price_unit: {
+        type: Sequelize.BIGINT(20),
+        allowNull: false,
+      },
+      import_price_product: {
+        type: Sequelize.BIGINT(20),
+        allowNull: false,
       },
     },
     {

@@ -9,13 +9,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      import_number: {
-        type: Sequelize.STRING(40),
+      request_import_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: false,
       },
-      total_cost: {
-        type: Sequelize.BIGINT(20),
-      },
-      import_action_date: {
+      import_date: {
         type: Sequelize.DATEONLY,
       },
       state: {

@@ -18,7 +18,7 @@ const returnCustomError = error => {
   return {
     status,
     success: status === 200,
-    error: _message,
+    message: _message,
   };
 };
 

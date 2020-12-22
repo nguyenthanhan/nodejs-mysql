@@ -18,7 +18,7 @@ const _ = require('lodash');
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.total && !req.body.checkerId && !req.body.import_number && !req.body.supplierId) {
+  if (!req.body.requesterId && !req.body.request_import_date) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -35,73 +35,52 @@ exports.create = async (req, res, next) => {
   }
 
   try {
-    const total_cost = req.body.importProducts.reduce((sum, importProduct) => {
-      return sum + importProduct.real_total_unit * importProduct.import_price_unit;
-    }, 0);
-
     // Create a import
     const newImport = {
-      import_action_date: req.body.import_action_date ? moment(req.body.import_action_date) : new Date(),
-      import_number: req.body.import_number,
-      total_cost: total_cost,
-      state: req.body.state ? req.body.state : 'request',
+      request_import_date: req.body.request_import_date ? moment(req.body.request_import_date) : new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : 'normal',
-      checkerId: parseInt(req.body.checkerId),
-      bonus: req.body.bonus ? req.body.bonus : '',
-      mngID: req.userId,
-      supplierId: parseInt(req.body.supplierId),
+      bonus: req.body.bonus ? req.body.bonus : undefined,
+      requesterId: parseInt(req.body.requesterId) || undefined,
+      supplierId: req.body.supplierId ? parseInt(req.body.supplierId) : undefined,
     };
 
     // Save import in the database
     const tExcImport = await Import.create(newImport);
     const excImport = tExcImport.get({ plain: true });
+    if (!excImport) {
+      next({
+        status: 400,
+        message: 'Không tạo được đơn xuất hàng!',
+      });
+      return;
+    }
 
-    if (excImport && excImport.ImID) {
-      if (req.body.importProducts && _.isArray(req.body.importProducts) && req.body.importProducts.length > 0) {
-        const productsInImport = await createItemsWithProducts(req.body.importProducts, excImport.ImID);
-        console.log('productsInImport', productsInImport);
+    if (req.body.importProducts && _.isArray(req.body.importProducts) && req.body.importProducts.length > 0) {
+      const prepareImportProducts = req.body.importProducts.map(importProduct => {
+        return {
+          productId: importProduct.productId,
+          request_total_unit: parseInt(importProduct.request_total_unit),
+          importId: excImport.ImID,
+        };
+      });
 
-        // update W_curr_qtt in product
-        const updateProducts = await Promise.all(
-          req.body.importProducts.map(async importProduct => {
-            const { conversionRate, real_total_unit } = importProduct;
-
-            const oldProduct = await Product.findByPk(importProduct.productId);
-            const newUpdate = await Product.update(
-              {
-                W_curr_qtt: oldProduct.W_curr_qtt + real_total_unit * conversionRate,
-              },
-              {
-                where: { PID: importProduct.productId },
-              }
-            );
-            return parseInt(newUpdate);
-          })
+      // const productsInImport = await createItemsWithProducts(req.body.importProducts, excImport.ImID);
+      const productsInImport = await ProductInImport.bulkCreate(prepareImportProducts);
+      //return result
+      if (productsInImport) {
+        res.send(
+          common.returnAPIData(
+            {
+              ...excImport,
+              productsInImport,
+            },
+            'Tạo đơn nhập hàng thành công'
+          )
         );
-        console.log('updateProducts', updateProducts);
-
-        if (productsInImport) {
-          res.send(
-            common.returnAPIData(
-              {
-                ...excImport,
-                productsInImport,
-                countUpdatedProducts: updateProducts.reduce((acum, number) => acum + number, 0),
-              },
-              'Tạo đơn nhập hàng thành công'
-            )
-          );
-        } else {
-          next({
-            status: 400,
-            message: 'Thông tin sản phẩm không đúng!',
-          });
-          return;
-        }
       } else {
         next({
           status: 400,
-          message: 'Không có sản phẩm trong đơn nhập hàng',
+          message: 'Thông tin sản phẩm không đủ!',
         });
         return;
       }
@@ -118,45 +97,24 @@ exports.create = async (req, res, next) => {
   }
 };
 
-const createItemsWithProducts = (importProducts, importId) => {
-  return Promise.all(
-    importProducts.map(async importProduct => {
-      const { import_price_unit, conversionRate, real_total_unit, productId } = importProduct;
+// const createItemsWithProducts = (importProducts, importId) => {
+//   return Promise.all(
+//     importProducts.map(async importProduct => {
+//       const { productId } = importProduct;
 
-      const _productInImport = await ProductInImport.create({
-        productId: productId,
-        request_total_unit: importProduct.request_total_unit,
-        real_total_unit: real_total_unit,
-        expires: moment(importProduct.expires),
-        unit_name: importProduct.unit_name,
-        conversionRate: conversionRate,
-        import_price_unit: import_price_unit,
-        importId: importId,
-        import_price_product: Math.ceil(import_price_unit / conversionRate),
-      });
+//       const _productInImport = await ProductInImport.create({
+//         productId: productId,
+//         request_total_unit: parseInt(importProduct.request_total_unit),
+//         importId: importId,
+//       });
+//       const productInImport = _productInImport.get({ plain: true });
 
-      const productInImport = _productInImport.get({ plain: true });
-
-      const _createLot = await Lot.create({
-        qttLotProductInWarehouse: real_total_unit * conversionRate,
-        importId: importId,
-        productId: productId,
-      });
-
-      let isCreateLot = false;
-      const createLot = _createLot.get({ plain: true });
-      if (!_.isEmpty(createLot)) {
-        console.log('createLot', createLot);
-        isCreateLot = true;
-      }
-
-      return {
-        productInImport,
-        isCreateLot,
-      };
-    })
-  );
-};
+//       return {
+//         productInImport,
+//       };
+//     })
+//   );
+// };
 
 // Retrieve all imports from the database.
 exports.findAll = async (req, res, next) => {
@@ -164,8 +122,9 @@ exports.findAll = async (req, res, next) => {
     // const mngID = req.query.mngID;
     // let condition = mngID ? { mngID: { [Op.like]: `%${mngID}%` } } : null;
 
-    const data = await Import.findAll({
+    const _data = await Import.findAll({
       // where: condition,
+      attributes: { exclude: ['deletedAt'] },
       include: [
         {
           model: Manager,
@@ -185,12 +144,19 @@ exports.findAll = async (req, res, next) => {
         {
           model: Product,
           as: 'products',
-          attributes: ['PID', 'W_curr_qtt'],
+          attributes: ['PID', 'name'],
         },
       ],
     });
+    const data = _data.map(el => el.get({ plain: true }));
 
-    res.send(common.returnAPIData(data));
+    const newData = await Promise.all(
+      data.map(async eachData => {
+        return processEachData(eachData);
+      })
+    );
+
+    res.send(common.returnAPIData(newData));
   } catch (error) {
     next({
       status: 400,
@@ -203,85 +169,194 @@ exports.findAll = async (req, res, next) => {
   }
 };
 
+const processEachData = async data => {
+  const { products, ...remain } = data;
+  const importAndProductIds = products.map(product => {
+    return {
+      productId: product.PID,
+      importId: product.ProductInImport.importId,
+    };
+  });
+
+  const _lots = await Lot.findAll({
+    where: { [Op.or]: importAndProductIds },
+    attributes: {
+      exclude: ['deletedAt'],
+    },
+  });
+  const lots = _lots.map(el => el.get({ plain: true }));
+
+  const newProducts = products.map(product => {
+    const selectedLot = lots.find(
+      lot => product.PID === lot.productId && product.ProductInImport.importId === lot.importId
+    );
+    if (selectedLot) {
+      return {
+        ...product,
+        isHasLot: true,
+        lot: _.omit(selectedLot, 'deletedAt', 'productId', 'importId'),
+      };
+    } else {
+      return { ...product, isHasLot: false };
+    }
+  });
+
+  return { ...remain, products: newProducts };
+};
+
 // Find a single import with an id
 exports.findOne = async (req, res, next) => {
-  const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-  Import.findByPk(id, {
-    include: [
-      {
-        model: Manager,
-        as: 'checker',
-        attributes: ['MngID', 'accountName', 'LName', 'FName'],
-      },
-      {
-        model: Manager,
-        as: 'manager',
-        attributes: ['MngID', 'accountName', 'LName', 'FName'],
-      },
-      {
-        model: Supplier,
-        as: 'supplier',
-        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-      },
-      {
-        model: Product,
-        as: 'products',
-        attributes: ['PID', 'W_curr_qtt'],
-      },
-    ],
-  })
-    .then(data => {
-      res.send(common.returnAPIData(data));
-    })
-    .catch(err => {
-      next({
-        status: 400,
-        message: err.message,
-        method: 'get',
-        name: 'thông tin nhập hàng',
-        id: id,
-      });
-      return;
+    const _data = await Import.findByPk(id, {
+      include: [
+        {
+          model: Manager,
+          as: 'checker',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'manager',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        },
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID', 'name'],
+        },
+      ],
     });
+    const data = _data.get({ plain: true });
+
+    const newData = await processEachData(data);
+
+    res.send(common.returnAPIData(newData));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: 'get',
+      name: 'thông tin nhập hàng',
+      id: req.params.id,
+    });
+    return;
+  }
 };
 
 // Update a import by the id in the request
 exports.update = async (req, res, next) => {
   try {
-    const { import_number, supplierId, ...body } = req.body;
+    // const total_cost =
+    //   req.body.importProducts && req.body.importProducts.length > 0
+    //     ? req.body.importProducts.reduce((sum, importProduct) => {
+    //         return sum + importProduct.real_total_unit * importProduct.import_price_unit;
+    //       }, 0)
+    //     : null;
 
-    const newBody = { ...body, updatedAt: new Date() };
+    const _findImport = await Import.findByPk(req.params.id);
+    const findImport = _findImport.get({ plain: true });
 
-    const numbersUpdateImport = await Import.update(newBody, {
+    if (findImport.state === 'close') {
+      return res.send(common.returnAPIData({}, `Tình trạng đơn này đã đóng, không thể cập nhập!`));
+    }
+
+    const body = {
+      ..._.omit(req.body, 'importProducts', 'request_import_date', 'mngID'),
+      request_export_date: req.body.request_export_date ? moment(req.body.request_export_date) : new Date(),
+      state: req.body.state === 'request' && findImport.state === 'executed' ? undefined : req.body.state,
+      updatedAt: new Date(),
+    };
+
+    const updateImport = await Import.update(body, {
       where: { ImID: req.params.id },
     });
 
-    if (parseInt(numbersUpdateImport, 10) === 1) {
-      if (req.body.importProducts && _.isArray(req.body.importProducts) && req.body.importProducts.length > 0) {
-        const updateProductsInImport = await updateItemsWithProducts(req.body.importProducts, req.params.id);
-        console.log('createProductsInImport', updateProductsInImport);
-        let numberRowUpdated = 0;
-        let numberRowNotUpdate = 0;
+    if (parseInt(updateImport, 10) === 1 && req.body.state === 'close') {
+      res.send(common.returnAPIData({}, `Cập nhật thông tin nhập hàng thành công`));
+      return;
+    }
 
-        updateProductsInImport.forEach(updateDiscounts => {
-          if (parseInt(updateDiscounts, 10) === 1) {
-            numberRowUpdated = numberRowUpdated + 1;
-          } else {
-            numberRowNotUpdate = numberRowNotUpdate + 1;
-          }
-        });
-
-        res.send(
-          common.returnAPIData({ numberRowUpdated, numberRowNotUpdate }, `Cập nhật thông tin nhập hàng thành công`)
+    if (
+      parseInt(updateImport, 10) === 1 &&
+      req.body.importProducts &&
+      _.isArray(req.body.importProducts) &&
+      req.body.importProducts.length > 0
+    ) {
+      if (req.body.state === 'request') {
+        const updateProductsInImportAndLot = await Promise.all(
+          req.body.importProducts.map(async importProduct => {
+            return ProductInImport.update(
+              {
+                request_total_unit: parseInt(importProduct.request_total_unit),
+                updatedAt: moment(),
+              },
+              {
+                where: { importId: req.params.id, productId: importProduct.productId },
+                silent: true,
+              }
+            );
+          })
         );
-      } else {
-        next({
-          status: 400,
-          message: 'Không có sản phẩm trong đơn nhập hàng',
-        });
-        return;
+        console.log(`req.body.state === 'request'`, updateProductsInImportAndLot);
+        return res.send(common.returnAPIData({}, `Cập nhật thông tin nhập hàng thành công`));
       }
+
+      const updateProductsInImportAndLot = await Promise.all(
+        req.body.importProducts.map(async importProduct => {
+          const newProductInImport = {
+            request_total_unit: importProduct.request_total_unit
+              ? parseInt(importProduct.request_total_unit)
+              : undefined,
+            real_total_unit: importProduct.real_total_unit ? parseInt(importProduct.real_total_unit) : undefined,
+          };
+
+          const updateProductsInImport = await ProductInImport.update(
+            {
+              ...newProductInImport,
+              updatedAt: moment(),
+            },
+            {
+              where: { importId: req.params.id, productId: importProduct.productId },
+              silent: true,
+            }
+          );
+
+          const newLot = {
+            real_total_unit: importProduct.real_total_unit ? parseInt(importProduct.real_total_unit) : undefined,
+            expires: importProduct.expires ? moment(importProduct.expires) : undefined,
+            unit_name: importProduct.unit_name || undefined,
+            conversionRate: parseInt(importProduct.conversionRate),
+            import_price_unit: importProduct.import_price_unit ? parseInt(importProduct.import_price_unit) : undefined,
+            qttLotInWarehouse: importProduct.real_total_unit,
+            importId: req.params.id,
+            productId: importProduct.productId,
+            import_price_product: Math.ceil(importProduct.import_price_unit / importProduct.conversionRate),
+          };
+          const _createLot = await Lot.create(newLot);
+          const createdLot = _createLot.get({ plain: true });
+
+          return {
+            isUpdatedImport: true,
+            isUpdatedProductsInImport: parseInt(updateProductsInImport) === 1,
+            createdLot,
+          };
+        })
+      );
+
+      res.send(common.returnAPIData(updateProductsInImportAndLot, `Cập nhật thông tin nhập hàng thành công`));
+    } else {
+      next({
+        status: 400,
+        message: 'Không có sản phẩm trong đơn nhập hàng',
+      });
+      return;
     }
   } catch (error) {
     next({
@@ -289,28 +364,10 @@ exports.update = async (req, res, next) => {
       message: error.message,
       method: 'put',
       name: 'thông tin nhập hàng',
-      id: id,
+      id: 1,
     });
     return;
   }
-};
-
-const asyncUpdateItemProductOnImport = (importProduct, importId) => {
-  return ProductInImport.update(
-    {
-      ...importProduct,
-      importId: importId,
-      updatedAt: moment(),
-    },
-    {
-      where: { importId: importId, productId: importProduct.productId },
-      silent: true,
-    }
-  );
-};
-
-const updateItemsWithProducts = async (importProducts, importId) => {
-  return Promise.all(importProducts.map(importProduct => asyncUpdateItemProductOnImport(importProduct, importId)));
 };
 
 // Delete a import with the specified id in the request

@@ -160,7 +160,6 @@ exports.findAll = async (req, res, next) => {
 
     const message = data.rows.length === 0 ? 'Không có sản phẩm nào' : '';
     const productsList = data.rows.map(product => product.get({ plain: true }));
-    console.log('productsList', productsList);
 
     const arrayIds = productsList.map(product => product.PID);
 
@@ -195,7 +194,6 @@ exports.findAll = async (req, res, next) => {
         lots: common.sortedByDate(newLots, true),
       };
     });
-    console.log('newProductList', newProductList);
 
     res.send(
       common.returnAPIData(newProductList, message, {
@@ -256,26 +254,26 @@ exports.findOne = async (req, res, next) => {
     }
 
     const { lots, ...newProduct } = productInfo;
-    const newLots = lots.map(lot => {
-      let newLot = lot;
-      newProductsImport.forEach(productImport => {
-        if (productInfo.PID === productImport.productId && lot.importId === productImport.importId) {
-          const { expires, import_price_product } = productImport;
-          newLot = {
-            ...lot,
-            expires,
-            import_price_product,
-          };
-        }
-      });
+    // const newLots = lots.map(lot => {
+    //   let newLot = lot;
+    //   newProductsImport.forEach(productImport => {
+    //     if (productInfo.PID === productImport.productId && lot.importId === productImport.importId) {
+    //       const { expires, import_price_product } = productImport;
+    //       newLot = {
+    //         ...lot,
+    //         expires,
+    //         import_price_product,
+    //       };
+    //     }
+    //   });
 
-      return newLot;
-    });
+    //   return newLot;
+    // });
 
     res.send(
       common.returnAPIData({
         ...newProduct,
-        lots: common.sortedByDate(newLots, true),
+        lots: common.sortedByDate(lots, true),
       })
     );
   } catch (error) {

@@ -32,8 +32,12 @@ db.log = require('./log.model.js')(sequelize, Sequelize);
 
 //Associations
 //one to one
+db.import.belongsTo(db.manager, { foreignKey: 'requesterId', as: 'requester' });
+db.import.belongsTo(db.manager, { foreignKey: 'executorId', as: 'executor' });
 db.import.belongsTo(db.manager, { foreignKey: 'checkerId', as: 'checker' });
 
+db.export.belongsTo(db.manager, { foreignKey: 'requesterId', as: 'requester' });
+db.export.belongsTo(db.manager, { foreignKey: 'executorId', as: 'executor' });
 db.export.belongsTo(db.manager, { foreignKey: 'checkerId', as: 'checker' });
 
 //one to many
@@ -58,6 +62,7 @@ db.categoryShelf = sequelize.define(
   'CategoryShelf',
   {},
   {
+    paranoid: true,
     freezeTableName: true,
   }
 );
@@ -83,27 +88,10 @@ const ProductInImport = sequelize.define(
     },
     real_total_unit: {
       type: Sequelize.INTEGER(20),
-      allowNull: false,
-    },
-    expires: {
-      type: Sequelize.DATE,
-    },
-    unit_name: {
-      type: Sequelize.STRING(20),
-    },
-    conversionRate: {
-      type: Sequelize.INTEGER(20),
-    },
-    import_price_unit: {
-      type: Sequelize.BIGINT(20),
-      allowNull: false,
-    },
-    import_price_product: {
-      type: Sequelize.BIGINT(20),
-      allowNull: false,
     },
   },
   {
+    paranoid: true,
     freezeTableName: true,
   }
 );
@@ -136,24 +124,24 @@ const ProductInExport = sequelize.define(
     },
     real_total_product: {
       type: Sequelize.INTEGER(20),
-      allowNull: false,
     },
   },
   {
+    paranoid: true,
     freezeTableName: true,
   }
 );
 db.productInExport = ProductInExport;
-// db.import.belongsToMany(db.product, {
-//   through: ProductInImport,
-//   as: "products",
-//   foreignKey: "importId",
-// });
-// db.product.belongsToMany(db.import, {
-//   through: ProductInImport,
-//   as: "imports",
-//   foreignKey: "productId",
-// });
+db.export.belongsToMany(db.product, {
+  through: ProductInExport,
+  as: 'products',
+  foreignKey: 'exportId',
+});
+db.product.belongsToMany(db.export, {
+  through: ProductInExport,
+  as: 'exports',
+  foreignKey: 'productId',
+});
 
 // //----------
 
@@ -192,6 +180,7 @@ const ProductOnBill = sequelize.define(
     // },
   },
   {
+    paranoid: true,
     freezeTableName: true,
   }
 );
@@ -216,6 +205,7 @@ const ProductOnDiscount = sequelize.define(
     },
   },
   {
+    paranoid: true,
     freezeTableName: true,
   }
 );
