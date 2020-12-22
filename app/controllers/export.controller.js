@@ -103,7 +103,26 @@ exports.findOne = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const data = await Export.findByPk(id);
+    const data = await Export.findByPk(id, {
+      attributes: { exclude: ['deletedAt'] },
+      include: [
+        {
+          model: Manager,
+          as: 'checker',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'manager',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID', 'name'],
+        },
+      ],
+    });
 
     res.send(common.returnAPIData(data));
   } catch (error) {
