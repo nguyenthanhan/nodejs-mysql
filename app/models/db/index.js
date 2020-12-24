@@ -52,11 +52,6 @@ db.bill.belongsTo(db.manager, {
   as: 'manager',
 });
 
-db.import.belongsTo(db.manager, {
-  foreignKey: 'mngID',
-  as: 'manager',
-});
-
 //----------
 db.categoryShelf = sequelize.define(
   'CategoryShelf',

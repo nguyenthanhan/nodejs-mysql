@@ -52,6 +52,7 @@ if (!isDev && cluster.isMaster) {
     db.sequelize.sync({ force: true }).then(async () => {
       const admin = await faker.admin();
       await db.category.bulkCreate(faker.categories);
+      await db.product.bulkCreate(faker.products);
       await db.shelf.bulkCreate(faker.shelves);
       await db.categoryShelf.bulkCreate(faker.categoriesShelves);
       await db.supplier.bulkCreate(faker.suppliers);

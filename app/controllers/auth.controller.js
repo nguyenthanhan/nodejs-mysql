@@ -16,6 +16,16 @@ exports.login = async (req, res, next) => {
     return;
   }
 
+  if (!validator.isAlphanumeric(req.body.account)) {
+    next({ status: 400, message: 'Tên tài khoản không hợp lệ!' });
+    return;
+  }
+
+  if (!validator.isAscii(req.body.password)) {
+    next({ status: 400, message: 'Mật khẩu không hợp lệ!' });
+    return;
+  }
+
   try {
     const accountName = req.body.account;
     const managerData = await Manager.findOne({

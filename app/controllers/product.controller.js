@@ -38,8 +38,7 @@ exports.create = async (req, res, next) => {
   // if (req.body.W_max_qtt > req.body.W_min_qtt) {
   //   next({
   //     status: 400,
-  //     message:
-  //       "Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu",
+  //     message: 'Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu',
   //   });
   //   return;
   // }
@@ -47,8 +46,7 @@ exports.create = async (req, res, next) => {
   // if (req.body.S_max_qtt > req.body.S_min_qtt) {
   //   next({
   //     status: 400,
-  //     message:
-  //       "Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu",
+  //     message: 'Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu',
   //   });
   //   return;
   // }
@@ -74,7 +72,10 @@ exports.create = async (req, res, next) => {
 
   let imageMessage = 'Tạo sản phẩm thành công nhưng không có hình ảnh sản phẩm';
 
-  if (req.file) {
+  if (req.body.img_url && validator.isUrl(req.body.img_url)) {
+    product = { ...product, img_url: req.body.img_url };
+    imageMessage = 'Tạo sản phẩm thành công';
+  } else if (req.file) {
     const convertImageResult = await cloudinary.uploadSingle(req.file.path, 'product');
 
     if (convertImageResult && convertImageResult.url) {
@@ -172,6 +173,10 @@ exports.findAll = async (req, res, next) => {
       if (product.lots.length === 0) {
         return product;
       }
+
+      let warehouse_curr_qtt = 0;
+      let store_curr_qtt = 0;
+
       const { lots, ...newProduct } = product;
       const newLots = lots.map(lot => {
         let newLot = lot;
@@ -186,11 +191,21 @@ exports.findAll = async (req, res, next) => {
           }
         });
 
+        if (newLot.qttLotInWarehouse) {
+          warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
+        }
+
+        if (newLot.qttProductInStore) {
+          store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
+        }
+
         return newLot;
       });
 
       return {
         ...newProduct,
+        warehouse_curr_qtt,
+        store_curr_qtt,
         lots: common.sortedByDate(newLots, true),
       };
     });
