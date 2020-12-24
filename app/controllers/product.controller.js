@@ -148,13 +148,13 @@ exports.findAll = async (req, res, next) => {
           model: Lot,
           as: 'lots',
           attributes: {
-            exclude: ['productId', 'createdAt', 'updatedAt', 'deletedAt'],
+            exclude: ['productId', 'deletedAt'],
           },
         },
         {
           model: Discount,
           as: 'discounts',
-          // attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+          attributes: { exclude: ['deletedAt'] },
         },
       ],
     });
@@ -162,51 +162,26 @@ exports.findAll = async (req, res, next) => {
     const message = data.rows.length === 0 ? 'Không có sản phẩm nào' : '';
     const productsList = data.rows.map(product => product.get({ plain: true }));
 
-    const arrayIds = productsList.map(product => product.PID);
-
-    const _newProductsImport = await ProductInImport.findAll({
-      where: { productId: { [Op.or]: arrayIds } },
-    });
-    const newProductsImport = _newProductsImport.map(product => product.get({ plain: true }));
-
     const newProductList = productsList.map(product => {
-      if (product.lots.length === 0) {
-        return product;
-      }
-
+      const { lots, ...remain } = product;
       let warehouse_curr_qtt = 0;
       let store_curr_qtt = 0;
 
-      const { lots, ...newProduct } = product;
-      const newLots = lots.map(lot => {
-        let newLot = lot;
-        newProductsImport.forEach(productImport => {
-          if (product.PID === productImport.productId && lot.importId === productImport.importId) {
-            const { expires, import_price_product } = productImport;
-            newLot = {
-              ...lot,
-              expires,
-              import_price_product,
-            };
-          }
-        });
-
-        if (newLot.qttLotInWarehouse) {
-          warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
+      lots.forEach(lot => {
+        if (lot.qttLotInWarehouse) {
+          warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
         }
 
-        if (newLot.qttProductInStore) {
-          store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
+        if (lot.qttProductInStore) {
+          store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
         }
-
-        return newLot;
       });
 
       return {
-        ...newProduct,
+        ...remain,
         warehouse_curr_qtt,
         store_curr_qtt,
-        lots: common.sortedByDate(newLots, true),
+        lots: common.sortedByDate(lots, true),
       };
     });
 
@@ -217,7 +192,7 @@ exports.findAll = async (req, res, next) => {
         // total_page: Math.ceil(
         //   parseInt(data.count) / parseInt(req.query.per_page)
         // ),
-        total_products: parseInt(data.count),
+        total_products: parseInt(productsList.length),
       })
     );
   } catch (error) {
@@ -247,7 +222,7 @@ exports.findOne = async (req, res, next) => {
           model: Lot,
           as: 'lots',
           attributes: {
-            exclude: ['productId', 'createdAt', 'updatedAt', 'deletedAt'],
+            exclude: ['productId', 'deletedAt'],
           },
         },
         {
@@ -259,35 +234,29 @@ exports.findOne = async (req, res, next) => {
     });
     const productInfo = data.get({ plain: true });
 
-    const _newProductsImport = await ProductInImport.findAll({
-      where: { productId: productInfo.PID },
-    });
-    const newProductsImport = _newProductsImport.map(product => product.get({ plain: true }));
-
     if (productInfo.lots.length === 0) {
       res.send(common.returnAPIData(productInfo));
     }
 
     const { lots, ...newProduct } = productInfo;
-    // const newLots = lots.map(lot => {
-    //   let newLot = lot;
-    //   newProductsImport.forEach(productImport => {
-    //     if (productInfo.PID === productImport.productId && lot.importId === productImport.importId) {
-    //       const { expires, import_price_product } = productImport;
-    //       newLot = {
-    //         ...lot,
-    //         expires,
-    //         import_price_product,
-    //       };
-    //     }
-    //   });
+    let warehouse_curr_qtt = 0;
+    let store_curr_qtt = 0;
 
-    //   return newLot;
-    // });
+    lots.forEach(lot => {
+      if (lot.qttLotInWarehouse) {
+        warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
+      }
+
+      if (lot.qttProductInStore) {
+        store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
+      }
+    });
 
     res.send(
       common.returnAPIData({
         ...newProduct,
+        warehouse_curr_qtt,
+        store_curr_qtt,
         lots: common.sortedByDate(lots, true),
       })
     );

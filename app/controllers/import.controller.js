@@ -126,26 +126,26 @@ exports.findAll = async (req, res, next) => {
       // where: condition,
       attributes: { exclude: ['deletedAt'] },
       include: [
-        // {
-        //   model: Manager,
-        //   as: 'checker',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Manager,
-        //   as: 'executor',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Manager,
-        //   as: 'requester',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Supplier,
-        //   as: 'supplier',
-        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        // },
+        {
+          model: Manager,
+          as: 'checker',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'executor',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'requester',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        },
         {
           model: Product,
           as: 'products',
@@ -216,26 +216,26 @@ exports.findOne = async (req, res, next) => {
 
     const _data = await Import.findByPk(id, {
       include: [
-        // {
-        //   model: Manager,
-        //   as: 'checker',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Manager,
-        //   as: 'executor',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Manager,
-        //   as: 'requester',
-        //   attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        // },
-        // {
-        //   model: Supplier,
-        //   as: 'supplier',
-        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        // },
+        {
+          model: Manager,
+          as: 'checker',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'executor',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'requester',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Supplier,
+          as: 'supplier',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        },
         {
           model: Product,
           as: 'products',
