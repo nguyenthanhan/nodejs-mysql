@@ -281,23 +281,28 @@ exports.update = async (req, res, next) => {
     const _findImport = await Import.findByPk(req.params.id);
     const findImport = _findImport.get({ plain: true });
 
-    if (findImport.state === 'close') {
+    if (findImport && findImport.state === 'close') {
       return res.send(common.returnAPIData({}, `Tình trạng đơn này đã đóng, không thể cập nhập!`));
     }
 
     const body = {
-      ..._.omit(req.body, 'importProducts', 'request_import_date', 'mngID'),
-      request_export_date: req.body.request_export_date ? moment(req.body.request_export_date) : new Date(),
+      request_import_date: moment(req.body.request_import_date) || undefined,
       state: req.body.state === 'request' && findImport.state === 'executed' ? undefined : req.body.state,
       import_date: moment(req.body.import_date) || undefined,
       updatedAt: new Date(),
+      urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
+      requesterId: parseInt(req.body.supplierId) || undefined,
+      checkerId: parseInt(req.body.supplierId) || undefined,
+      executorId: parseInt(req.body.supplierId) || undefined,
+      supplierId: parseInt(req.body.supplierId) || undefined,
+      bonus: req.body.bonus || undefined,
     };
 
     const updateImport = await Import.update(body, {
       where: { ImID: req.params.id },
     });
 
-    if (parseInt(updateImport, 10) === 1 && req.body.state === 'close') {
+    if (parseInt(updateImport, 10) === 1 && updateImport.state === 'close') {
       res.send(common.returnAPIData({}, `Cập nhật thông tin nhập hàng thành công`));
       return;
     }
@@ -308,7 +313,7 @@ exports.update = async (req, res, next) => {
       _.isArray(req.body.importProducts) &&
       req.body.importProducts.length > 0
     ) {
-      if (req.body.state === 'request') {
+      if (updateImport.state === 'request') {
         const updateProductsInImportAndLot = await Promise.all(
           req.body.importProducts.map(async importProduct => {
             return ProductInImport.update(
@@ -334,21 +339,15 @@ exports.update = async (req, res, next) => {
               ? parseInt(importProduct.request_total_unit)
               : undefined,
             real_total_unit: importProduct.real_total_unit ? parseInt(importProduct.real_total_unit) : undefined,
+            updatedAt: new Date(),
           };
 
-          const updateProductsInImport = await ProductInImport.update(
-            {
-              ...newProductInImport,
-              updatedAt: moment(),
-            },
-            {
-              where: { importId: req.params.id, productId: importProduct.productId },
-              silent: true,
-            }
-          );
+          const updateProductsInImport = await ProductInImport.update(newProductInImport, {
+            where: { importId: req.params.id, productId: importProduct.productId },
+            silent: true,
+          });
 
           const newLot = {
-            real_total_unit: importProduct.real_total_unit ? parseInt(importProduct.real_total_unit) : undefined,
             expires: importProduct.expires ? moment(importProduct.expires) : undefined,
             unit_name: importProduct.unit_name || undefined,
             conversionRate: parseInt(importProduct.conversionRate),

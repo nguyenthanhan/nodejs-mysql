@@ -113,11 +113,11 @@ db.product.hasMany(db.lot, { foreignKey: 'productId', as: 'lots' });
 const ProductInExport = sequelize.define(
   'ProductInExport',
   {
-    request_total_product: {
+    request_total_unit: {
       type: Sequelize.INTEGER(20),
       allowNull: false,
     },
-    real_total_product: {
+    real_total_unit: {
       type: Sequelize.INTEGER(20),
     },
   },

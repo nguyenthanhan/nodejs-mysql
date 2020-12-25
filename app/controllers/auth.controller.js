@@ -5,9 +5,9 @@ const db = require('../models/db');
 const config = require('../config/auth.config');
 const lang = require('../lang');
 const constants = require('../constants');
-var validator = require('validator');
-var bcrypt = require('bcrypt');
-var jwt = require('jsonwebtoken');
+const validator = require('validator');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const Manager = db.manager;
 
 exports.login = async (req, res, next) => {
@@ -108,7 +108,7 @@ exports.changePassword = async (req, res, next) => {
         where: { MngID: req.userId },
       })
         .then(num => {
-          if (num == 1) {
+          if (num === 1) {
             res.send(common.returnAPIData({}));
           } else {
             next({

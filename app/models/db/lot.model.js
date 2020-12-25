@@ -11,6 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       qttLotInWarehouse: {
         type: Sequelize.INTEGER(20),
+        defaultValue: 0,
       },
       qttProductInStore: {
         type: Sequelize.INTEGER(20),
