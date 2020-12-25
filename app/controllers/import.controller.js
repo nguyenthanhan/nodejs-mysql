@@ -133,7 +133,12 @@ exports.findAll = async (req, res, next) => {
         },
         {
           model: Manager,
-          as: 'manager',
+          as: 'executor',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'requester',
           attributes: ['MngID', 'accountName', 'LName', 'FName'],
         },
         {
@@ -218,7 +223,12 @@ exports.findOne = async (req, res, next) => {
         },
         {
           model: Manager,
-          as: 'manager',
+          as: 'executor',
+          attributes: ['MngID', 'accountName', 'LName', 'FName'],
+        },
+        {
+          model: Manager,
+          as: 'requester',
           attributes: ['MngID', 'accountName', 'LName', 'FName'],
         },
         {
@@ -252,6 +262,14 @@ exports.findOne = async (req, res, next) => {
 
 // Update a import by the id in the request
 exports.update = async (req, res, next) => {
+  if (!req.body.import_date) {
+    next({
+      status: 400,
+      message: 'Thiếu ngày thực hiện nhập hàng',
+    });
+    return;
+  }
+
   try {
     // const total_cost =
     //   req.body.importProducts && req.body.importProducts.length > 0
@@ -271,6 +289,7 @@ exports.update = async (req, res, next) => {
       ..._.omit(req.body, 'importProducts', 'request_import_date', 'mngID'),
       request_export_date: req.body.request_export_date ? moment(req.body.request_export_date) : new Date(),
       state: req.body.state === 'request' && findImport.state === 'executed' ? undefined : req.body.state,
+      import_date: moment(req.body.import_date) || undefined,
       updatedAt: new Date(),
     };
 
