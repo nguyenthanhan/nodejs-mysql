@@ -9,6 +9,8 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Manager = db.manager;
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 exports.login = async (req, res, next) => {
   if (!req.body.account || !req.body.password) {
@@ -52,6 +54,14 @@ exports.login = async (req, res, next) => {
     });
 
     res.send(common.returnAPIData({ ..._.omit(managerData, 'password'), token }, ''));
+
+    LogController.createLog({
+      MngID: managerData.MngID,
+      action: ActionOnTable.LOGIN,
+      tableOfAction: Table.MANAGER,
+      affectedRowID: managerData.MngID,
+      nameInRow: managerData.accountName,
+    });
   } catch (error) {
     next({ status: 400, message: error.message });
     return;

@@ -4,6 +4,8 @@ const db = require('../models/db');
 const lang = require('../lang');
 const { shelf: Shelf, category: Category } = db;
 const Op = db.Sequelize.Op;
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new Shelf
 exports.create = async (req, res, next) => {
@@ -30,6 +32,13 @@ exports.create = async (req, res, next) => {
     const shelfQuery = Shelf.create(shelf);
     if (shelfQuery) {
       res.send(common.returnAPIData(shelfQuery, 'Tạo kệ hàng thành công'));
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.SHELF,
+        affectedRowID: shelfQuery.ShID,
+        nameInRow: shelfQuery.name,
+      });
     }
   } catch (error) {
     next({
@@ -113,6 +122,15 @@ exports.update = async (req, res, next) => {
     .then(num => {
       if (num == 1) {
         res.send(common.returnAPIData({}, 'Cập nhật kệ hàng thành công'));
+        Shelf.findByPk(id, { raw: true }).then(data => {
+          LogController.createLog({
+            MngID: req.userId,
+            action: ActionOnTable.EDIT,
+            tableOfAction: Table.SHELF,
+            affectedRowID: data.ShID,
+            nameInRow: data.name,
+          });
+        });
       } else {
         next({
           status: 400,
@@ -150,12 +168,28 @@ exports.delete = async (req, res, next) => {
     res.send(
       common.returnAPIData(
         {
-          deleteShelf: parseInt(deleteShelf),
-          deleteCategoryInShelf: parseInt(deleteCategoryInShelf),
+          deletedCount: parseInt(deleteShelf),
+          deletedCategoryInShelfCount: parseInt(deleteCategoryInShelf),
         },
-        `${deleteShelf} kệ hàng đã bị xoá!`
+        `${parseInt(deleteShelf)} kệ hàng đã bị xoá!`
       )
     );
+
+    Shelf.findAll({
+      where: { ShID: { [Op.or]: arrayIds } },
+      raw: true,
+      paranoid: false,
+    }).then(data => {
+      data.forEach(item => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.DELETE,
+          tableOfAction: Table.SHELF,
+          affectedRowID: item.ShID,
+          nameInRow: item.name,
+        });
+      });
+    });
   } catch (error) {
     next({
       status: 400,

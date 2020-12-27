@@ -9,15 +9,16 @@ const Table = {
   IMPORT: 'Nhập hàng',
   LOT: 'Lô hàng',
   MANAGER: 'Quản lý',
-  PRODUCT: 'Sản phẩm',
   SHELF: 'Kệ hàng',
   SUPPLIER: 'Nhà cung cấp',
+  DISCOUNT: 'Giảm giá',
 };
 
 const ActionOnTable = {
   ADD: 'Thêm',
   DELETE: 'Xoá',
   EDIT: 'Sửa',
+  LOGIN: 'Đăng nhập',
 };
 
 module.exports = {

@@ -5,6 +5,8 @@ const db = require('../models/db');
 const lang = require('../lang');
 const { category: Category, product: Product, shelf: Shelf, categoryShelf: CategoryShelf } = db;
 const Op = db.Sequelize.Op;
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new Category
 exports.create = async (req, res, next) => {
@@ -37,6 +39,7 @@ exports.create = async (req, res, next) => {
     const newCategory = await Category.create(category);
 
     if (newCategory && newCategory.CID) {
+
       const newBulkCreate = req.body.shelfIds.map(id => ({
         shelfId: id,
         categoryId: newCategory.CID,
@@ -45,6 +48,14 @@ exports.create = async (req, res, next) => {
       const newCategoryShelf = await CategoryShelf.bulkCreate.create(newBulkCreate);
 
       res.send(common.returnAPIData({ ...newCategory, newCategoryShelf }, message));
+
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.CATEGORY,
+        affectedRowID: newCategory.CID,
+        nameInRow: newCategory.name,
+      });
     }
   } catch (error) {
     next({
@@ -161,6 +172,16 @@ exports.update = async (req, res, next) => {
         });
         return;
       }
+
+      Category.findByPk(id, { raw: true }).then(data => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.EDIT,
+          tableOfAction: Table.CATEGORY,
+          affectedRowID: data.BID,
+          nameInRow: data.cus_name,
+        });
+      });
     })
     .catch(err => {
       next({
@@ -198,6 +219,22 @@ exports.delete = async (req, res, next) => {
         `${parseInt(deleteCategory)} phân loại hàng đã bị xoá!`
       )
     );
+
+    Category.findAll({
+      where: { CID: { [Op.or]: arrayIds } },
+      raw: true,
+      paranoid: false
+    }).then(data => {
+      data.forEach(item => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.DELETE,
+          tableOfAction: Table.CATEGORY,
+          affectedRowID: item.CID,
+          nameInRow: item.name,
+        });
+      });
+    });
   } catch (error) {
     next({
       status: 400,

@@ -6,6 +6,8 @@ const { bill: Bill, manager: Manager, product: Product, productOnBill: ProductOn
 const Op = db.Sequelize.Op;
 const _ = require('lodash');
 const moment = require('moment');
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 const updateProductsInStore = async sellProducts => {
   try {
@@ -82,6 +84,14 @@ exports.create = async (req, res, next) => {
     const currentBill = await Bill.create(bill, { raw: true });
 
     if (currentBill && currentBill.BID) {
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.BILL,
+        affectedRowID: currentBill.BID,
+        nameInRow: currentBill.cus_name,
+      });
+
       const createProductsOnBill = await updateProductsOnBill(req.body.sellProducts, currentBill.BID);
 
       if (createProductsOnBill) {
@@ -186,7 +196,7 @@ exports.update = async (req, res, next) => {
   })
     .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(common.returnAPIData({}, 'Cập nhật đơn hàng thành công!'));
       } else {
         next({
           status: 400,
@@ -194,6 +204,15 @@ exports.update = async (req, res, next) => {
         });
         return;
       }
+      Bill.findByPk(id, { raw: true }).then(data => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.EDIT,
+          tableOfAction: Table.BILL,
+          affectedRowID: data.BID,
+          nameInRow: data.cus_name,
+        });
+      });
     })
     .catch(err => {
       next({
@@ -221,8 +240,27 @@ exports.delete = async (req, res, next) => {
     .then(num => {
       if (num > 0) {
         res.send(
-          common.returnAPIData({ deleteProductOnBill: parseInt(deleteProductOnBill) }, `${num} hoá đơn đã bị xoá!`)
+          common.returnAPIData(
+            { deletedProductOnBillCount: parseInt(deleteProductOnBill) },
+            `${num} hoá đơn đã bị xoá!`
+          )
         );
+
+        Bill.findAll({
+          where: { BID: { [Op.or]: arrayIds } },
+          raw: true,
+          paranoid: false
+        }).then(data => {
+          data.forEach(item => {
+            LogController.createLog({
+              MngID: req.userId,
+              action: ActionOnTable.DELETE,
+              tableOfAction: Table.BILL,
+              affectedRowID: item.BID,
+              nameInRow: item.cus_name,
+            });
+          });
+        });
       } else {
         next({
           status: 400,

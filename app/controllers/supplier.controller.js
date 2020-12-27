@@ -4,6 +4,8 @@ const db = require('../models/db');
 const lang = require('../lang');
 const { supplier: Supplier, import: Import } = db;
 const Op = db.Sequelize.Op;
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new supplier
 exports.create = async (req, res, next) => {
@@ -29,6 +31,13 @@ exports.create = async (req, res, next) => {
   Supplier.create(supplier)
     .then(data => {
       res.send(common.returnAPIData(data, 'Tạo nhà cung cấp thành công'));
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.SUPPLIER,
+        affectedRowID: data.SupID,
+        nameInRow: data.name,
+      });
     })
     .catch(err => {
       next({
@@ -120,6 +129,15 @@ exports.update = async (req, res, next) => {
     .then(num => {
       if (num == 1) {
         res.send(common.returnAPIData({}, 'Cập nhật nhà cung cấp thành công'));
+        Supplier.findByPk(id, { raw: true }).then(data => {
+          LogController.createLog({
+            MngID: req.userId,
+            action: ActionOnTable.EDIT,
+            tableOfAction: Table.SUPPLIER,
+            affectedRowID: data.SupID,
+            nameInRow: data.name,
+          });
+        });
       } else {
         next({
           status: 400,
@@ -149,7 +167,30 @@ exports.delete = async (req, res, next) => {
   })
     .then(num => {
       if (num >= 1) {
-        res.send(common.returnAPIData({}));
+        res.send(
+          common.returnAPIData(
+            {
+              deletedCount: parseInt(num),
+            },
+            `${parseInt(num)} kệ hàng đã bị xoá!`
+          )
+        );
+
+        Supplier.findAll({
+          where: { ShID: { [Op.or]: arrayIds } },
+          raw: true,
+          paranoid: false,
+        }).then(data => {
+          data.forEach(item => {
+            LogController.createLog({
+              MngID: req.userId,
+              action: ActionOnTable.DELETE,
+              tableOfAction: Table.SUPPLIER,
+              affectedRowID: item.SupID,
+              nameInRow: item.name,
+            });
+          });
+        });
       } else {
         next({
           status: 400,

@@ -6,6 +6,8 @@ const { discount: Discount, productOnDiscount: ProductOnDiscount, product: Produ
 const moment = require('moment');
 const Op = db.Sequelize.Op;
 const _ = require('lodash');
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new Discount
 exports.create = async (req, res, next) => {
@@ -105,6 +107,14 @@ exports.create = async (req, res, next) => {
       if (discountsWithProduct) {
         res.send(common.returnAPIData({ ...createDiscount, discountsWithProduct }, 'Tạo mã giảm giá thành công'));
       }
+
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.DISCOUNT,
+        affectedRowID: createDiscount.discountId,
+        nameInRow: createDiscount.title,
+      });
     }
   } catch (error) {
     next({
@@ -241,6 +251,16 @@ exports.update = async (req, res, next) => {
       res.send(
         common.returnAPIData({ numberRowUpdated, numberRowNotUpdate }, `Cập nhật mã sản phẩm giảm giá thành công`)
       );
+
+      Discount.findByPk(req.params.id, { raw: true }).then(data => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.EDIT,
+          tableOfAction: Table.DISCOUNT,
+          affectedRowID: data.discountId,
+          nameInRow: data.title,
+        });
+      });
     } else {
       next({
         status: 400,
@@ -293,6 +313,22 @@ exports.delete = async (req, res, next) => {
       });
 
       res.send(common.returnAPIData({ deletedCount: deletedCount }, `${numberDelete} mã giảm giá đã bị xoá!`));
+
+      Discount.findAll({
+        where: { discountId: { [Op.or]: arrayIds } },
+        raw: true,
+        paranoid: false,
+      }).then(data => {
+        data.forEach(item => {
+          LogController.createLog({
+            MngID: req.userId,
+            action: ActionOnTable.DELETE,
+            tableOfAction: Table.DISCOUNT,
+            affectedRowID: item.discountId,
+            nameInRow: item.title,
+          });
+        });
+      });
     } else {
       common.returnAPIData({}, `Không có phiếu nhập bị xoá!`);
     }

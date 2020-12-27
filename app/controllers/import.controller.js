@@ -13,6 +13,8 @@ const {
 const Op = db.Sequelize.Op;
 const moment = require('moment');
 const _ = require('lodash');
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new import
 exports.create = async (req, res, next) => {
@@ -77,6 +79,14 @@ exports.create = async (req, res, next) => {
             'Tạo đơn nhập hàng thành công'
           )
         );
+
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.ADD,
+          tableOfAction: Table.IMPORT,
+          affectedRowID: excImport.ImID,
+          nameInRow: null,
+        });
       } else {
         next({
           status: 400,
@@ -369,6 +379,14 @@ exports.update = async (req, res, next) => {
       );
 
       res.send(common.returnAPIData(updateProductsInImportAndLot, `Cập nhật thông tin nhập hàng thành công`));
+
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.EDIT,
+        tableOfAction: Table.IMPORT,
+        affectedRowID: req.params.id,
+        nameInRow: null,
+      });
     } else {
       next({
         status: 400,
@@ -410,6 +428,16 @@ exports.delete = async (req, res, next) => {
         `${parseInt(numberDelete)} phiếu nhập đã bị xoá!`
       )
     );
+
+    arrayIds.forEach(id => {
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.DELETE,
+        tableOfAction: Table.IMPORT,
+        affectedRowID: id,
+        nameInRow: null,
+      });
+    });
   } catch (error) {
     next({
       status: 400,

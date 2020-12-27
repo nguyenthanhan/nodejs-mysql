@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT(20),
       },
       action: {
-        type: Sequelize.ENUM('Thêm', 'Sửa', 'Xoá'),
+        type: Sequelize.ENUM('Thêm', 'Sửa', 'Xoá', 'Đăng nhập'),
       },
       tableOfAction: {
         type: Sequelize.ENUM(

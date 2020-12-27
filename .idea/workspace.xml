@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9c1c04a9-88e6-49de-a0e7-001478a91f85" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/auth.controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/auth.controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/db/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/db/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,10 +28,12 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="javascript.nodejs.core.library.configured.version" value="15.3.0" />
+    <property name="javascript.nodejs.core.library.typings.version" value="14.14.16" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
-    <property name="settings.editor.selected.configurable" value="fileTemplates" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -53,6 +53,9 @@
       <workItem from="1608870055599" duration="624000" />
       <workItem from="1608870741346" duration="1022000" />
       <workItem from="1608872182447" duration="3128000" />
+      <workItem from="1608910948358" duration="277000" />
+      <workItem from="1608911361116" duration="427000" />
+      <workItem from="1608983912778" duration="590000" />
     </task>
     <servers />
   </component>

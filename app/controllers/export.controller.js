@@ -5,6 +5,8 @@ const { manager: Manager, export: Export, product: Product, lot: Lot, productInE
 const Op = db.Sequelize.Op;
 const moment = require('moment');
 const _ = require('lodash');
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new export
 exports.create = async (req, res, next) => {
@@ -42,8 +44,15 @@ exports.create = async (req, res, next) => {
 
     const productsWithExport = await ProductInExport.bulkCreate(prepareExportProducts);
 
-    //handle logic export
     res.send(common.returnAPIData({ ...createExport, productsWithExport }, 'Tạo đơn xuất hàng thành công!'));
+
+    LogController.createLog({
+      MngID: req.userId,
+      action: ActionOnTable.ADD,
+      tableOfAction: Table.EXPORT,
+      affectedRowID: createExport.ExID,
+      nameInRow: null,
+    });
   } catch (error) {
     next({
       status: 400,
@@ -283,6 +292,14 @@ exports.update = async (req, res, next) => {
       );
 
       res.send(common.returnAPIData(updateProductsInExportAndLot, `Cập nhật thông tin nhập hàng thành công`));
+
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.EDIT,
+        tableOfAction: Table.EXPORT,
+        affectedRowID: req.params.id,
+        nameInRow: null,
+      });
     } else {
       next({
         status: 400,
@@ -316,6 +333,16 @@ exports.delete = async (req, res, next) => {
     });
 
     res.send(common.returnAPIData(`${count_deleted_export} phiếu xuất đã bị xoá!`));
+
+    arrayIds.forEach(id => {
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.DELETE,
+        tableOfAction: Table.EXPORT,
+        affectedRowID: id,
+        nameInRow: null,
+      });
+    });
   } catch (error) {
     next({
       status: 400,

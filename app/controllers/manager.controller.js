@@ -10,6 +10,8 @@ const lang = require('../lang');
 const Manager = db.manager;
 const Op = db.Sequelize.Op;
 const constants = require('../constants');
+const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new manager
 exports.create = async (req, res, next) => {
@@ -79,6 +81,14 @@ exports.create = async (req, res, next) => {
     const newManagerJSON = newManager.toJSON();
     if (newManagerJSON) {
       res.send(common.returnAPIData(_.omit(newManagerJSON, 'password'), 'Tạo người quản lí thành công'));
+
+      LogController.createLog({
+        MngID: req.userId,
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.MANAGER,
+        affectedRowID: newManagerJSON.MngID,
+        nameInRow: newManagerJSON.accountName,
+      });
     }
   } catch (err) {
     next({
@@ -217,6 +227,16 @@ exports.updateMe = async (req, res, next) => {
         });
         return;
       }
+
+      Product.findByPk(id, { raw: true }).then(data => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.EDIT,
+          tableOfAction: Table.MANAGER,
+          affectedRowID: data.MngID,
+          nameInRow: data.accountName,
+        });
+      });
     })
     .catch(err => {
       next({
@@ -260,6 +280,16 @@ exports.update = async (req, res, next) => {
         });
         return;
       }
+
+      Product.findByPk(id, { raw: true }).then(data => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.EDIT,
+          tableOfAction: Table.MANAGER,
+          affectedRowID: data.MngID,
+          nameInRow: data.accountName,
+        });
+      });
     })
     .catch(err => {
       next({
@@ -290,6 +320,22 @@ exports.delete = async (req, res, next) => {
         });
         return;
       }
+
+      Product.findAll({
+        where: { MngID: { [Op.or]: arrayIds } },
+        raw: true,
+        paranoid: false,
+      }).then(data => {
+        data.forEach(item => {
+          LogController.createLog({
+            MngID: req.userId,
+            action: ActionOnTable.DELETE,
+            tableOfAction: Table.MANAGER,
+            affectedRowID: item.MngID,
+            nameInRow: item.accountName,
+          });
+        });
+      });
     })
     .catch(err => {
       next({

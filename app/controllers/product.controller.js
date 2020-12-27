@@ -14,6 +14,7 @@ const {
 } = db;
 const Op = db.Sequelize.Op;
 const LogController = require('./log.controller');
+const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new product
 exports.create = async (req, res, next) => {
@@ -90,8 +91,8 @@ exports.create = async (req, res, next) => {
       res.send(common.returnAPIData(data, imageMessage));
       LogController.createLog({
         MngID: req.userId,
-        action: 'Thêm',
-        tableOfAction: 'Sản phẩm',
+        action: ActionOnTable.ADD,
+        tableOfAction: Table.PRODUCT,
         affectedRowID: data.PID,
         nameInRow: data.name,
       });
@@ -290,11 +291,11 @@ exports.update = async (req, res, next) => {
     .then(num => {
       if (num == 1) {
         res.send(common.returnAPIData({}, 'Cập nhật sản phẩm thành công '));
-        Product.findByPk(PID, { raw: true }).then(data => {
+        Product.findByPk(id, { raw: true }).then(data => {
           LogController.createLog({
             MngID: req.userId,
-            action: 'Thêm',
-            tableOfAction: 'Sản phẩm',
+            action: ActionOnTable.EDIT,
+            tableOfAction: Table.PRODUCT,
             affectedRowID: data.PID,
             nameInRow: data.name,
           });
@@ -342,6 +343,22 @@ exports.delete = async (req, res, next) => {
         `${num} sản phẩm đã bị xoá!`
       )
     );
+    
+    Product.findAll({
+      where: { PID: { [Op.or]: arrayIds } },
+      raw: true,
+      paranoid: false,
+    }).then(data => {
+      data.forEach(item => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.DELETE,
+          tableOfAction: Table.PRODUCT,
+          affectedRowID: item.PID,
+          nameInRow: item.name,
+        });
+      });
+    });
   } catch (error) {
     next({
       status: 400,
