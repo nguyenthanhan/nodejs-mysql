@@ -2,7 +2,7 @@
 const common = require('../utils/common');
 const db = require('../models/db');
 const lang = require('../lang');
-const { shelf: Shelf, category: Category } = db;
+const { shelf: Shelf, category: Category, categoryShelf: CategoryShelf } = db;
 const Op = db.Sequelize.Op;
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
@@ -193,10 +193,10 @@ exports.delete = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'delete',
       name: 'kệ hàng',
-      id: id,
+      id: 0,
     });
     return;
   }
