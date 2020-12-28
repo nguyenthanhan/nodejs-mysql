@@ -16,6 +16,7 @@ const admin = async () => {
     BDay: '1980-01-01T00:01:00.000Z',
     email: 'dtitab109@leavr.com',
     telephoneNumber: '(84-4) 5373367',
+    avt_url: `${faker.image.imageUrl(300, 300)}`,
   };
 };
 

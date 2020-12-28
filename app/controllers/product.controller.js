@@ -264,7 +264,7 @@ exports.findOne = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'get',
       name: 'sản phẩm',
       id: id,
@@ -343,7 +343,7 @@ exports.delete = async (req, res, next) => {
         `${num} sản phẩm đã bị xoá!`
       )
     );
-    
+
     Product.findAll({
       where: { PID: { [Op.or]: arrayIds } },
       raw: true,
@@ -362,7 +362,7 @@ exports.delete = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'delete',
       name: 'sản phẩm',
       id: id,

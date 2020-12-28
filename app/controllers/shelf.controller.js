@@ -43,7 +43,7 @@ exports.create = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'post',
       name: 'kệ hàng',
       id: 0,

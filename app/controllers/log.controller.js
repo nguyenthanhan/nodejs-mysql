@@ -33,7 +33,7 @@ exports.getAll = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'get',
       name: 'bản ghi',
       id: 0,

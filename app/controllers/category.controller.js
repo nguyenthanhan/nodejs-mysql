@@ -39,7 +39,6 @@ exports.create = async (req, res, next) => {
     const newCategory = await Category.create(category);
 
     if (newCategory && newCategory.CID) {
-
       const newBulkCreate = req.body.shelfIds.map(id => ({
         shelfId: id,
         categoryId: newCategory.CID,
@@ -60,7 +59,7 @@ exports.create = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'post',
       name: 'phân ngành hàng',
       id: 0,
@@ -223,7 +222,7 @@ exports.delete = async (req, res, next) => {
     Category.findAll({
       where: { CID: { [Op.or]: arrayIds } },
       raw: true,
-      paranoid: false
+      paranoid: false,
     }).then(data => {
       data.forEach(item => {
         LogController.createLog({
@@ -238,7 +237,7 @@ exports.delete = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'delete',
       name: 'phân ngành hàng',
       id: id,
