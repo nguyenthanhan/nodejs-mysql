@@ -2,6 +2,7 @@
 const lang = require('../lang');
 var bcrypt = require('bcrypt');
 const constants = require('../constants');
+const faker = require('faker');
 
 const admin = async () => {
   const hashPassword = await bcrypt.hash('password', constants.SALT_ROUNDS);
@@ -36,35 +37,44 @@ const shelves = [
 const categories = [
   {
     name: 'Đồ uống',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Đồ ăn nhanh',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Đồ ăn lạnh',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Thực phẩm khô',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Thực phẩm đóng hộp',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Gia vị',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Lương thực',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Rau củ',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
   {
     name: 'Khăn giấy, giấy vệ sinh, tã em bé',
+    img_url: `${faker.image.imageUrl(300, 300)}`,
   },
-  { name: 'Hóa mỹ phẩm' },
-  { name: 'Văn phòng phẩm' },
-  { name: 'Đồ sinh hoạt cá nhân' },
-  { name: 'Thẻ cào điện thoại' },
+  { name: 'Hóa mỹ phẩm', img_url: `${faker.image.imageUrl(300, 300)}` },
+  { name: 'Văn phòng phẩm', img_url: `${faker.image.imageUrl(300, 300)}` },
+  { name: 'Đồ sinh hoạt cá nhân', img_url: `${faker.image.imageUrl(300, 300)}` },
+  { name: 'Thẻ cào điện thoại', img_url: `${faker.image.imageUrl(300, 300)}` },
 ];
 
 const suppliers = [
