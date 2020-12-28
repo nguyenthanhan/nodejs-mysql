@@ -178,7 +178,7 @@ exports.findOne = async (req, res, next) => {
       next({
         status: 400,
         message: err.message,
-        id: id,
+        id: req.params.id,
         name: 'hoá đơn',
         method: 'get',
       });
@@ -218,7 +218,7 @@ exports.update = async (req, res, next) => {
       next({
         status: 400,
         message: err.message,
-        id: id,
+        id: req.params.id,
         name: 'hoá đơn',
         method: 'put',
       });

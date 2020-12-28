@@ -267,7 +267,7 @@ exports.findOne = async (req, res, next) => {
       message: error.message,
       method: 'get',
       name: 'sản phẩm',
-      id: id,
+      id: req.params.id,
     });
     return;
   }
@@ -314,7 +314,7 @@ exports.update = async (req, res, next) => {
         message: err.message,
         method: 'put',
         name: 'sản phẩm',
-        id: id,
+        id: req.params.id,
       });
       return;
     });
@@ -340,7 +340,7 @@ exports.delete = async (req, res, next) => {
         {
           deleteProducts: parseInt(deleteProducts),
         },
-        `${num} sản phẩm đã bị xoá!`
+        `${parseInt(deleteProducts)} sản phẩm đã bị xoá!`
       )
     );
 
@@ -365,7 +365,7 @@ exports.delete = async (req, res, next) => {
       message: error.message,
       method: 'delete',
       name: 'sản phẩm',
-      id: id,
+      id: 0,
     });
     return;
   }

@@ -140,7 +140,7 @@ exports.findOne = async (req, res, next) => {
         message: err.message,
         method: 'get',
         name: 'phân ngành hàng',
-        id: id,
+        id: req.params.id,
       });
       return;
     });
@@ -240,7 +240,7 @@ exports.delete = async (req, res, next) => {
       message: error.message,
       method: 'delete',
       name: 'phân ngành hàng',
-      id: id,
+      id: 0,
     });
     return;
   }

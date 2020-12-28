@@ -205,7 +205,7 @@ exports.delete = async (req, res, next) => {
         message: err.message,
         method: 'delete',
         name: 'nhà cung cấp',
-        id: id,
+        id: 0,
       });
       return;
     });
