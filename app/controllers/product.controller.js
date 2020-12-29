@@ -154,7 +154,7 @@ exports.findAll = async (req, res, next) => {
         },
         {
           model: Discount,
-          as: 'discounts',
+          as: 'discount',
           attributes: { exclude: ['deletedAt'] },
         },
       ],
@@ -228,7 +228,7 @@ exports.findOne = async (req, res, next) => {
         },
         {
           model: Discount,
-          as: 'discounts',
+          as: 'discount',
           // attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
       ],
