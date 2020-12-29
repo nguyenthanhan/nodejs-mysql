@@ -18,6 +18,7 @@ verifyToken = (req, res, next) => {
         status: 401,
         message: 'Không có quyèn truy cập. Xác thực bị lỗi!',
       });
+      return;
     }
     req.userId = decoded.id;
     next();

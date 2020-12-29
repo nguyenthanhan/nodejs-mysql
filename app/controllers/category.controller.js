@@ -165,7 +165,10 @@ exports.findOne = async (req, res, next) => {
 // Update a category by the id in the request
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  let body = { ...req.body, updatedAt: new Date() };
+  let body = {};
+
+  console.log(req.body);
+  console.log(req.file);
 
   if (req.file) {
     const convertImageResult = await cloudinary.uploadSingle(req.file.path, 'category');
@@ -174,12 +177,26 @@ exports.update = async (req, res, next) => {
     }
   }
 
-  Category.update(newBody, {
+  if (req.body.name && _.isString(req.body.name)) {
+    body = { ...body, name: req.body.name };
+  }
+
+  if (!_.isEmpty(body)) {
+    body = { ...body, updatedAt: new Date() };
+  } else {
+    next({
+      status: 400,
+      message: 'Nội dung trống',
+    });
+    return;
+  }
+
+  Category.update(body, {
     where: { CID: id },
   })
     .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, 'Cập nhật phân ngành hàng thành công'));
+        res.send(common.returnAPIData({}, 'Cập nhật ngành hàng này thành công'));
       } else {
         next({
           status: 400,
