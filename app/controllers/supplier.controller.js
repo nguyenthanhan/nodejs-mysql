@@ -86,7 +86,6 @@ exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
   Supplier.findByPk(id, {
-    where: condition,
     include: [
       {
         model: Import,

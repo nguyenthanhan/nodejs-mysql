@@ -165,45 +165,113 @@ exports.findOne = async (req, res, next) => {
 // Update a category by the id in the request
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  let body = {};
+  try {
+    let body = {};
 
-  console.log(req.body);
-  console.log(req.file);
+    console.log(req.body);
+    console.log(req.file);
 
-  if (req.file) {
-    const convertImageResult = await cloudinary.uploadSingle(req.file.path, 'category');
-    if (convertImageResult.url) {
-      body = { ...body, img_url: convertImageResult.url };
-    }
-  }
-
-  if (req.body.name && _.isString(req.body.name)) {
-    body = { ...body, name: req.body.name };
-  }
-
-  if (!_.isEmpty(body)) {
-    body = { ...body, updatedAt: new Date() };
-  } else {
-    next({
-      status: 400,
-      message: 'Nội dung trống',
-    });
-    return;
-  }
-
-  Category.update(body, {
-    where: { CID: id },
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send(common.returnAPIData({}, 'Cập nhật ngành hàng này thành công'));
-      } else {
-        next({
-          status: 400,
-          message: `Không thể cập nhật phân ngành hàng này. Phân ngành hàng không thể tìm thấy!`,
-        });
-        return;
+    if (req.file) {
+      const convertImageResult = await cloudinary.uploadSingle(req.file.path, 'category');
+      if (convertImageResult.url) {
+        body = { ...body, img_url: convertImageResult.url };
       }
+    }
+
+    if (req.body.name && _.isString(req.body.name)) {
+      body = { ...body, name: req.body.name };
+    }
+
+    if (!_.isEmpty(body)) {
+      body = { ...body, updatedAt: new Date() };
+    } else {
+      next({
+        status: 400,
+        message: 'Nội dung trống',
+      });
+      return;
+    }
+
+    if (!req.body.shelfIds) {
+      await CategoryShelf.destroy({
+        where: {
+          categoryId: id,
+        },
+      });
+    }
+
+    const updateCategory = await Category.update(body, {
+      where: { CID: id },
+    });
+
+    let newCategoryShelf;
+    let deletedCategoryShelfCount = 0;
+
+    if (_.isArray(req.body.shelfIds)) {
+      const _oldCategoryInShelf = await CategoryShelf.findAll({
+        where: {
+          categoryId: id,
+        },
+      });
+      const oldCategoryInShelf = _oldCategoryInShelf.map(ll => ll.get({ plain: true }));
+      console.log('oldCategoryInShelf', oldCategoryInShelf);
+
+      if (oldCategoryInShelf) {
+        const oldShelfIds = _.uniq(oldCategoryInShelf.map(item => item.shelfId));
+        const newShelfIds = _.uniq(req.body.shelfIds.map(shelfId => parseInt(shelfId)));
+
+        console.log('oldShelfIds', oldShelfIds);
+        console.log('newShelfIds', newShelfIds);
+
+        const unionTwoArrays = _.union(oldShelfIds, newShelfIds);
+        console.log('unionTwoArrays', unionTwoArrays);
+        const wantAddShelfIds = _.difference(unionTwoArrays, oldShelfIds);
+        const wantDeleteShelfIds = _.difference(unionTwoArrays, newShelfIds);
+
+        const prepareDeleteData = wantDeleteShelfIds.map(shelfId => ({
+          shelfId,
+          categoryId: id,
+        }));
+
+        const prepareAddData = wantAddShelfIds.map(shelfId => ({
+          shelfId,
+          categoryId: id,
+        }));
+
+        console.log(`prepareDeleteData`, prepareDeleteData);
+        console.log('prepareAddData', prepareAddData);
+
+        const _deletedCategoryShelfCount = await CategoryShelf.destroy({
+          where: {
+            [Op.or]: prepareDeleteData,
+          },
+        });
+        const _newCategoryShelf = await CategoryShelf.bulkCreate(prepareAddData);
+
+        deletedCategoryShelfCount = _deletedCategoryShelfCount ? parseInt(_deletedCategoryShelfCount) : 0;
+        newCategoryShelf = _newCategoryShelf ? _newCategoryShelf.map(el => el.get({ plain: true })) : null;
+      }
+    } else if (_.isString(req.body.shelfIds) || _.isNumber(req.body.shelfIds)) {
+      //destroy all and create easy than
+      await CategoryShelf.destroy({
+        where: {
+          categoryId: id,
+        },
+      });
+
+      const _newCategoryShelf = await CategoryShelf.create({
+        shelfId: parseInt(req.body.shelfIds),
+        categoryId: id,
+      });
+
+      newCategoryShelf = _newCategoryShelf ? _newCategoryShelf.get({ plain: true }) : null;
+    }
+    console.log('newCategoryShelf', newCategoryShelf);
+
+    if (parseInt(updateCategory) === 1) {
+      res.send(
+        common.returnAPIData({ deletedCategoryShelfCount, newCategoryShelf }, 'Cập nhật ngành hàng này thành công')
+      );
 
       Category.findByPk(id, { raw: true }).then(data => {
         LogController.createLog({
@@ -214,17 +282,23 @@ exports.update = async (req, res, next) => {
           nameInRow: data.cus_name,
         });
       });
-    })
-    .catch(err => {
+    } else {
       next({
         status: 400,
-        message: err.message,
-        method: 'put',
-        name: 'phân ngành hàng',
-        id: id,
+        message: `Không thể cập nhật ngành hàng này. Ngành hàng không thể tìm thấy!`,
       });
       return;
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: 'put',
+      name: 'ngành hàng',
+      id: id,
     });
+    return;
+  }
 };
 
 // Delete a category with the specified id in the request

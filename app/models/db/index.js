@@ -57,7 +57,7 @@ db.categoryShelf = sequelize.define(
   'CategoryShelf',
   {},
   {
-    paranoid: true,
+    paranoid: false,
     freezeTableName: true,
   }
 );

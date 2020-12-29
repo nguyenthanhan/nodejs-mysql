@@ -29,9 +29,12 @@ exports.create = async (req, res, next) => {
     };
 
     // Save shelf in the database
-    const shelfQuery = Shelf.create(shelf);
+    const _shelfQuery = await Shelf.create(shelf);
+    const shelfQuery = _shelfQuery.get({ plain: true });
     if (shelfQuery) {
+      console.log('shelfQuery', shelfQuery);
       res.send(common.returnAPIData(shelfQuery, 'Tạo kệ hàng thành công'));
+
       LogController.createLog({
         MngID: req.userId,
         action: ActionOnTable.ADD,
