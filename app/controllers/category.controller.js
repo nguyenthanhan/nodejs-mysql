@@ -7,10 +7,12 @@ const { category: Category, product: Product, shelf: Shelf, categoryShelf: Categ
 const Op = db.Sequelize.Op;
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
+const _ = require('lodash');
 
 // Create and Save a new Category
 exports.create = async (req, res, next) => {
   console.log(req.body);
+  console.log(req.file);
   // Validate request
   if (!req.body.name) {
     next({
@@ -40,16 +42,24 @@ exports.create = async (req, res, next) => {
     const newCategory = _newCategory.get({ plain: true });
 
     if (newCategory && newCategory.CID) {
-      const newBulkCreate = req.body.shelfIds
-        ? req.body.shelfIds.map(id => ({
-            shelfId: parseInt(id),
-            categoryId: newCategory.CID,
-          }))
-        : null;
-
       let newCategoryShelf;
-      if (newBulkCreate) {
-        newCategoryShelf = await CategoryShelf.bulkCreate(newBulkCreate);
+
+      if (!req.body.shelfIds) {
+        newCategoryShelf = null;
+      } else if (_.isArray(req.body.shelfIds)) {
+        const newBulkCreate = req.body.shelfIds.map(id => ({
+          shelfId: parseInt(id),
+          categoryId: newCategory.CID,
+        }));
+
+        if (newBulkCreate) {
+          newCategoryShelf = await CategoryShelf.bulkCreate(newBulkCreate);
+        }
+      } else if (_.isString(req.body.shelfIds) || _.isNumber(req.body.shelfIds)) {
+        newCategoryShelf = await CategoryShelf.create({
+          shelfId: parseInt(req.body.shelfIds),
+          categoryId: newCategory.CID,
+        });
       }
 
       res.send(common.returnAPIData({ ...newCategory, newCategoryShelf }, message));
