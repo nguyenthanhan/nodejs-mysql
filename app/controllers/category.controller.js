@@ -40,12 +40,17 @@ exports.create = async (req, res, next) => {
     const newCategory = _newCategory.get({ plain: true });
 
     if (newCategory && newCategory.CID) {
-      const newBulkCreate = req.body.shelfIds.map(id => ({
-        shelfId: parseInt(id),
-        categoryId: newCategory.CID,
-      }));
+      const newBulkCreate = req.body.shelfIds
+        ? req.body.shelfIds.map(id => ({
+            shelfId: parseInt(id),
+            categoryId: newCategory.CID,
+          }))
+        : null;
 
-      const newCategoryShelf = await CategoryShelf.bulkCreate(newBulkCreate);
+      let newCategoryShelf;
+      if (newBulkCreate) {
+        newCategoryShelf = await CategoryShelf.bulkCreate(newBulkCreate);
+      }
 
       res.send(common.returnAPIData({ ...newCategory, newCategoryShelf }, message));
 
