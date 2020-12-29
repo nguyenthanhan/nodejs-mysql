@@ -36,15 +36,16 @@ exports.create = async (req, res, next) => {
     }
 
     // Save category in the database
-    const newCategory = await Category.create(category);
+    const _newCategory = await Category.create(category);
+    const newCategory = _newCategory.get({ plain: true });
 
     if (newCategory && newCategory.CID) {
       const newBulkCreate = req.body.shelfIds.map(id => ({
-        shelfId: id,
+        shelfId: parseInt(id),
         categoryId: newCategory.CID,
       }));
 
-      const newCategoryShelf = await CategoryShelf.bulkCreate.create(newBulkCreate);
+      const newCategoryShelf = await CategoryShelf.bulkCreate(newBulkCreate);
 
       res.send(common.returnAPIData({ ...newCategory, newCategoryShelf }, message));
 
@@ -85,7 +86,7 @@ exports.findAll = async (req, res, next) => {
         {
           model: Shelf,
           as: 'shelves',
-          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+          attributes: ['ShID'],
         },
       ],
     });
