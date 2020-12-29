@@ -9,10 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
       },
-      discount_code: {
-        type: Sequelize.STRING(10),
-        allowNull: false,
-      },
       rate: {
         type: Sequelize.INTEGER(5),
         allowNull: false,
@@ -20,13 +16,14 @@ module.exports = (sequelize, Sequelize) => {
       },
       description: {
         type: Sequelize.TEXT,
+        allowNull: false,
       },
       start_date: {
         type: Sequelize.DATEONLY,
         allowNull: false,
       },
       title: {
-        type: Sequelize.STRING(80),
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       end_date: {

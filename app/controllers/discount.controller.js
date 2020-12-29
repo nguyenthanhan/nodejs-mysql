@@ -13,7 +13,7 @@ const { Table, ActionOnTable } = require('../constants');
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.rate || !req.body.title || !req.body.start_date || !req.body.end_date || !req.body.discountCode) {
+  if (!req.body.rate || !req.body.title || !req.body.start_date || !req.body.end_date) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -45,68 +45,84 @@ exports.create = async (req, res, next) => {
       description: req.body.description,
       start_date: moment(req.body.start_date),
       end_date: moment(req.body.end_date),
-      discount_code: req.body.discountCode,
     };
 
     // Save discount in the database
-    const createDiscount = await Discount.create(discount, { raw: true });
-    console.log('createDiscount', createDiscount);
+    const _createDiscount = await Discount.create(discount, { raw: true });
+    const createDiscount = _createDiscount.get({ plain: true });
 
     if (createDiscount && createDiscount.discountId) {
-      let applyProductsInCategories = [];
+      // let applyProductsInCategories = [];
 
       //check if have applyCategories
-      if (req.body.applyCategories && _.isArray(req.body.applyCategories)) {
-        const arrayIds = req.body.applyCategories.map(applyCategory => applyCategory.categoryId);
+      // if (req.body.applyCategories && _.isArray(req.body.applyCategories)) {
+      // const arrayIds = req.body.applyCategories.map(applyCategory => applyCategory.categoryId);
 
-        const categories = await Category.findAll({
-          where: { CID: { [Op.or]: arrayIds } },
-          include: [
-            {
-              model: Product,
-              as: 'products',
-              attributes: ['PID'],
-            },
-          ],
-        });
-        console.log('categories', categories);
-        const categoriesJSON = categories.map(el => el.get({ plain: true }));
+      // const categories = await Category.findAll({
+      //   where: { CID: { [Op.or]: arrayIds } },
+      //   include: [
+      //     {
+      //       model: Product,
+      //       as: 'products',
+      //       attributes: ['PID'],
+      //     },
+      //   ],
+      // });
+      // console.log('categories', categories);
+      // const categoriesJSON = categories.map(el => el.get({ plain: true }));
 
-        categoriesJSON.forEach(category => {
-          const applyCategories = req.body.applyCategories.find(
-            applyCategory => applyCategory.categoryId === category.CID
-          );
-          const separateProducts = category.products.map(product => {
-            return {
-              productId: product.PID,
-              requirementQuantity: applyCategories.requirementQuantity,
-            };
-          });
-          applyProductsInCategories = [...applyProductsInCategories, ...separateProducts];
-        });
+      // categoriesJSON.forEach(category => {
+      //   const applyCategories = req.body.applyCategories.find(
+      //     applyCategory => applyCategory.categoryId === category.CID
+      //   );
+      //   const separateProducts = category.products.map(product => {
+      //     return {
+      //       productId: product.PID,
+      //       requirementQuantity: applyCategories.requirementQuantity,
+      //     };
+      //   });
+      //   applyProductsInCategories = [...applyProductsInCategories, ...separateProducts];
+      // });
 
-        applyProductsInCategories = applyProductsInCategories.map(applyProductsInCategory => {
-          const index = _.findIndex(req.body.applyProducts, ['productId', applyProductsInCategory.productId]);
-          if (index >= 0) {
-            return req.body.applyProducts[index];
-          }
-          return applyProductsInCategory;
-        });
-        console.log('applyProductsInCategories', applyProductsInCategories);
-      } else {
-        applyProductsInCategories = req.body.applyProducts;
-        console.log('applyProductsInCategories else ', applyProductsInCategories);
+      // applyProductsInCategories = applyProductsInCategories.map(applyProductsInCategory => {
+      //   const index = _.findIndex(req.body.applyProducts, ['productId', applyProductsInCategory.productId]);
+      //   if (index >= 0) {
+      //     return req.body.applyProducts[index];
+      //   }
+      //   return applyProductsInCategory;
+      // });
+      //   console.log('applyProductsInCategories', applyProductsInCategories);
+      // } else {
+      //   applyProductsInCategories = req.body.applyProducts;
+      //   console.log('applyProductsInCategories else ', applyProductsInCategories);
+      // }
+
+      // const discountsWithProduct = await createDiscountsWithProduct(
+      //   applyProductsInCategories,
+      //   createDiscount.discountId
+      // );
+
+      // console.log('newDiscountsWithProduct', discountsWithProduct);
+
+      let applyDiscountToProductCount = 0;
+      if (_.isArray(req.body.productIds)) {
+        const applyDiscount = await Promise.all(
+          req.body.productIds.map(async productId => {
+            const result = await Product.update(
+              { discountId: createDiscount.discountId },
+              {
+                where: {
+                  PID: parseInt(productId),
+                },
+              }
+            );
+            return parseInt(result);
+          })
+        );
+        applyDiscountToProductCount = applyDiscount.reduce((sum, bool) => (bool ? sum + 1 : sum), 0);
       }
 
-      const discountsWithProduct = await createDiscountsWithProduct(
-        applyProductsInCategories,
-        createDiscount.discountId
-      );
-      console.log('newDiscountsWithProduct', discountsWithProduct);
-
-      if (discountsWithProduct) {
-        res.send(common.returnAPIData({ ...createDiscount, discountsWithProduct }, 'Tạo mã giảm giá thành công'));
-      }
+      res.send(common.returnAPIData({ ...createDiscount, applyDiscountToProductCount }, 'Tạo mã giảm giá thành công'));
 
       LogController.createLog({
         MngID: req.userId,
@@ -128,58 +144,63 @@ exports.create = async (req, res, next) => {
   }
 };
 
-const createDiscountsWithProduct = async (discountProducts, discountId) => {
-  const newDiscountProducts = discountProducts.map(discountProduct => {
-    return {
-      productId: discountProduct.productId,
-      requirementQuantity: discountProduct.requirementQuantity,
-      discountId: discountId,
-    };
-  });
-  return ProductOnDiscount.bulkCreate(newDiscountProducts);
-};
+// const createDiscountsWithProduct = async (discountProducts, discountId) => {
+//   const newDiscountProducts = discountProducts.map(discountProduct => {
+//     return {
+//       productId: discountProduct.productId,
+//       requirementQuantity: discountProduct.requirementQuantity,
+//       discountId: discountId,
+//     };
+//   });
+//   return ProductOnDiscount.bulkCreate(newDiscountProducts);
+// };
 
 exports.findAll = async (req, res, next) => {
-  const discount_code = req.query.nameKeyword;
-  const condition = discount_code ? { discount_code: { [Op.like]: `%${discount_code}%` } } : null;
+  try {
+    const title = req.query.nameKeyword;
+    const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
-  Discount.findAll({
-    where: condition,
-    include: [
-      {
-        model: Product,
-        as: 'products',
-        attributes: ['PID', 'name'],
-      },
-    ],
-  })
-    .then(data => {
-      const message = data.length === 0 ? 'Không có mã giảm giá nào!' : '';
-      res.send(common.returnAPIData(data, message));
-      //TODO Auto delete
-    })
-    .catch(err => {
-      next({
-        status: 400,
-        message: err.message,
-        method: 'get',
-        name: 'phân ngành hàng',
-        id: 0,
-      });
-      return;
+    const _data = await Discount.findAll({
+      where: condition,
+      attributes: { exclude: ['deletedAt'] },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID'],
+        },
+      ],
     });
+    const data = _data.map(el => el.get({ plain: true }));
+    console.log(data);
+    const message = data.length === 0 ? 'Không có mã giảm giá nào!' : '';
+    const newData = data.map(eachData => ({
+      ...eachData,
+      products: eachData.products ? eachData.products.map(object => object.PID) : undefined,
+    }));
+
+    res.send(common.returnAPIData(newData, message));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: 'get',
+      name: 'phân ngành hàng',
+      id: 0,
+    });
+    return;
+  }
 };
 
 exports.update = async (req, res, next) => {
   try {
     // Create a Discount
     const discount = {
-      rate: parseInt(req.body.rate),
+      rate: req.body.rate ? parseInt(req.body.rate) : undefined,
       title: req.body.title,
       description: req.body.description,
-      start_date: moment(req.body.start_date),
-      end_date: moment(req.body.end_date),
-      discount_code: req.body.discountCode,
+      start_date: moment(req.body.start_date) || undefined,
+      end_date: moment(req.body.end_date) || undefined,
       updatedAt: moment(),
     };
 
@@ -191,66 +212,77 @@ exports.update = async (req, res, next) => {
       raw: true,
     });
 
-    if (parseInt(numbersUpdateOnDiscountTable, 10) !== 0) {
-      let applyProductsInCategories = [];
+    if (parseInt(numbersUpdateOnDiscountTable) === 1) {
+      // let applyProductsInCategories = [];
 
-      //check if have applyCategories
-      if (req.body.applyCategories && _.isArray(req.body.applyCategories)) {
-        const arrayIds = req.body.applyCategories.map(applyCategory => applyCategory.categoryId);
+      // //check if have applyCategories
+      // if (req.body.applyCategories && _.isArray(req.body.applyCategories)) {
+      //   const arrayIds = req.body.applyCategories.map(applyCategory => applyCategory.categoryId);
 
-        const categories = await Category.findAll({
-          where: { CID: { [Op.or]: arrayIds } },
-          include: [
-            {
-              model: Product,
-              as: 'products',
-              attributes: ['PID'],
-            },
-          ],
-        });
-        const categoriesJSON = categories.map(el => el.get({ plain: true }));
+      //   const categories = await Category.findAll({
+      //     where: { CID: { [Op.or]: arrayIds } },
+      //     include: [
+      //       {
+      //         model: Product,
+      //         as: 'products',
+      //         attributes: ['PID'],
+      //       },
+      //     ],
+      //   });
+      //   const categoriesJSON = categories.map(el => el.get({ plain: true }));
 
-        categoriesJSON.forEach(category => {
-          const applyCategories = req.body.applyCategories.find(
-            applyCategory => applyCategory.categoryId === category.CID
-          );
-          const separateProducts = category.products.map(product => {
-            return {
-              productId: product.PID,
-              requirementQuantity: applyCategories.requirementQuantity,
-            };
-          });
-          applyProductsInCategories = [...applyProductsInCategories, ...separateProducts];
-        });
+      //   categoriesJSON.forEach(category => {
+      //     const applyCategories = req.body.applyCategories.find(
+      //       applyCategory => applyCategory.categoryId === category.CID
+      //     );
+      //     const separateProducts = category.products.map(product => {
+      //       return {
+      //         productId: product.PID,
+      //         requirementQuantity: applyCategories.requirementQuantity,
+      //       };
+      //     });
+      //     applyProductsInCategories = [...applyProductsInCategories, ...separateProducts];
+      //   });
 
-        applyProductsInCategories = applyProductsInCategories.map(applyProductsInCategory => {
-          const index = _.findIndex(req.body.applyProducts, ['productId', applyProductsInCategory.productId]);
-          if (index >= 0) {
-            return req.body.applyProducts[index];
-          }
-          return applyProductsInCategory;
-        });
-      } else {
-        applyProductsInCategories = req.body.applyProducts;
+      //   applyProductsInCategories = applyProductsInCategories.map(applyProductsInCategory => {
+      //     const index = _.findIndex(req.body.applyProducts, ['productId', applyProductsInCategory.productId]);
+      //     if (index >= 0) {
+      //       return req.body.applyProducts[index];
+      //     }
+      //     return applyProductsInCategory;
+      //   });
+      // } else {
+      //   applyProductsInCategories = req.body.applyProducts;
+      // }
+
+      // const updateDiscountsWithProduct = await updateDiscountsWithProducts(applyProductsInCategories, discountId);
+      let deleteCount = 0;
+      let addCount = 0;
+      if (_.isArray(req.body.productIds)) {
+        const _oldProduct = await Product.findAll({ where: { discountId: discountId } });
+        const oldProductId = _oldProduct.map(el => el.get({ plain: true })).map(product => product.PID);
+        const newProductIds = _.uniq(req.body.productIds.map(id => parseInt(id)));
+
+        const unionTwoArrays = _.union(oldProductId, newProductIds);
+        const wantAddProductIds = _.difference(unionTwoArrays, oldProductId);
+        const wantDeleteProductIds = _.difference(unionTwoArrays, newProductIds);
+
+        const deleteDiscountOnProductCount = Product.update(
+          { discountId: null },
+          { where: { PID: { [Op.or]: wantDeleteProductIds } } }
+        );
+
+        const addDiscountOnProductCount = Product.update(
+          { discountId: req.params.id },
+          { where: { PID: { [Op.or]: wantAddProductIds } } }
+        );
+
+        const [_deleteCount, _addCount] = await Promise.all([deleteDiscountOnProductCount, addDiscountOnProductCount]);
+        deleteCount = parseInt(_deleteCount);
+        addCount = parseInt(_addCount);
       }
 
-      const updateDiscountsWithProduct = await updateDiscountsWithProducts(applyProductsInCategories, discountId);
-      console.log('updateDiscountsWithProduct', updateDiscountsWithProduct);
-      let numberRowUpdated = 0;
-      let numberRowNotUpdate = 0;
-      console.log(typeof updateDiscountsWithProduct);
-
-      updateDiscountsWithProduct.forEach(updateDiscounts => {
-        if (parseInt(updateDiscounts, 10) === 1) {
-          numberRowUpdated = numberRowUpdated + 1;
-        } else {
-          numberRowNotUpdate = numberRowNotUpdate + 1;
-        }
-      });
-
-      res.send(
-        common.returnAPIData({ numberRowUpdated, numberRowNotUpdate }, `Cập nhật mã sản phẩm giảm giá thành công`)
-      );
+      res.send(common.returnAPIData({ deleteCount, addCount }, `Cập nhật mã sản phẩm giảm giá thành công`));
 
       Discount.findByPk(req.params.id, { raw: true }).then(data => {
         LogController.createLog({
@@ -280,24 +312,24 @@ exports.update = async (req, res, next) => {
   }
 };
 
-const asyncUpdateItemProductOnDiscount = async (discountProduct, discountId) => {
-  return ProductOnDiscount.update(
-    {
-      ...discountProduct,
-      updatedAt: moment(),
-    },
-    {
-      where: { discountId: discountId, productId: discountProduct.productId },
-      silent: true,
-    }
-  );
-};
+// const asyncUpdateItemProductOnDiscount = async (discountProduct, discountId) => {
+//   return ProductOnDiscount.update(
+//     {
+//       ...discountProduct,
+//       updatedAt: moment(),
+//     },
+//     {
+//       where: { discountId: discountId, productId: discountProduct.productId },
+//       silent: true,
+//     }
+//   );
+// };
 
-const updateDiscountsWithProducts = async (discountProducts, discountId) => {
-  return Promise.all(
-    discountProducts.map(discountProduct => asyncUpdateItemProductOnDiscount(discountProduct, discountId))
-  );
-};
+// const updateDiscountsWithProducts = async (discountProducts, discountId) => {
+//   return Promise.all(
+//     discountProducts.map(discountProduct => asyncUpdateItemProductOnDiscount(discountProduct, discountId))
+//   );
+// };
 
 exports.delete = async (req, res, next) => {
   try {

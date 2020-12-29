@@ -53,6 +53,16 @@ db.bill.belongsTo(db.manager, {
 });
 
 //----------
+db.discount.hasMany(db.product, {
+  as: 'products',
+  foreignKey: 'discountId',
+});
+db.product.belongsTo(db.discount, {
+  as: 'discount',
+  foreignKey: 'discountId',
+});
+
+//----------
 db.categoryShelf = sequelize.define(
   'CategoryShelf',
   {},
@@ -191,30 +201,6 @@ db.product.belongsToMany(db.bill, {
   foreignKey: 'productId',
 });
 
-//----------
-const ProductOnDiscount = sequelize.define(
-  'ProductOnDiscount',
-  {
-    requirementQuantity: {
-      type: Sequelize.BIGINT(20),
-    },
-  },
-  {
-    paranoid: true,
-    freezeTableName: true,
-  }
-);
-db.productOnDiscount = ProductOnDiscount;
-db.discount.belongsToMany(db.product, {
-  through: ProductOnDiscount,
-  as: 'products',
-  foreignKey: 'discountId',
-});
-db.product.belongsToMany(db.discount, {
-  through: ProductOnDiscount,
-  as: 'discounts',
-  foreignKey: 'productId',
-});
 //----------
 
 //hook

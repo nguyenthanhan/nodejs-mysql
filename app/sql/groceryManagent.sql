@@ -93,7 +93,6 @@ CREATE TABLE `Bill` (
 DROP TABLE IF EXISTS Discount; --done
 CREATE TABLE `Discount` (
   `DiscountID`              bigint(20) NOT NULL auto_increment,
-  `discount_code`           varchar(10) NOT NULL,
   `rate`                    int(5) NOT NULL,
   `title`                   varchar(80) NOT NULL,
   `description`             text,

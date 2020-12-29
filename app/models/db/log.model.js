@@ -25,7 +25,8 @@ module.exports = (sequelize, Sequelize) => {
           'Quản lý',
           'Sản phẩm',
           'Kệ hàng',
-          'Nhà cung cấp'
+          'Nhà cung cấp',
+          'Giảm giá'
         ),
       },
       nameInRow: {
