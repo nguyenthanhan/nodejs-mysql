@@ -13,6 +13,8 @@ module.exports = app => {
 
   router.get('/', [authJwt.verifyToken], discount.findAll);
 
+  router.get('/:id', [authJwt.verifyToken], discount.findOne);
+
   router.put('/:id', [authJwt.verifyToken], discount.update);
 
   router.delete('/', [authJwt.verifyToken], discount.delete);

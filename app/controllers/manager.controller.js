@@ -80,7 +80,7 @@ exports.create = async (req, res, next) => {
     const newManager = await Manager.create(manager);
     const newManagerJSON = newManager.toJSON();
     if (newManagerJSON) {
-      res.send(common.returnAPIData(_.omit(newManagerJSON, 'password'), 'Tạo người quản lí thành công'));
+      res.send(common.returnAPIData(_.omit(newManagerJSON, 'password'), 'Tạo thông tin nhân viên thành công'));
 
       LogController.createLog({
         MngID: req.userId,
@@ -153,7 +153,7 @@ exports.findOne = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: 'Không tìm thấy người quản lí này',
+          message: 'Không tìm thấy thông tin người nhân viên này',
         });
         return;
       }
@@ -223,7 +223,7 @@ exports.updateMe = async (req, res, next) => {
       } else {
         next({
           status: 400,
-          message: `Không thể cập nhật người quản lí này. người quản lí không thể tìm thấy!`,
+          message: `Không tìm thấy thông tin nhân viên này trong hệ thông!`,
         });
         return;
       }

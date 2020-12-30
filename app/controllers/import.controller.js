@@ -253,11 +253,19 @@ exports.findOne = async (req, res, next) => {
         },
       ],
     });
-    const data = _data.get({ plain: true });
+    if (_data) {
+      const data = _data.get({ plain: true });
 
-    const newData = await processEachData(data);
+      const newData = await processEachData(data);
 
-    res.send(common.returnAPIData(newData));
+      res.send(common.returnAPIData(newData));
+    } else {
+      next({
+        status: 400,
+        message: 'Không tìm thấy thông tin của đơn nhập hàng này',
+      });
+      return;
+    }
   } catch (error) {
     next({
       status: 400,

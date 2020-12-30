@@ -176,7 +176,8 @@ exports.findAll = async (req, res, next) => {
     const message = data.length === 0 ? 'Không có mã giảm giá nào!' : '';
     const newData = data.map(eachData => ({
       ...eachData,
-      products: eachData.products ? eachData.products.map(object => object.PID) : undefined,
+      productIds: eachData.products ? eachData.products.map(object => object.PID) : undefined,
+      products: undefined,
     }));
 
     res.send(common.returnAPIData(newData, message));
@@ -187,6 +188,50 @@ exports.findAll = async (req, res, next) => {
       method: 'get',
       name: 'phân ngành hàng',
       id: 0,
+    });
+    return;
+  }
+};
+
+exports.findOne = async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const _data = await Discount.findByPk(id, {
+      attributes: { exclude: ['deletedAt'] },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID'],
+        },
+      ],
+    });
+
+    if (_data) {
+      const data = _data.get({ plain: true });
+
+      const newData = {
+        ...data,
+        productIds: data.products ? data.products.map(object => object.PID) : undefined,
+        products: undefined,
+      };
+
+      res.send(common.returnAPIData(newData));
+    } else {
+      next({
+        status: 400,
+        message: 'Không tìm thấy mã giảm giá này',
+      });
+      return;
+    }
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: 'get',
+      name: 'phân ngành hàng',
+      id: req.params.id,
     });
     return;
   }
@@ -278,11 +323,11 @@ exports.update = async (req, res, next) => {
         );
 
         const [_deleteCount, _addCount] = await Promise.all([deleteDiscountOnProductCount, addDiscountOnProductCount]);
-        deleteCount = parseInt(_deleteCount);
-        addCount = parseInt(_addCount);
+        deletedCount = parseInt(_deleteCount);
+        addedCount = parseInt(_addCount);
       }
 
-      res.send(common.returnAPIData({ deleteCount, addCount }, `Cập nhật mã sản phẩm giảm giá thành công`));
+      res.send(common.returnAPIData({ deletedCount, addedCount }, `Cập nhật mã sản phẩm giảm giá thành công`));
 
       Discount.findByPk(req.params.id, { raw: true }).then(data => {
         LogController.createLog({
@@ -332,38 +377,31 @@ exports.update = async (req, res, next) => {
 // };
 
 exports.delete = async (req, res, next) => {
+  console.log(req.body);
   try {
     const { arrayIds = [] } = req.body;
 
-    const deleteProductOnDiscount = await ProductOnDiscount.destroy({
+    const deletedCount = await Discount.destroy({
       where: { discountId: { [Op.or]: arrayIds } },
     });
 
-    if (deleteProductOnDiscount) {
-      const deletedCount = await Discount.destroy({
-        where: { discountId: { [Op.or]: arrayIds } },
-      });
+    res.send(common.returnAPIData({ deletedCount: deletedCount }, `${deletedCount} mã giảm giá đã bị xoá!`));
 
-      res.send(common.returnAPIData({ deletedCount: deletedCount }, `${numberDelete} mã giảm giá đã bị xoá!`));
-
-      Discount.findAll({
-        where: { discountId: { [Op.or]: arrayIds } },
-        raw: true,
-        paranoid: false,
-      }).then(data => {
-        data.forEach(item => {
-          LogController.createLog({
-            MngID: req.userId,
-            action: ActionOnTable.DELETE,
-            tableOfAction: Table.DISCOUNT,
-            affectedRowID: item.discountId,
-            nameInRow: item.title,
-          });
+    Discount.findAll({
+      where: { discountId: { [Op.or]: arrayIds } },
+      raw: true,
+      paranoid: false,
+    }).then(data => {
+      data.forEach(item => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.DELETE,
+          tableOfAction: Table.DISCOUNT,
+          affectedRowID: item.discountId,
+          nameInRow: item.title,
         });
       });
-    } else {
-      common.returnAPIData({}, `Không có phiếu nhập bị xoá!`);
-    }
+    });
   } catch (error) {
     next({
       status: 400,
@@ -376,18 +414,18 @@ exports.delete = async (req, res, next) => {
   }
 };
 
-exports.deleteExpiresDiscount = async arrayIds => {
-  try {
-    const discounts = await Discount.findAll();
-    console.log(discounts);
-  } catch (error) {
-    next({
-      status: 400,
-      message: error.message,
-      method: 'delete',
-      name: 'giảm giá',
-      id: 0,
-    });
-    return;
-  }
-};
+// exports.deleteExpiresDiscount = async arrayIds => {
+//   try {
+//     const discounts = await Discount.findAll();
+//     console.log(discounts);
+//   } catch (error) {
+//     next({
+//       status: 400,
+//       message: error.message,
+//       method: 'delete',
+//       name: 'giảm giá',
+//       id: 0,
+//     });
+//     return;
+//   }
+// };

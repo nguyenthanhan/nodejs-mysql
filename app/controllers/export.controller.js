@@ -132,8 +132,15 @@ exports.findOne = async (req, res, next) => {
         },
       ],
     });
-
-    res.send(common.returnAPIData(data));
+    if (data) {
+      res.send(common.returnAPIData(data));
+    } else {
+      next({
+        status: 400,
+        message: 'Không tìm thấy thông tin của đơn xuất hàng này',
+      });
+      return;
+    }
   } catch (error) {
     next({
       status: 400,
@@ -275,7 +282,7 @@ exports.update = async (req, res, next) => {
                     silent: true,
                   }
                 );
-                //TODO
+
                 return productInExport;
               } else {
                 return 0;

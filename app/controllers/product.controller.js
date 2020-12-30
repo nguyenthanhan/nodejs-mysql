@@ -132,7 +132,13 @@ exports.findAll = async (req, res, next) => {
 
     //search name products
     const name = req.query.nameKeyword;
-    let condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+
+    const condition = {
+      [Op.and]: [
+        name ? { name: { [Op.like]: `%${name}%` } } : null,
+        req.query.categoryId ? { categoryId: parseInt(req.query.categoryId) } : null,
+      ],
+    };
 
     const data = await Product.findAndCountAll({
       // limit,
@@ -152,15 +158,15 @@ exports.findAll = async (req, res, next) => {
             exclude: ['productId', 'deletedAt'],
           },
         },
-        {
-          model: Discount,
-          as: 'discount',
-          attributes: { exclude: ['deletedAt'] },
-        },
+        // {
+        //   model: Discount,
+        //   as: 'discount',
+        //   attributes: { exclude: ['deletedAt'] },
+        // },
       ],
     });
 
-    const message = data.rows.length === 0 ? 'Không có sản phẩm nào' : '';
+    const message = data.rows.length === 0 ? 'Không có sản phẩm nào' : 'Lấy danh sách sản phẩm thành công';
     const productsList = data.rows.map(product => product.get({ plain: true }));
 
     const newProductList = productsList.map(product => {
@@ -212,7 +218,8 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const data = await Product.findByPk(id, {
+    const _data = await Product.findByPk(id, {
+      attributes: { exclude: ['deletedAt'] },
       include: [
         {
           model: Category,
@@ -226,41 +233,49 @@ exports.findOne = async (req, res, next) => {
             exclude: ['productId', 'deletedAt'],
           },
         },
-        {
-          model: Discount,
-          as: 'discount',
-          // attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
-        },
+        // {
+        //   model: Discount,
+        //   as: 'discount',
+        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        // },
       ],
     });
-    const productInfo = data.get({ plain: true });
+    if (_data) {
+      const productInfo = _data.get({ plain: true });
 
-    if (productInfo.lots.length === 0) {
-      res.send(common.returnAPIData(productInfo));
+      if (productInfo.lots.length === 0) {
+        res.send(common.returnAPIData(productInfo));
+      }
+
+      const { lots, ...newProduct } = productInfo;
+      let warehouse_curr_qtt = 0;
+      let store_curr_qtt = 0;
+
+      lots.forEach(lot => {
+        if (lot.qttLotInWarehouse) {
+          warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
+        }
+
+        if (lot.qttProductInStore) {
+          store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
+        }
+      });
+
+      res.send(
+        common.returnAPIData({
+          ...newProduct,
+          warehouse_curr_qtt,
+          store_curr_qtt,
+          lots: common.sortedByDate(lots, true),
+        })
+      );
+    } else {
+      next({
+        status: 400,
+        message: 'Không tìm thấy thông tin của sản phẩm này',
+      });
+      return;
     }
-
-    const { lots, ...newProduct } = productInfo;
-    let warehouse_curr_qtt = 0;
-    let store_curr_qtt = 0;
-
-    lots.forEach(lot => {
-      if (lot.qttLotInWarehouse) {
-        warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
-      }
-
-      if (lot.qttProductInStore) {
-        store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
-      }
-    });
-
-    res.send(
-      common.returnAPIData({
-        ...newProduct,
-        warehouse_curr_qtt,
-        store_curr_qtt,
-        lots: common.sortedByDate(lots, true),
-      })
-    );
   } catch (error) {
     next({
       status: 400,
