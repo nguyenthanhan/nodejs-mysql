@@ -159,11 +159,11 @@ exports.findAll = async (req, res, next) => {
             exclude: ['productId', 'deletedAt'],
           },
         },
-        // {
-        //   model: Discount,
-        //   as: 'discount',
-        //   attributes: { exclude: ['deletedAt'] },
-        // },
+        {
+          model: Discount,
+          as: 'discount',
+          attributes: { exclude: ['deletedAt'] },
+        },
       ],
     });
 
@@ -234,11 +234,11 @@ exports.findOne = async (req, res, next) => {
             exclude: ['productId', 'deletedAt'],
           },
         },
-        // {
-        //   model: Discount,
-        //   as: 'discount',
-        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        // },
+        {
+          model: Discount,
+          as: 'discount',
+          attributes: { exclude: ['deletedAt'] },
+        },
       ],
     });
     if (_data) {
