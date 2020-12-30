@@ -76,16 +76,6 @@ exports.findAll = async (req, res, next) => {
       attributes: { exclude: ['deletedAt'] },
       include: [
         {
-          model: Manager,
-          as: 'checker',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'manager',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
           model: Product,
           as: 'products',
           attributes: ['PID', 'name'],
@@ -115,16 +105,6 @@ exports.findOne = async (req, res, next) => {
     const data = await Export.findByPk(id, {
       attributes: { exclude: ['deletedAt'] },
       include: [
-        {
-          model: Manager,
-          as: 'checker',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'manager',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
         {
           model: Product,
           as: 'products',
@@ -292,7 +272,7 @@ exports.update = async (req, res, next) => {
 
           return {
             productId,
-            productsInExport,
+            productsInExport: _.flattenDeep(productsInExport),
             lots,
           };
         })

@@ -62,8 +62,8 @@ exports.create = async (req, res, next) => {
     S_curr_qtt: parseInt(req.body.S_curr_qtt) ? parseInt(req.body.S_curr_qtt) : 0,
     S_max_qtt: parseInt(req.body.S_max_qtt),
     S_min_qtt: parseInt(req.body.S_min_qtt),
-    // sell_price: req.body.sell_price,
-    // import_price: req.body.import_price,
+    sell_price: parseInt(req.body.sell_price),
+    unit_name: req.body.unit_name ? req.body.unit_name : 'sản phẩm',
     brand: req.body.brand,
     categoryId: parseInt(req.body.categoryId),
     otherDetail: req.body.otherDetail,
@@ -145,6 +145,7 @@ exports.findAll = async (req, res, next) => {
       // offset,
       where: condition,
       order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]), //remove null, false
+      attributes: { exclude: ['deletedAt'] },
       include: [
         {
           model: Category,
@@ -253,11 +254,11 @@ exports.findOne = async (req, res, next) => {
 
       lots.forEach(lot => {
         if (lot.qttLotInWarehouse) {
-          warehouse_curr_qtt = warehouse_curr_qtt + newLot.qttLotInWarehouse;
+          warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
         }
 
         if (lot.qttProductInStore) {
-          store_curr_qtt = store_curr_qtt + newLot.qttProductInStore;
+          store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
         }
       });
 

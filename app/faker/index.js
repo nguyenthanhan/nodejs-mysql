@@ -130,6 +130,8 @@ const products = [
     vat: 10,
     brand: 'La Vie',
     categoryId: 1,
+    sell_price: 10000,
+    unit_name: 'chai',
   },
 
   {
@@ -144,6 +146,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 2,
+    sell_price: 5000,
+    unit_name: 'cái',
   },
   {
     name: 'Kem',
@@ -157,6 +161,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 3,
+    sell_price: 34000,
+    unit_name: 'hộp',
   },
   {
     name: 'Mít sấy',
@@ -170,6 +176,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 4,
+    sell_price: 20000,
+    unit_name: 'bịch',
   },
   {
     name: 'Ngũ cốc ăn kiêng Natural Granola',
@@ -183,6 +191,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 5,
+    sell_price: 10000,
+    unit_name: 'hộp',
   },
   {
     name: 'Đường',
@@ -197,6 +207,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 6,
+    sell_price: 10000,
+    unit_name: 'bịch',
   },
   {
     name: 'Gạo Khang Dân nguyên chất',
@@ -210,6 +222,8 @@ const products = [
     vat: 10,
     brand: 'Khang Dân',
     categoryId: 7,
+    sell_price: 50000,
+    unit_name: 'bịch',
   },
   {
     name: 'Rau xà lách',
@@ -224,6 +238,8 @@ const products = [
     vat: 5,
     brand: 'Không có',
     categoryId: 8,
+    sell_price: 5000,
+    unit_name: 'bịch',
   },
   {
     name: 'Giấy lụa bỏ túi Pulppy',
@@ -238,6 +254,8 @@ const products = [
     vat: 10,
     brand: 'Pulppy',
     categoryId: 9,
+    sell_price: 20000,
+    unit_name: 'bịch',
   },
   {
     name: 'Bột trà xanh',
@@ -252,6 +270,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 10,
+    sell_price: 50000,
+    unit_name: 'bịch',
   },
   {
     name: 'Bút Mực Sao Thiên',
@@ -265,6 +285,8 @@ const products = [
     vat: 10,
     brand: 'Sao Thiên',
     categoryId: 11,
+    sell_price: 5000,
+    unit_name: 'cây',
   },
   {
     name: 'Bàn chải đánh răng DOCTOR.B XIAOMI',
@@ -278,11 +300,13 @@ const products = [
     vat: 10,
     brand: 'Xiaomi',
     categoryId: 12,
+    sell_price: 25000,
+    unit_name: 'cái',
   },
   {
-    name: 'Thẻ điện thoại các loại',
-    description: ``,
-    otherDetail: '',
+    name: 'Thẻ điện thoại Viettel, Vina, Mobile 20k',
+    description: `Nạp cho điện thoại trả trước`,
+    otherDetail: 'Hạn sử dụng ghi trên thẻ',
     img_url: 'https://banthe247.com/upload/files/cac-menh-gia-mua-the-dien-thoai-tai-banthe247.jpg',
     W_max_qtt: 15,
     W_min_qtt: 5,
@@ -291,6 +315,8 @@ const products = [
     vat: 10,
     brand: 'Không có',
     categoryId: 13,
+    sell_price: 20000,
+    unit_name: 'thẻ',
   },
 ];
 

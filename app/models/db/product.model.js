@@ -65,11 +65,14 @@ module.exports = (sequelize, Sequelize) => {
       //   allowNull: false,
       //   defaultValue: 0,
       // },
-      // qtt_per_unit: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   defaultValue: 1,
-      // },
+      sell_price: {
+        type: Sequelize.BIGINT(20),
+        allowNull: false,
+      },
+      unit_name: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+      },
       vat: {
         type: Sequelize.INTEGER(2),
       },

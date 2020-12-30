@@ -251,9 +251,3 @@ CREATE TABLE `Logs` (
   PRIMARY KEY  (`id`),
   FOREIGN KEY (`MngID`) REFERENCES `Manager` (`MngID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
-INSERT INTO Manager
-  (FName, LName, accountName, password, Address, BDay,date_start_working, managerType) 
-VALUES
-  ("Admin", "", "admin",  "$2b$10$/vEpr7cQewqynPD38Om1yuvQflO5AfVNdIiRpqCSIVNxPfd/vogiG", "102 Xóm Chiếu", CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, "prime");

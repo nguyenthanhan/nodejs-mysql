@@ -137,26 +137,6 @@ exports.findAll = async (req, res, next) => {
       attributes: { exclude: ['deletedAt'] },
       include: [
         {
-          model: Manager,
-          as: 'checker',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'executor',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'requester',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Supplier,
-          as: 'supplier',
-          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        },
-        {
           model: Product,
           as: 'products',
           attributes: ['PID', 'name'],
@@ -226,26 +206,6 @@ exports.findOne = async (req, res, next) => {
 
     const _data = await Import.findByPk(id, {
       include: [
-        {
-          model: Manager,
-          as: 'checker',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'executor',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Manager,
-          as: 'requester',
-          attributes: ['MngID', 'accountName', 'LName', 'FName'],
-        },
-        {
-          model: Supplier,
-          as: 'supplier',
-          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        },
         {
           model: Product,
           as: 'products',
