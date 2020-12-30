@@ -5,6 +5,22 @@ const Logs = db.log;
 const _ = require('lodash');
 // const Op = db.Sequelize.Op;
 
+exports.create = async (req, res, next) => {
+  try {
+    console.log('Content: ', req.body.content);
+    res.send(common.returnAPIData({}, ''));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      method: 'get',
+      name: 'bản ghi',
+      id: 0,
+    });
+    return;
+  }
+};
+
 // Retrieve all logs from the database.
 exports.getAll = async (req, res, next) => {
   try {
