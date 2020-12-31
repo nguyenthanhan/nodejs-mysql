@@ -123,7 +123,7 @@ exports.findAll = async (req, res, next) => {
 
   Manager.findAll({
     where: condition,
-    attributes: { exclude: ['password'] },
+    attributes: { exclude: ['password', 'deletedAt'] },
     raw: true,
     order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]),
   })
@@ -146,7 +146,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
   const id = req.params.id;
 
-  Manager.findByPk(id, { attributes: { exclude: ['password'] } })
+  Manager.findByPk(id, { attributes: { exclude: ['password', 'deletedAt'] } })
     .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));
@@ -173,7 +173,7 @@ exports.findOne = async (req, res, next) => {
 exports.findMe = async (req, res, next) => {
   const id = req.userId;
 
-  Manager.findByPk(id, { raw: true, attributes: { exclude: ['password'] } })
+  Manager.findByPk(id, { raw: true, attributes: { exclude: ['password', 'deletedAt'] } })
     .then(data => {
       if (data) {
         res.send(common.returnAPIData(data));

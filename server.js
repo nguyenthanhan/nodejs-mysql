@@ -6,8 +6,12 @@ const lang = require('./app/lang/index');
 const cluster = require('cluster');
 const logger = require('morgan');
 const numCPUs = require('os').cpus().length;
+const axios = require('axios');
+let cron = require('node-cron');
+let first_send = true;
 const isDev = process.env.NODE_ENV !== 'prod';
 const PORT = process.env.PORT || 5000;
+const API_BASE = process.env.API_BASE;
 const faker = require('./app/faker');
 
 // Multi-process to utilize all CPU cores.
@@ -82,6 +86,7 @@ if (!isDev && cluster.isMaster) {
   require('./app/routes/import.routes')(app);
   require('./app/routes/export.routes')(app);
   require('./app/routes/log.routes')(app);
+  require('./app/routes/mailer.routes')(app);
 
   // Catch 404 Errors and forward them to error handler
   app.use((req, res, next) => {
@@ -94,6 +99,24 @@ if (!isDev && cluster.isMaster) {
   app.use((err, req, res, next) => {
     // response to client
     return res.status(err.status || 500).send(common.returnCustomError(err));
+  });
+
+  cron.schedule('* * * * *', () => {
+    if (first_send) {
+      first_send = false;
+    } else {
+      // axios
+      //   .post(`${API_BASE}send_mails`, {
+      //     content: 'Fred',
+      //   })
+      //   .then(function (response) {
+      //     const { status, header, config, data } = response;
+      //     console.log({ status, header, config, data });
+      //   })
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   });
+    }
   });
 
   // set port, listen for requests

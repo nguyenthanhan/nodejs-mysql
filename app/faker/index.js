@@ -2,21 +2,42 @@
 const lang = require('../lang');
 var bcrypt = require('bcrypt');
 const constants = require('../constants');
-const faker = require('faker');
+let faker = require('faker');
+
+faker.locale = 'vi';
+
+const lastName = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ'];
+const middleName = ['Đăng', 'Quốc', 'Phúc', 'Đức', 'Ngọc', 'Phong', 'Văn', 'Vĩnh'];
+const firstName = ['Quyền', 'Phục', 'Tuấn', 'Toàn', 'Hải', 'Hoàng', 'Tường', 'Duy'];
+
+const randomFullName = () => {
+  return `${faker.random.arrayElement(lastName)} ${faker.random.arrayElement(middleName)} ${faker.random.arrayElement(
+    firstName
+  )}`;
+};
+
+const randomLastName = () => {
+  return `${faker.random.arrayElement(lastName)}`;
+};
+
+const randomName = () => {
+  return `${faker.random.arrayElement(middleName)} ${faker.random.arrayElement(firstName)}`;
+};
 
 const admin = async () => {
   const hashPassword = await bcrypt.hash('password', constants.SALT_ROUNDS);
   return {
-    FName: 'Admin',
-    LName: '',
+    FName: randomName(),
+    LName: randomLastName(),
     accountName: 'admin',
     password: hashPassword,
     Address: '102 Thái Hà, Đống Đa',
     managerType: 'prime',
     BDay: '1980-01-01T00:01:00.000Z',
-    email: 'dtitab109@leavr.com',
+    email: 'heimer.nguyen@gmail.com',
     telephoneNumber: '(84-4) 5373367',
     avt_url: `${faker.image.imageUrl(300, 300)}`,
+    salary: 12000000,
   };
 };
 
@@ -80,7 +101,7 @@ const categories = [
 
 const suppliers = [
   {
-    name: 'Mâu Hoàn Thục',
+    name: randomFullName(),
     Address: '0875 Phố Chử, Xã 6, Huyện Linh Đới Thái Bình',
     Tax_ID: 48883106,
     Email: 'Cara61@yahoo.com',
