@@ -69,6 +69,7 @@ exports.create = async (req, res, next) => {
     otherDetail: req.body.otherDetail,
     description: req.body.description,
     vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,
+    discountId: parseInt(req.body.discountId) || undefined,
   };
 
   let imageMessage = 'Tạo sản phẩm thành công nhưng không có hình ảnh sản phẩm';
@@ -292,7 +293,26 @@ exports.findOne = async (req, res, next) => {
 // Update a product by the id in the request
 exports.update = async (req, res, next) => {
   const id = req.params.id;
-  let body = { ...req.body, updatedAt: new Date() };
+
+  let body = {
+    name: req.body.name || undefined,
+    barcode: req.body.barcode || undefined,
+    W_curr_qtt: parseInt(req.body.W_curr_qtt) || undefined,
+    W_max_qtt: parseInt(req.body.W_max_qtt) || undefined,
+    W_min_qtt: parseInt(req.body.W_min_qtt) || undefined,
+    S_curr_qtt: parseInt(req.body.S_curr_qtt) || undefined,
+    S_max_qtt: parseInt(req.body.S_max_qtt) || undefined,
+    S_min_qtt: parseInt(req.body.S_min_qtt) || undefined,
+    sell_price: parseInt(req.body.sell_price) || undefined,
+    unit_name: req.body.unit_name || undefined,
+    brand: req.body.brand || undefined,
+    categoryId: parseInt(req.body.categoryId) || undefined,
+    otherDetail: req.body.otherDetail || undefined,
+    description: req.body.description || undefined,
+    vat: parseInt(req.body.vat) ? (parseInt(req.body.vat) === 5 ? 5 : 10) : undefined,
+    discountId: parseInt(req.body.discountId) || undefined,
+    updatedAt: new Date(),
+  };
 
   if (req.file) {
     const convertImageResult = await cloudinary.uploadSingle(req.file.path, 'product');
