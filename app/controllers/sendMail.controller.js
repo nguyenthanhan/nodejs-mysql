@@ -29,10 +29,11 @@ exports.sendMail = async (req, res, next) => {
     console.log('mails', mails);
 
     let mailOptions = {
-      from: 'an.ngth.1996@gmail.com',
+      from: '"Grocery Store" <foo@example.com>',
       to: mails,
-      subject: 'Email from Node-App: A Test Message!',
+      subject: 'Báo cáo cuối ngày - Grocery Store',
       text: 'Some content to send',
+      html: '<b>Hello world?</b>', // html body
     };
 
     let transporter = nodemailer.createTransport({
@@ -51,7 +52,7 @@ exports.sendMail = async (req, res, next) => {
         });
         return;
       } else {
-        res.send(common.returnAPIData({}, `Email sent: ${info.response}`));
+        res.send(common.returnAPIData({ content: req.body.content }, `Email sent ${info.response}`));
       }
     });
   } catch (error) {

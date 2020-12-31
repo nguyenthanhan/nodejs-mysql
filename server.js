@@ -101,23 +101,30 @@ if (!isDev && cluster.isMaster) {
     return res.status(err.status || 500).send(common.returnCustomError(err));
   });
 
-  cron.schedule('* * * * *', () => {
-    if (first_send) {
-      first_send = false;
-    } else {
-      // axios
-      //   .post(`${API_BASE}send_mails`, {
-      //     content: 'Fred',
-      //   })
-      //   .then(function (response) {
-      //     const { status, header, config, data } = response;
-      //     console.log({ status, header, config, data });
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error);
-      //   });
+  cron.schedule(
+    '0 0 * * *',
+    () => {
+      // if (first_send) {
+      //   first_send = false;
+      // } else {
+      axios
+        .post(`${API_BASE}send_mails`, {
+          content: 'Fred',
+        })
+        .then(function (response) {
+          const { status, header, config, data } = response;
+          console.log({ status, header, config, data });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      // }
+    },
+    {
+      scheduled: true,
+      timezone: 'Asia/Bangkok',
     }
-  });
+  );
 
   // set port, listen for requests
   app.listen(PORT, () => {
