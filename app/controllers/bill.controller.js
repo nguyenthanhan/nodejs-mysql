@@ -64,8 +64,8 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (req.body.sellProducts.length === 0) {
-    next({ status: 400, message: 'Đơn hang phải có sản phẩm' });
+  if (req.body.sellProducts && req.body.sellProducts.length === 0) {
+    next({ status: 400, message: 'Đơn hàng phải có ít nhất một sản phẩm!' });
     return;
   }
 
@@ -81,9 +81,11 @@ exports.create = async (req, res, next) => {
     };
 
     // Save bill in the database
-    const currentBill = await Bill.create(bill, { raw: true });
+    const _currentBill = await Bill.create(bill, { raw: true });
 
-    if (currentBill && currentBill.BID) {
+    if (_currentBill) {
+      const currentBill = _currentBill.get({ plain: true });
+
       LogController.createLog({
         MngID: req.userId,
         action: ActionOnTable.ADD,
@@ -94,10 +96,9 @@ exports.create = async (req, res, next) => {
 
       const createProductsOnBill = await updateProductsOnBill(req.body.sellProducts, currentBill.BID);
 
-      if (createProductsOnBill) {
-        res.send(common.returnAPIData({}, 'Tạo thành công đơn hàng'));
-        updateProductsInStore(req.body.sellProducts);
-      }
+      // updateProductsInStore(req.body.sellProducts);
+
+      res.send(common.returnAPIData(currentBill, 'Tạo thành công đơn hàng'));
     }
   } catch (error) {
     next({
@@ -127,7 +128,7 @@ exports.findAll = async (req, res, next) => {
       {
         model: Product,
         as: 'products',
-        // attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        attributes: ['PID'],
       },
     ],
   })
@@ -249,7 +250,7 @@ exports.delete = async (req, res, next) => {
         Bill.findAll({
           where: { BID: { [Op.or]: arrayIds } },
           raw: true,
-          paranoid: false
+          paranoid: false,
         }).then(data => {
           data.forEach(item => {
             LogController.createLog({
