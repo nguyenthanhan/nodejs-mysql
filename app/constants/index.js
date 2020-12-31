@@ -1,5 +1,6 @@
 const EXPIRES_TIME_OF_TOKEN = 86400; // 24 hours
 const SALT_ROUNDS = 10;
+const { html } = require('./htmlTemplate');
 
 const Table = {
   PRODUCT: 'Sản phẩm',
@@ -26,4 +27,5 @@ module.exports = {
   Table,
   ActionOnTable,
   SALT_ROUNDS,
+  htmlTemplate: html,
 };

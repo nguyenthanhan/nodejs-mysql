@@ -3,6 +3,10 @@ const common = require('../utils/common');
 const db = require('../models/db');
 const Manager = db.manager;
 let nodemailer = require('nodemailer');
+const QuickChart = require('quickchart-js');
+let handlebars = require('handlebars');
+let fs = require('fs');
+const path = require('path');
 
 exports.sendMail = async (req, res, next) => {
   try {
@@ -28,12 +32,54 @@ exports.sendMail = async (req, res, next) => {
     const mails = _managers.map(manager => manager.email).join(', ');
     console.log('mails', mails);
 
+    //chart
+    const myChart = new QuickChart();
+    myChart.setConfig({
+      type: 'bar',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May'],
+        datasets: [
+          {
+            label: 'Dogs',
+            data: [50, 60, 70, 180, 190],
+          },
+        ],
+      },
+      options: {
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                callback: function (value) {
+                  return '$' + value;
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+    myChart.setWidth(500).setHeight(300).setBackgroundColor('transparent');
+
+    // const chartUrl = await myChart.getShortUrl();
+    const chartUrl = myChart.getUrl();
+    console.log(chartUrl);
+
+    const html = await fs.readFileSync(path.dirname(__dirname) + '/templates/email.html', 'utf8');
+
+    console.log(path.dirname(__dirname) + '/templates/email.html');
+    const template = handlebars.compile(html);
+
+    const htmlToSend = template({
+      img_url: chartUrl,
+    });
+
     let mailOptions = {
-      from: '"Grocery Store" <foo@example.com>',
+      from: '"Grocery Store" <an.ngth.1996@gmail.com>',
       to: mails,
-      subject: 'Báo cáo cuối ngày - Grocery Store',
-      text: 'Some content to send',
-      html: '<b>Hello world?</b>', // html body
+      subject: '[Grocery Store] - Báo cáo cuối ngày',
+      text: 'Fail to load html',
+      html: htmlToSend,
     };
 
     let transporter = nodemailer.createTransport({
