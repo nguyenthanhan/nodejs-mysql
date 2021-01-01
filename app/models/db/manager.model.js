@@ -62,6 +62,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: '',
       },
+      is_active: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     },
     {
       paranoid: true,

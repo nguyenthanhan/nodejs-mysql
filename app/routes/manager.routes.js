@@ -26,7 +26,7 @@ module.exports = app => {
 
   router.put('/:id', [authJwt.verifyToken, authJwt.isAdmin], uploadMulter.single('avatar'), managers.update);
 
-  router.delete('/:id', [authJwt.verifyToken, authJwt.isAdmin], managers.delete);
+  router.delete('/', [authJwt.verifyToken, authJwt.isAdmin], managers.delete);
 
   app.use('/api/managers', router);
 };

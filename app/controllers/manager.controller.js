@@ -74,6 +74,7 @@ exports.create = async (req, res, next) => {
       salary: req.body.salary,
       date_start_working: req.body.date_start_working ? moment(req.body.date_start_working) : '',
       managerType: req.body.managerType,
+      is_active: true,
     };
 
     // Save manager in the database
@@ -208,18 +209,24 @@ exports.updateMe = async (req, res, next) => {
 
   //can't change accountName and password
   const { accountName, password, ...remain } = req.body;
-  const newBody = {
+  let newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : '',
     updatedAt: new Date(),
   };
+
+  if (req.body.is_active && (req.body.is_active === 'false' || req.body.is_active === false)) {
+    newBody = { ...newBody, is_active: false };
+  } else if (req.body.is_active && (req.body.is_active === 'true' || req.body.is_active === true)) {
+    newBody = { ...newBody, is_active: true };
+  }
 
   Manager.update(newBody, {
     where: { MngID: id },
   })
     .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}));
+        res.send(common.returnAPIData({}, 'Cập nhật tài khoản thành công!'));
       } else {
         next({
           status: 400,
@@ -261,11 +268,17 @@ exports.update = async (req, res, next) => {
 
   //can't change accountName
   const { accountName, password, ...remain } = req.body;
-  const newBody = {
+  let newBody = {
     ...remain,
     avt_url: convertImageResult.url ? convertImageResult.url : '',
     updatedAt: new Date(),
   };
+
+  if (req.body.is_active && (req.body.is_active === 'false' || req.body.is_active === false)) {
+    newBody = { ...newBody, is_active: false };
+  } else if (req.body.is_active && (req.body.is_active === 'true' || req.body.is_active === true)) {
+    newBody = { ...newBody, is_active: true };
+  }
 
   Manager.update(newBody, {
     where: { MngID: id },
@@ -305,46 +318,56 @@ exports.update = async (req, res, next) => {
 
 // Delete a manager with the specified id in the request
 exports.delete = async (req, res, next) => {
-  const { arrayIds = [] } = req.body;
+  try {
+    const { arrayIds = [] } = req.body;
 
-  Manager.destroy({
-    where: { MngID: { [Op.or]: arrayIds } },
-  })
-    .then(num => {
-      if (num >= 1) {
-        res.send(common.returnAPIData({}, `${num} quản lí đã bị xoá!`));
-      } else {
-        next({
-          status: 400,
-          message: `Không thể xoá người quản lí này. Có thể không tìm thấy người quản lí!`,
-        });
-        return;
-      }
-
-      Product.findAll({
-        where: { MngID: { [Op.or]: arrayIds } },
-        raw: true,
-        paranoid: false,
-      }).then(data => {
-        data.forEach(item => {
-          LogController.createLog({
-            MngID: req.userId,
-            action: ActionOnTable.DELETE,
-            tableOfAction: Table.MANAGER,
-            affectedRowID: item.MngID,
-            nameInRow: item.accountName,
-          });
-        });
-      });
-    })
-    .catch(err => {
+    if (arrayIds.indexOf(req.userId) !== -1) {
       next({
         status: 400,
-        message: err.message,
-        method: 'delete',
-        name: 'người quản lí',
-        id: 0,
+        message: 'Không thể xoá tài khoản của chính bạn!',
       });
       return;
+    }
+
+    const _num = Manager.destroy({
+      where: { MngID: { [Op.or]: arrayIds } },
     });
+    const num = _num.get({ plain: true });
+    console.log(num);
+
+    if (num >= 1) {
+      res.send(common.returnAPIData({}, `${num} quản lí đã bị xoá!`));
+    } else {
+      next({
+        status: 400,
+        message: `Không thể xoá người quản lí này. Có thể không tìm thấy người quản lí!`,
+      });
+      return;
+    }
+
+    Product.findAll({
+      where: { MngID: { [Op.or]: arrayIds } },
+      raw: true,
+      paranoid: false,
+    }).then(data => {
+      data.forEach(item => {
+        LogController.createLog({
+          MngID: req.userId,
+          action: ActionOnTable.DELETE,
+          tableOfAction: Table.MANAGER,
+          affectedRowID: item.MngID,
+          nameInRow: item.accountName,
+        });
+      });
+    });
+  } catch (error) {
+    next({
+      status: 400,
+      message: err.message,
+      method: 'delete',
+      name: 'người quản lí',
+      id: 0,
+    });
+    return;
+  }
 };
