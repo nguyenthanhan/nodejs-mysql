@@ -10,11 +10,11 @@ module.exports = (sequelize, Sequelize) => {
         autoIncrement: true,
       },
       request_import_date: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       import_date: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
       },
       state: {
         type: Sequelize.ENUM('request', 'executed', 'close'),

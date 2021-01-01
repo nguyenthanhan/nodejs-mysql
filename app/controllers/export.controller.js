@@ -24,7 +24,7 @@ exports.create = async (req, res, next) => {
   try {
     const _export = {
       state: 'request',
-      requesterId: parseInt(req.body.requesterId) || undefined,
+      requesterId: req.userId,
       urgent_level: req.body.urgent_level ? req.body.urgent_level : 'normal',
       request_export_date: moment(req.body.request_export_date) || new Date(),
       bonus: req.body.bonus,

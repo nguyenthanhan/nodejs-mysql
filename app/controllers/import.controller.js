@@ -20,7 +20,7 @@ const { Table, ActionOnTable } = require('../constants');
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.requesterId && !req.body.request_import_date) {
+  if (!req.body.requesterId) {
     next({
       status: 400,
       message: lang.general.error._400,
@@ -39,10 +39,10 @@ exports.create = async (req, res, next) => {
   try {
     // Create a import
     const newImport = {
-      request_import_date: req.body.request_import_date ? moment(req.body.request_import_date) : new Date(),
+      request_import_date: moment(req.body.request_import_date) || new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : 'normal',
       bonus: req.body.bonus ? req.body.bonus : undefined,
-      requesterId: parseInt(req.body.requesterId) || undefined,
+      requesterId: req.userId,
       supplierId: req.body.supplierId ? parseInt(req.body.supplierId) : undefined,
     };
 

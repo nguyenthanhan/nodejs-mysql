@@ -16,10 +16,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM('normal', 'priority'),
       },
       export_date: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
       },
       request_export_date: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       bonus: {
