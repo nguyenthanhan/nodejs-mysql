@@ -2,13 +2,14 @@
 const common = require('../utils/common');
 const _ = require('lodash');
 const db = require('../models/db');
+const { manager: Manager } = db;
 const config = require('../config/auth.config');
 const lang = require('../lang');
 const constants = require('../constants');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Manager = db.manager;
+const moment = require('moment');
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
 
@@ -18,7 +19,7 @@ exports.login = async (req, res, next) => {
     return;
   }
 
-  if (!validator.isAlphanumeric(req.body.account)) {
+  if (!validator.isAlphanumeric(req.body.account.replace('_', 'a').replace('.', 'a'))) {
     next({ status: 400, message: 'Tên tài khoản không hợp lệ!' });
     return;
   }
@@ -34,6 +35,7 @@ exports.login = async (req, res, next) => {
       where: {
         accountName: accountName,
       },
+      attributes: { exclude: ['deletedAt'] },
       raw: true,
     });
 
@@ -41,7 +43,7 @@ exports.login = async (req, res, next) => {
       next({ status: 404, message: lang.general.error.accountNotFound });
       return;
     }
-
+    console.log('hashing', managerData);
     const result = await bcrypt.compare(req.body.password, managerData.password);
 
     if (!result) {
@@ -53,7 +55,12 @@ exports.login = async (req, res, next) => {
       expiresIn: constants.EXPIRES_TIME_OF_TOKEN,
     });
 
-    res.send(common.returnAPIData({ ..._.omit(managerData, 'password'), token }, ''));
+    res.send(
+      common.returnAPIData(
+        { ..._.omit(managerData, 'password'), token, tokenInfo: { expires: moment().add(1, 'days') } },
+        ''
+      )
+    );
 
     LogController.createLog({
       MngID: managerData.MngID,

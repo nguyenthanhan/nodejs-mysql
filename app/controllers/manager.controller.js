@@ -15,6 +15,7 @@ const { Table, ActionOnTable } = require('../constants');
 
 // Create and Save a new manager
 exports.create = async (req, res, next) => {
+  console.log(req.body);
   // Validate request
   if (!req.body.FName || !req.body.LName || !req.body.accountName || !req.body.password || !req.body.managerType) {
     next({
@@ -32,7 +33,7 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (!validator.isAlphanumeric(req.body.accountName)) {
+  if (!validator.isAlphanumeric(req.body.accountName.replace('.', 'a').replace('_', 'a'))) {
     next({
       status: 400,
       message: 'Tên tài khoản không hợp lệ',
@@ -68,13 +69,13 @@ exports.create = async (req, res, next) => {
       password: hashPassword,
       Address: req.body.Address,
       telephoneNumber: req.body.telephoneNumber ? req.body.telephoneNumber : '',
-      BDay: req.body.BDay ? moment(req.body.BDay) : '',
+      BDay: moment(req.body.BDay) || '',
       gender: req.body.gender,
       email: req.body.email,
       salary: req.body.salary,
-      date_start_working: req.body.date_start_working ? moment(req.body.date_start_working) : '',
+      date_start_working: moment(req.body.date_start_working) || '',
       managerType: req.body.managerType,
-      is_active: true,
+      is_active: req.body.is_active === 0 || req.body.is_active === '0' ? 0 : 1,
     };
 
     // Save manager in the database
@@ -200,7 +201,19 @@ exports.findMe = async (req, res, next) => {
 
 // Update a manager by the id in the request
 exports.updateMe = async (req, res, next) => {
+  console.log(req.body);
   const id = req.userId;
+  const _getManager = await Manager.findByPk(req.userId);
+  const getManager = _getManager.get({ plain: true });
+
+  if ((req.body.is_active === 0 || req.body.is_active === '0') && getManager.managerType === 'prime') {
+    next({
+      status: 400,
+      message: 'Không thể tắt tài khoản của chính bạn!',
+    });
+    return;
+  }
+
   let convertImageResult = {};
 
   if (req.file && req.file !== {}) {
@@ -211,26 +224,21 @@ exports.updateMe = async (req, res, next) => {
   const { accountName, password, ...remain } = req.body;
   let newBody = {
     ...remain,
+    is_active: req.body.is_active === 0 || req.body.is_active === '0' ? 0 : 1,
     avt_url: convertImageResult.url ? convertImageResult.url : '',
     updatedAt: new Date(),
   };
-
-  if (req.body.is_active && (req.body.is_active === 'false' || req.body.is_active === false)) {
-    newBody = { ...newBody, is_active: false };
-  } else if (req.body.is_active && (req.body.is_active === 'true' || req.body.is_active === true)) {
-    newBody = { ...newBody, is_active: true };
-  }
 
   Manager.update(newBody, {
     where: { MngID: id },
   })
     .then(num => {
       if (num == 1) {
-        res.send(common.returnAPIData({}, 'Cập nhật tài khoản thành công!'));
+        res.send(common.returnAPIData({}, 'Cập nhật tài khoản của bạn thành công!'));
       } else {
         next({
           status: 400,
-          message: `Không tìm thấy thông tin nhân viên này trong hệ thông!`,
+          message: `Không tìm thấy thông tin của bạn trong hệ thông!`,
         });
         return;
       }
@@ -259,8 +267,17 @@ exports.updateMe = async (req, res, next) => {
 
 // Update a manager by the id in the request
 exports.update = async (req, res, next) => {
+  console.log(req.body);
   const id = req.params.id;
   let convertImageResult = {};
+
+  if ((req.body.is_active === 0 || req.body.is_active === '0') && parseInt(req.userId) === parseInt(req.params.id)) {
+    next({
+      status: 400,
+      message: 'Không thể tắt tài khoản của chính bạn!',
+    });
+    return;
+  }
 
   if (req.file) {
     convertImageResult = await cloudinary.uploadSingle(req.file.path, 'avatar', 300, 300);
@@ -270,15 +287,10 @@ exports.update = async (req, res, next) => {
   const { accountName, password, ...remain } = req.body;
   let newBody = {
     ...remain,
+    is_active: req.body.is_active === 0 || req.body.is_active === '0' ? 0 : 1,
     avt_url: convertImageResult.url ? convertImageResult.url : '',
     updatedAt: new Date(),
   };
-
-  if (req.body.is_active && (req.body.is_active === 'false' || req.body.is_active === false)) {
-    newBody = { ...newBody, is_active: false };
-  } else if (req.body.is_active && (req.body.is_active === 'true' || req.body.is_active === true)) {
-    newBody = { ...newBody, is_active: true };
-  }
 
   Manager.update(newBody, {
     where: { MngID: id },
@@ -329,14 +341,14 @@ exports.delete = async (req, res, next) => {
       return;
     }
 
-    const _num = Manager.destroy({
+    const _num = await Manager.destroy({
       where: { MngID: { [Op.or]: arrayIds } },
     });
-    const num = _num.get({ plain: true });
+    const num = parseInt(_num);
     console.log(num);
 
     if (num >= 1) {
-      res.send(common.returnAPIData({}, `${num} quản lí đã bị xoá!`));
+      res.send(common.returnAPIData({ deletedCount: num }, `${num} quản lí đã bị xoá!`));
     } else {
       next({
         status: 400,
@@ -363,7 +375,7 @@ exports.delete = async (req, res, next) => {
   } catch (error) {
     next({
       status: 400,
-      message: err.message,
+      message: error.message,
       method: 'delete',
       name: 'người quản lí',
       id: 0,

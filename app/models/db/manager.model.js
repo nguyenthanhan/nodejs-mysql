@@ -63,7 +63,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: '',
       },
       is_active: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.TINYINT(1),
         allowNull: false,
         defaultValue: true,
       },
