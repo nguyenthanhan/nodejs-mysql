@@ -172,13 +172,13 @@ exports.findAll = async (req, res, next) => {
       ],
     });
     const data = _data.map(el => el.get({ plain: true }));
-    console.log(data);
     const message = data.length === 0 ? 'Không có mã giảm giá nào!' : '';
     const newData = data.map(eachData => ({
       ...eachData,
-      productIds: eachData.products ? eachData.products.map(object => object.PID) : undefined,
+      productIds: eachData.products ? eachData.products.map(object => parseInt(object.PID)) : undefined,
       products: undefined,
     }));
+    console.log(newData);
 
     res.send(common.returnAPIData(newData, message));
   } catch (error) {
@@ -213,7 +213,7 @@ exports.findOne = async (req, res, next) => {
 
       const newData = {
         ...data,
-        productIds: data.products ? data.products.map(object => object.PID) : undefined,
+        productIds: data.products ? data.products.map(object => parseInt(object.PID)) : undefined,
         products: undefined,
       };
 
@@ -242,8 +242,8 @@ exports.update = async (req, res, next) => {
     // Create a Discount
     const discount = {
       rate: req.body.rate ? parseInt(req.body.rate) : undefined,
-      title: req.body.title,
-      description: req.body.description,
+      title: req.body.title || undefined,
+      description: req.body.description || undefined,
       start_date: moment(req.body.start_date) || undefined,
       end_date: moment(req.body.end_date) || undefined,
       updatedAt: moment(),
@@ -301,8 +301,8 @@ exports.update = async (req, res, next) => {
       // }
 
       // const updateDiscountsWithProduct = await updateDiscountsWithProducts(applyProductsInCategories, discountId);
-      let deleteCount = 0;
-      let addCount = 0;
+      let deletedCount = 0;
+      let addedCount = 0;
       if (_.isArray(req.body.productIds)) {
         const _oldProduct = await Product.findAll({ where: { discountId: discountId } });
         const oldProductId = _oldProduct.map(el => el.get({ plain: true })).map(product => product.PID);
@@ -312,17 +312,16 @@ exports.update = async (req, res, next) => {
         const wantAddProductIds = _.difference(unionTwoArrays, oldProductId);
         const wantDeleteProductIds = _.difference(unionTwoArrays, newProductIds);
 
-        const deleteDiscountOnProductCount = Product.update(
+        const _deleteCount = await Product.update(
           { discountId: null },
           { where: { PID: { [Op.or]: wantDeleteProductIds } } }
         );
 
-        const addDiscountOnProductCount = Product.update(
+        const _addCount = await Product.update(
           { discountId: req.params.id },
           { where: { PID: { [Op.or]: wantAddProductIds } } }
         );
 
-        const [_deleteCount, _addCount] = await Promise.all([deleteDiscountOnProductCount, addDiscountOnProductCount]);
         deletedCount = parseInt(_deleteCount);
         addedCount = parseInt(_addCount);
       }

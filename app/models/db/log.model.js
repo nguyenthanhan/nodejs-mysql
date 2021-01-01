@@ -30,7 +30,7 @@ module.exports = (sequelize, Sequelize) => {
         ),
       },
       nameInRow: {
-        type: Sequelize.STRING(80),
+        type: Sequelize.TEXT,
       },
       affectedRowID: {
         type: Sequelize.BIGINT(20),
