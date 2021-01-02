@@ -82,8 +82,7 @@ exports.create = async (req, res, next) => {
             })
           );
 
-          console.log(`11111 ${sellProduct.PID}`);
-          const updatedLotsCount = _updatedLots.length;
+          const updatedNumberOfLots = _updatedLots.reduce((sum, bool) => sum + parseInt(bool), 0);
 
           //create productOnBill
           const _createProductOnBill = await ProductOnBill.create({
@@ -93,7 +92,6 @@ exports.create = async (req, res, next) => {
           });
           const createProductOnBill = _createProductOnBill.get({ plain: true });
 
-          console.log(`11111 ${sellProduct.PID}`, _updatedLots);
           //update count product
           const _oldProduct = await Product.findByPk(sellProduct.PID, {
             attributes: ['PID'],
@@ -104,15 +102,13 @@ exports.create = async (req, res, next) => {
                 attributes: ['qttProductInStore', 'conversionRate'],
               },
             ],
-          }); //Khong update
+          });
           let updatedProductCount;
           if (_oldProduct) {
             const oldProduct = _oldProduct.get({ plain: true });
-            console.log(`222222 ${sellProduct.PID}`);
             const store_curr_qtt = oldProduct.lots.reduce((sum, productLot) => {
               return sum + productLot.qttProductInStore * productLot.conversionRate;
             }, 0);
-            console.log(`33333 ${sellProduct.PID}`);
             updatedProductCount = await Product.update(
               { store_curr_qtt },
               { where: { PID: parseInt(sellProduct.PID) } }
@@ -122,18 +118,16 @@ exports.create = async (req, res, next) => {
 
           return {
             ...createProductOnBill,
-            updatedLotsCount,
+            updatedNumberOfLots,
             updatedProductQuantity: parseInt(updatedProductCount) === 1,
           };
         })
       );
 
-      console.log(createProductsOnBillAndUpdateLots);
-
       res.send(
         common.returnAPIData(
           { ...currentBill, productsOnBill: createProductsOnBillAndUpdateLots },
-          'Tạo thành công đơn hàng'
+          'Tạo đơn hàng thành công'
         )
       );
 

@@ -4,14 +4,7 @@ const db = require('../models/db');
 const lang = require('../lang');
 const cloudinary = require('../models/cloudinary.model');
 const _ = require('lodash');
-const {
-  product: Product,
-  category: Category,
-  discount: Discount,
-  lot: Lot,
-  productInImport: ProductInImport,
-  // productOnBill: ProductOnBill,
-} = db;
+const { product: Product, category: Category, discount: Discount, lot: Lot } = db;
 const Op = db.Sequelize.Op;
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
@@ -112,6 +105,7 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all products from the database.
 exports.findAll = async (req, res, next) => {
+  console.log(req.query);
   try {
     //pagination
     // const limit = parseInt(req.query.per_page) || 10;
@@ -129,15 +123,43 @@ exports.findAll = async (req, res, next) => {
 
     const defaultSort = sortByCreatedAt || sortByUpdatedAt ? null : ['name', 'ASC'];
     //sort name product
-    const sortName = common.checkValidSortString(req.query.sortName) ? ['name', req.query.sortName] : defaultSort;
+    const sortByName = common.checkValidSortString(req.query.sortByName) ? ['name', req.query.sortByName] : defaultSort;
 
     //search name products
-    const name = req.query.nameKeyword;
+    const name = req.query.name_keyword;
 
     const condition = {
       [Op.and]: [
         name ? { name: { [Op.like]: `%${name}%` } } : null,
         req.query.categoryId ? { categoryId: parseInt(req.query.categoryId) } : null,
+        req.query.is_less_than_Wmin === 'true' || req.query.is_less_than_Wmin === true
+          ? {
+              warehouse_curr_qtt: {
+                [Op.lt]: db.sequelize.col('W_min_qtt'),
+              },
+            }
+          : null,
+        req.query.is_less_than_Smin === 'true' || req.query.is_less_than_Smin === true
+          ? {
+              store_curr_qtt: {
+                [Op.lt]: db.sequelize.col('S_min_qtt'),
+              },
+            }
+          : null,
+        req.query.is_less_than_Wmin === 'false' || req.query.is_less_than_Wmin === false
+          ? {
+              warehouse_curr_qtt: {
+                [Op.gte]: db.sequelize.col('W_min_qtt'),
+              },
+            }
+          : null,
+        req.query.is_less_than_Smin === 'false' || req.query.is_less_than_Smin === false
+          ? {
+              store_curr_qtt: {
+                [Op.gte]: db.sequelize.col('S_min_qtt'),
+              },
+            }
+          : null,
       ],
     };
 
@@ -145,7 +167,7 @@ exports.findAll = async (req, res, next) => {
       // limit,
       // offset,
       where: condition,
-      order: _.compact([sortName, sortByCreatedAt, sortByUpdatedAt]), //remove null, false
+      order: _.compact([sortByName, sortByCreatedAt, sortByUpdatedAt]), //remove null, false
       attributes: { exclude: ['deletedAt'] },
       include: [
         {
