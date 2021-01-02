@@ -173,23 +173,9 @@ exports.findAll = async (req, res, next) => {
 
     const newProductList = productsList.map(product => {
       const { lots, ...remain } = product;
-      // let warehouse_curr_qtt = 0;
-      // let store_curr_qtt = 0;
-
-      // lots.forEach(lot => {
-      //   if (lot.qttLotInWarehouse) {
-      //     warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
-      //   }
-
-      //   if (lot.qttProductInStore) {
-      //     store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
-      //   }
-      // });
 
       return {
         ...remain,
-        // warehouse_curr_qtt,
-        // store_curr_qtt,
         lots: common.sortedByDate(lots, true),
       };
     });
@@ -246,28 +232,14 @@ exports.findOne = async (req, res, next) => {
       const productInfo = _data.get({ plain: true });
 
       if (productInfo.lots.length === 0) {
-        res.send(common.returnAPIData(productInfo));
+        return res.send(common.returnAPIData(productInfo));
       }
 
       const { lots, ...newProduct } = productInfo;
-      // let warehouse_curr_qtt = 0;
-      // let store_curr_qtt = 0;
-
-      // lots.forEach(lot => {
-      //   if (lot.qttLotInWarehouse) {
-      //     warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
-      //   }
-
-      //   if (lot.qttProductInStore) {
-      //     store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
-      //   }
-      // });
 
       res.send(
         common.returnAPIData({
           ...newProduct,
-          // warehouse_curr_qtt,
-          // store_curr_qtt,
           lots: common.sortedByDate(lots, true),
         })
       );

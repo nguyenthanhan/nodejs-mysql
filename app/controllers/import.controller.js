@@ -267,7 +267,7 @@ exports.update = async (req, res, next) => {
       where: { ImID: req.params.id },
     });
 
-    if (parseInt(updateImport, 10) === 1 && updateImport.state === 'close') {
+    if (parseInt(updateImport, 10) === 1 && req.body.state === 'close') {
       res.send(common.returnAPIData({}, `Cập nhật thông tin nhập hàng thành công`));
       return;
     }

@@ -2,59 +2,12 @@
 const common = require('../utils/common');
 const db = require('../models/db');
 const lang = require('../lang');
-const { bill: Bill, manager: Manager, product: Product, productOnBill: ProductOnBill } = db;
+const { bill: Bill, manager: Manager, product: Product, lot: Lot, productOnBill: ProductOnBill } = db;
 const Op = db.Sequelize.Op;
 const _ = require('lodash');
 const moment = require('moment');
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
-
-const updateProductsInStore = async sellProducts => {
-  try {
-    const oldProducts = await Product.findAll({
-      where: {
-        PID: {
-          [Op.or]: sellProducts.map(sellProduct => sellProduct.PID),
-        },
-      },
-      raw: true,
-    });
-
-    oldProducts.map(async oldProduct => {
-      const foundSellProduct = sellProducts.filter(sellProduct => sellProduct.PID === oldProduct.PID);
-
-      if (foundSellProduct.length > 0) {
-        Product.update(
-          { S_curr_qtt: oldProduct.S_curr_qtt - foundSellProduct[0].quantity },
-          {
-            where: { PID: oldProduct.PID },
-          }
-        );
-      }
-    });
-  } catch (error) {
-    next({
-      status: 400,
-      message: error.message,
-      id: 0,
-      name: 'hoá đơn',
-      method: 'post',
-    });
-    return;
-  }
-};
-
-const asyncUpdateItemProductOnBill = (sellProduct, billId) => {
-  return ProductOnBill.create({
-    productId: sellProduct.PID,
-    quantity: sellProduct.quantity,
-    billId: billId,
-  });
-};
-
-const updateProductsOnBill = (sellProducts, billId) => {
-  return Promise.all(sellProducts.map(sellProduct => asyncUpdateItemProductOnBill(sellProduct, billId)));
-};
 
 // Create and Save a new bill
 exports.create = async (req, res, next) => {
@@ -72,12 +25,10 @@ exports.create = async (req, res, next) => {
   try {
     // Create a bill
     const { cus_name, total } = req.body;
-    const date = moment.now();
     const bill = {
       cus_name: cus_name,
       total: total,
       MngID: req.userId,
-      createdAt: date,
     };
 
     // Save bill in the database
@@ -86,6 +37,106 @@ exports.create = async (req, res, next) => {
     if (_currentBill) {
       const currentBill = _currentBill.get({ plain: true });
 
+      const createProductsOnBillAndUpdateLots = await Promise.all(
+        req.body.sellProducts.map(async sellProduct => {
+          // Get and update lots
+          let remainProduct = sellProduct.quantity;
+          const _findLot = await Lot.findAll({
+            where: { productId: sellProduct.PID },
+            attributes: ['lotId', 'qttLotInWarehouse', 'qttProductInStore', 'conversionRate'],
+          });
+          const sortedLots = common.sortedByDate(
+            _findLot.map(el => el.get({ plain: true })),
+            false
+          );
+
+          const _updatedLots = await Promise.all(
+            sortedLots.map(async eachLot => {
+              let qttProductInStore = eachLot.qttProductInStore;
+
+              if (remainProduct === 0) {
+                return 0;
+              }
+
+              if (remainProduct <= eachLot.qttProductInStore) {
+                qttProductInStore -= remainProduct;
+                remainProduct = 0;
+              } else {
+                remainProduct -= eachLot.qttProductInStore;
+                qttProductInStore = 0;
+              }
+
+              const updateLotInDB = await Lot.update(
+                {
+                  qttProductInStore,
+                  updatedAt: new Date(),
+                },
+                {
+                  where: {
+                    lotId: parseInt(eachLot.lotId),
+                  },
+                }
+              );
+
+              return parseInt(updateLotInDB);
+            })
+          );
+
+          console.log(`11111 ${sellProduct.PID}`);
+          const updatedLotsCount = _updatedLots.length;
+
+          //create productOnBill
+          const _createProductOnBill = await ProductOnBill.create({
+            productId: sellProduct.PID,
+            quantity: sellProduct.quantity,
+            billId: currentBill.BID,
+          });
+          const createProductOnBill = _createProductOnBill.get({ plain: true });
+
+          console.log(`11111 ${sellProduct.PID}`, _updatedLots);
+          //update count product
+          const _oldProduct = await Product.findByPk(sellProduct.PID, {
+            attributes: ['PID'],
+            include: [
+              {
+                model: Lot,
+                as: 'lots',
+                attributes: ['qttProductInStore', 'conversionRate'],
+              },
+            ],
+          }); //Khong update
+          let updatedProductCount;
+          if (_oldProduct) {
+            const oldProduct = _oldProduct.get({ plain: true });
+            console.log(`222222 ${sellProduct.PID}`);
+            const store_curr_qtt = oldProduct.lots.reduce((sum, productLot) => {
+              return sum + productLot.qttProductInStore * productLot.conversionRate;
+            }, 0);
+            console.log(`33333 ${sellProduct.PID}`);
+            updatedProductCount = await Product.update(
+              { store_curr_qtt },
+              { where: { PID: parseInt(sellProduct.PID) } }
+            );
+          }
+          //-----
+
+          return {
+            ...createProductOnBill,
+            updatedLotsCount,
+            updatedProductQuantity: parseInt(updatedProductCount) === 1,
+          };
+        })
+      );
+
+      console.log(createProductsOnBillAndUpdateLots);
+
+      res.send(
+        common.returnAPIData(
+          { ...currentBill, productsOnBill: createProductsOnBillAndUpdateLots },
+          'Tạo thành công đơn hàng'
+        )
+      );
+
       LogController.createLog({
         MngID: req.userId,
         action: ActionOnTable.ADD,
@@ -93,12 +144,6 @@ exports.create = async (req, res, next) => {
         affectedRowID: currentBill.BID,
         nameInRow: currentBill.cus_name,
       });
-
-      const createProductsOnBill = await updateProductsOnBill(req.body.sellProducts, currentBill.BID);
-
-      // updateProductsInStore(req.body.sellProducts);
-
-      res.send(common.returnAPIData(currentBill, 'Tạo thành công đơn hàng'));
     }
   } catch (error) {
     next({

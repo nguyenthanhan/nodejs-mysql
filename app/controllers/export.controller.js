@@ -167,7 +167,7 @@ exports.update = async (req, res, next) => {
       where: { ExID: req.params.id },
     });
 
-    if (parseInt(updateExport, 10) === 1 && updateExport.state === 'close') {
+    if (parseInt(updateExport) === 1 && req.body.state === 'close') {
       res.send(common.returnAPIData({}, `Cập nhật thông tin nhập hàng thành công`));
       return;
     }
@@ -224,7 +224,7 @@ exports.update = async (req, res, next) => {
                 newLot.qttLotInWarehouse = 0;
               } else {
                 newLot.qttLotInWarehouse -= remain_total_unit;
-                newLot.qttProductInStore = remain_total_unit * newLot.conversionRate;
+                newLot.qttProductInStore += remain_total_unit * newLot.conversionRate;
                 remain_total_unit = 0;
               }
 

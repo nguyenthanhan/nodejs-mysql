@@ -102,7 +102,7 @@ if (!isDev && cluster.isMaster) {
   });
 
   cron.schedule(
-    '0 0 * * *',
+    '0 21 * * *',
     () => {
       // if (first_send) {
       //   first_send = false;
