@@ -55,16 +55,16 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
-      // W_curr_qtt: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   defaultValue: 0,
-      // },
-      // S_curr_qtt: {
-      //   type: Sequelize.INTEGER,
-      //   allowNull: false,
-      //   defaultValue: 0,
-      // },
+      warehouse_curr_qtt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      store_curr_qtt: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       sell_price: {
         type: Sequelize.BIGINT(20),
         allowNull: false,

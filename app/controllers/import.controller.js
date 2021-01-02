@@ -331,9 +331,18 @@ exports.update = async (req, res, next) => {
           const _createLot = await Lot.create(newLot);
           const createdLot = _createLot.get({ plain: true });
 
+          const _oldProduct = await Product.findByPk(importProduct.productId);
+          const oldProduct = _oldProduct.get({ plain: true });
+
+          const updatedProductsInWarehouse = await Product.update(
+            { warehouse_curr_qtt: oldProduct.warehouse_curr_qtt + importProduct.real_total_unit },
+            { where: { PID: importProduct.productId } }
+          );
+
           return {
             isUpdatedImport: true,
-            isUpdatedProductsInImport: parseInt(updateProductsInImport) === 1,
+            isUpdatedProductInImport: parseInt(updateProductsInImport) === 1,
+            isUpdatedProductInWarehouse: parseInt(updatedProductsInWarehouse) === 1,
             createdLot,
           };
         })

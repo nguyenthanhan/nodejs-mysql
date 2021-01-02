@@ -13,7 +13,7 @@
       "accountInvalid": "Tài khoản này đã được sử dụng. Vui lòng đổi tên tài khoản khác!",
       "emailInvalid": "Email này đã được sử dụng!",
       "accountNotFound": "Không thể tìm thấy tài khoản này!",
-      "notSamePassword": "Mật khẩu mới không khớp với mật khẩu cũ"
+      "notSamePassword": "Mật khẩu bạn nhập không đúng!"
     }
   }
 }

@@ -226,7 +226,7 @@ exports.update = async (req, res, next) => {
                 newLot.qttProductInStore = remain_total_unit * newLot.conversionRate;
                 remain_total_unit = 0;
               }
-
+              console.log(newLot);
               const updateLotInDB = await Lot.update(
                 {
                   qttLotInWarehouse: newLot.qttLotInWarehouse,

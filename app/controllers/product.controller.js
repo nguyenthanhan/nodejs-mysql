@@ -56,10 +56,10 @@ exports.create = async (req, res, next) => {
   let product = {
     name: req.body.name,
     barcode: req.body.barcode,
-    W_curr_qtt: parseInt(req.body.W_curr_qtt) ? parseInt(req.body.W_curr_qtt) : 0,
+    // warehouse_curr_qtt: parseInt(req.body.warehouse_curr_qtt) || 0,
     W_max_qtt: parseInt(req.body.W_max_qtt),
     W_min_qtt: parseInt(req.body.W_min_qtt),
-    S_curr_qtt: parseInt(req.body.S_curr_qtt) ? parseInt(req.body.S_curr_qtt) : 0,
+    // store_curr_qtt: parseInt(req.body.store_curr_qtt) || 0,
     S_max_qtt: parseInt(req.body.S_max_qtt),
     S_min_qtt: parseInt(req.body.S_min_qtt),
     sell_price: parseInt(req.body.sell_price),
@@ -114,8 +114,8 @@ exports.create = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   try {
     //pagination
-    const limit = parseInt(req.query.per_page) || 10;
-    const offset = (parseInt(req.query.page) - 1) * limit || 0;
+    // const limit = parseInt(req.query.per_page) || 10;
+    // const offset = (parseInt(req.query.page) - 1) * limit || 0;
 
     //sort by createdAt
     const sortByCreatedAt = common.checkValidSortString(req.query.sortByCreatedAt)
@@ -141,7 +141,7 @@ exports.findAll = async (req, res, next) => {
       ],
     };
 
-    const data = await Product.findAndCountAll({
+    const data = await Product.findAll({
       // limit,
       // offset,
       where: condition,
@@ -168,28 +168,28 @@ exports.findAll = async (req, res, next) => {
       ],
     });
 
-    const message = data.rows.length === 0 ? 'Không có sản phẩm nào' : 'Lấy danh sách sản phẩm thành công';
-    const productsList = data.rows.map(product => product.get({ plain: true }));
+    const message = data.length === 0 ? 'Không có sản phẩm nào' : 'Lấy danh sách sản phẩm thành công';
+    const productsList = data.map(product => product.get({ plain: true }));
 
     const newProductList = productsList.map(product => {
       const { lots, ...remain } = product;
-      let warehouse_curr_qtt = 0;
-      let store_curr_qtt = 0;
+      // let warehouse_curr_qtt = 0;
+      // let store_curr_qtt = 0;
 
-      lots.forEach(lot => {
-        if (lot.qttLotInWarehouse) {
-          warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
-        }
+      // lots.forEach(lot => {
+      //   if (lot.qttLotInWarehouse) {
+      //     warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
+      //   }
 
-        if (lot.qttProductInStore) {
-          store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
-        }
-      });
+      //   if (lot.qttProductInStore) {
+      //     store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
+      //   }
+      // });
 
       return {
         ...remain,
-        warehouse_curr_qtt,
-        store_curr_qtt,
+        // warehouse_curr_qtt,
+        // store_curr_qtt,
         lots: common.sortedByDate(lots, true),
       };
     });
@@ -201,7 +201,7 @@ exports.findAll = async (req, res, next) => {
         // total_page: Math.ceil(
         //   parseInt(data.count) / parseInt(req.query.per_page)
         // ),
-        total_products: parseInt(productsList.length),
+        total_products: parseInt(newProductList.length),
       })
     );
   } catch (error) {
@@ -297,10 +297,10 @@ exports.update = async (req, res, next) => {
   let body = {
     name: req.body.name || undefined,
     barcode: req.body.barcode || undefined,
-    W_curr_qtt: parseInt(req.body.W_curr_qtt) || undefined,
+    // warehouse_curr_qtt: parseInt(req.body.store_curr_qtt) || undefined,
     W_max_qtt: parseInt(req.body.W_max_qtt) || undefined,
     W_min_qtt: parseInt(req.body.W_min_qtt) || undefined,
-    S_curr_qtt: parseInt(req.body.S_curr_qtt) || undefined,
+    // store_curr_qtt: parseInt(req.body.store_curr_qtt) || undefined,
     S_max_qtt: parseInt(req.body.S_max_qtt) || undefined,
     S_min_qtt: parseInt(req.body.S_min_qtt) || undefined,
     sell_price: parseInt(req.body.sell_price) || undefined,
