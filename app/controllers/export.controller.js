@@ -138,7 +138,10 @@ exports.update = async (req, res, next) => {
   try {
     const _findExport = await Export.findByPk(req.params.id);
     if (!_findExport) {
-      res.send(common.returnAPIData({}, `Không thể cập nhập đơn xuất hàng`));
+      next({
+        status: 400,
+        message: `Không thể cập nhập đơn xuất hàng`,
+      });
       return;
     }
     const findExport = _findExport.get({ plain: true });
@@ -148,9 +151,9 @@ exports.update = async (req, res, next) => {
     }
 
     const body = {
-      request_export_date: req.body.request_export_date ? moment(req.body.request_export_date) : new Date(),
+      request_export_date: req.body.request_export_date ? moment(req.body.request_export_date) : undefined,
       state: req.body.state === 'request' && findExport.state === 'executed' ? undefined : req.body.state,
-      export_date: moment(req.body.export_date) || undefined,
+      export_date: moment(req.body.export_date) || moment(),
       updatedAt: new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
       requesterId: parseInt(req.body.supplierId) || undefined,
@@ -202,7 +205,6 @@ exports.update = async (req, res, next) => {
         req.body.exportProducts.map(async exportProduct => {
           //find all lot with product id to cal sum product
           let remain_total_unit = exportProduct.request_total_unit;
-          let productId = null;
 
           const _findLot = await Lot.findAll({ where: { productId: exportProduct.productId } });
           const sortedLots = common.sortedByDate(
@@ -212,21 +214,20 @@ exports.update = async (req, res, next) => {
 
           const lots = await Promise.all(
             sortedLots.map(async eachLot => {
-              productId = eachLot.productId;
               if (remain_total_unit === 0) {
                 return { ...eachLot, isUpdated: true };
               }
               let newLot = _.cloneDeep(eachLot);
               if (remain_total_unit > newLot.qttLotInWarehouse) {
-                remain_total_unit = remain_total_unit - newLot.qttLotInWarehouse;
-                newLot.qttProductInStore = newLot.qttLotInWarehouse * newLot.conversionRate;
+                remain_total_unit -= newLot.qttLotInWarehouse;
+                newLot.qttProductInStore += newLot.qttLotInWarehouse * newLot.conversionRate;
                 newLot.qttLotInWarehouse = 0;
               } else {
-                newLot.qttLotInWarehouse = newLot.qttLotInWarehouse - remain_total_unit;
+                newLot.qttLotInWarehouse -= remain_total_unit;
                 newLot.qttProductInStore = remain_total_unit * newLot.conversionRate;
                 remain_total_unit = 0;
               }
-              console.log(newLot);
+
               const updateLotInDB = await Lot.update(
                 {
                   qttLotInWarehouse: newLot.qttLotInWarehouse,
@@ -254,7 +255,7 @@ exports.update = async (req, res, next) => {
                 const productInExport = await ProductInExport.update(
                   {
                     request_total_unit: parseInt(exportProduct.request_total_unit),
-                    real_total_unit: remain_total_unit,
+                    real_total_unit: exportProduct.request_total_unit - remain_total_unit,
                     updatedAt: moment(),
                   },
                   {
@@ -270,9 +271,41 @@ exports.update = async (req, res, next) => {
             })
           );
 
+          //update count product
+          const _oldProduct = await Product.findByPk(exportProduct.productId, {
+            attributes: ['PID'],
+            include: [
+              {
+                model: Lot,
+                as: 'lots',
+                attributes: ['qttLotInWarehouse', 'qttProductInStore', 'conversionRate'],
+              },
+            ],
+          });
+          let updatedProductCount;
+          if (_oldProduct) {
+            const oldProduct = _oldProduct.get({ plain: true });
+
+            const warehouse_curr_qtt = oldProduct.lots.reduce((sum, productLot) => {
+              return sum + productLot.qttLotInWarehouse * productLot.conversionRate;
+            }, 0);
+
+            const store_curr_qtt = oldProduct.lots.reduce((sum, productLot) => {
+              return sum + productLot.qttProductInStore * productLot.conversionRate;
+            }, 0);
+
+            updatedProductCount = await Product.update(
+              { warehouse_curr_qtt, store_curr_qtt },
+              { where: { PID: exportProduct.productId } }
+            );
+          }
+          //-----
+
           return {
-            productId,
-            productsInExport: _.flattenDeep(productsInExport),
+            productId: exportProduct.productId,
+            real_total_unit: exportProduct.request_total_unit - remain_total_unit,
+            productsInExportCount: _.flattenDeep(productsInExport).length,
+            isUpdatedProductCount: parseInt(updatedProductCount) === 1,
             lots,
           };
         })

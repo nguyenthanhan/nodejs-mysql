@@ -36,7 +36,7 @@ exports.create = async (req, res, next) => {
       urgent_level: req.body.urgent_level ? req.body.urgent_level : 'normal',
       bonus: req.body.bonus ? req.body.bonus : undefined,
       requesterId: req.userId,
-      supplierId: req.body.supplierId ? parseInt(req.body.supplierId) : undefined,
+      supplierId: parseInt(req.body.supplierId) || undefined,
     };
 
     // Save import in the database
@@ -55,7 +55,7 @@ exports.create = async (req, res, next) => {
         return {
           productId: importProduct.productId,
           request_total_unit: parseInt(importProduct.request_total_unit),
-          importId: excImport.ImID,
+          importId: parseInt(excImport.ImID),
         };
       });
 
@@ -161,8 +161,8 @@ const processEachData = async data => {
   const { products, ...remain } = data;
   const importAndProductIds = products.map(product => {
     return {
-      productId: product.PID,
-      importId: product.ProductInImport.importId,
+      productId: parseInt(product.PID),
+      importId: parseInt(product.ProductInImport.importId),
     };
   });
 
@@ -176,7 +176,7 @@ const processEachData = async data => {
 
   const newProducts = products.map(product => {
     const selectedLot = lots.find(
-      lot => product.PID === lot.productId && product.ProductInImport.importId === lot.importId
+      lot => product.PID === lot.productId && parseInt(product.ProductInImport.importId) === parseInt(lot.importId)
     );
     if (selectedLot) {
       return {
@@ -198,6 +198,7 @@ exports.findOne = async (req, res, next) => {
     const id = req.params.id;
 
     const _data = await Import.findByPk(id, {
+      attributes: { exclude: ['deletedAt'] },
       include: [
         {
           model: Product,
@@ -242,13 +243,6 @@ exports.update = async (req, res, next) => {
   }
 
   try {
-    // const total_cost =
-    //   req.body.importProducts && req.body.importProducts.length > 0
-    //     ? req.body.importProducts.reduce((sum, importProduct) => {
-    //         return sum + importProduct.real_total_unit * importProduct.import_price_unit;
-    //       }, 0)
-    //     : null;
-
     const _findImport = await Import.findByPk(req.params.id);
     const findImport = _findImport.get({ plain: true });
 
@@ -259,7 +253,7 @@ exports.update = async (req, res, next) => {
     const body = {
       request_import_date: moment(req.body.request_import_date) || undefined,
       state: req.body.state === 'request' && findImport.state === 'executed' ? undefined : req.body.state,
-      import_date: moment(req.body.import_date) || undefined,
+      import_date: moment(req.body.import_date) || moment(),
       updatedAt: new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
       requesterId: parseInt(req.body.supplierId) || undefined,
@@ -322,27 +316,46 @@ exports.update = async (req, res, next) => {
             expires: importProduct.expires ? moment(importProduct.expires) : undefined,
             unit_name: importProduct.unit_name || undefined,
             conversionRate: parseInt(importProduct.conversionRate),
-            import_price_unit: importProduct.import_price_unit ? parseInt(importProduct.import_price_unit) : undefined,
-            qttLotInWarehouse: importProduct.real_total_unit,
-            importId: req.params.id,
-            productId: importProduct.productId,
-            import_price_product: Math.ceil(importProduct.import_price_unit / importProduct.conversionRate),
+            import_price_unit: parseInt(importProduct.import_price_unit) || undefined,
+            qttLotInWarehouse: parseInt(importProduct.real_total_unit),
+            importId: parseInt(req.params.id),
+            productId: parseInt(importProduct.productId),
+            import_price_product: Math.ceil(
+              parseInt(importProduct.import_price_unit) / parseInt(importProduct.conversionRate)
+            ),
           };
           const _createLot = await Lot.create(newLot);
           const createdLot = _createLot.get({ plain: true });
 
-          const _oldProduct = await Product.findByPk(importProduct.productId);
-          const oldProduct = _oldProduct.get({ plain: true });
+          //update count product
+          const _oldProduct = await Product.findByPk(importProduct.productId, {
+            attributes: ['PID'],
+            include: [
+              {
+                model: Lot,
+                as: 'lots',
+                attributes: ['qttLotInWarehouse', 'conversionRate'],
+              },
+            ],
+          });
+          let updatedProductCount;
+          if (_oldProduct) {
+            const oldProduct = _oldProduct.get({ plain: true });
+            const warehouse_curr_qtt = oldProduct.lots.reduce((sum, productLot) => {
+              return sum + parseInt(productLot.qttLotInWarehouse) * parseInt(productLot.conversionRate);
+            }, 0);
 
-          const updatedProductsInWarehouse = await Product.update(
-            { warehouse_curr_qtt: oldProduct.warehouse_curr_qtt + importProduct.real_total_unit },
-            { where: { PID: importProduct.productId } }
-          );
+            updatedProductCount = await Product.update(
+              { warehouse_curr_qtt },
+              { where: { PID: importProduct.productId } }
+            );
+          }
+          //-----
 
           return {
             isUpdatedImport: true,
             isUpdatedProductInImport: parseInt(updateProductsInImport) === 1,
-            isUpdatedProductInWarehouse: parseInt(updatedProductsInWarehouse) === 1,
+            isUpdatedProductCount: parseInt(updatedProductCount) === 1,
             createdLot,
           };
         })

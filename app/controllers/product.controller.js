@@ -250,24 +250,24 @@ exports.findOne = async (req, res, next) => {
       }
 
       const { lots, ...newProduct } = productInfo;
-      let warehouse_curr_qtt = 0;
-      let store_curr_qtt = 0;
+      // let warehouse_curr_qtt = 0;
+      // let store_curr_qtt = 0;
 
-      lots.forEach(lot => {
-        if (lot.qttLotInWarehouse) {
-          warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
-        }
+      // lots.forEach(lot => {
+      //   if (lot.qttLotInWarehouse) {
+      //     warehouse_curr_qtt = warehouse_curr_qtt + lot.qttLotInWarehouse;
+      //   }
 
-        if (lot.qttProductInStore) {
-          store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
-        }
-      });
+      //   if (lot.qttProductInStore) {
+      //     store_curr_qtt = store_curr_qtt + lot.qttProductInStore;
+      //   }
+      // });
 
       res.send(
         common.returnAPIData({
           ...newProduct,
-          warehouse_curr_qtt,
-          store_curr_qtt,
+          // warehouse_curr_qtt,
+          // store_curr_qtt,
           lots: common.sortedByDate(lots, true),
         })
       );

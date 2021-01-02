@@ -113,9 +113,7 @@ exports.changePassword = async (req, res, next) => {
 
     //compare password
     const result = await bcrypt.compare(oldPassword, managerData.password);
-    console.log(oldPassword);
-    console.log(managerData);
-    console.log(result);
+
     if (!result) {
       next({ status: 401, message: lang.general.error.notSamePassword });
       return;
