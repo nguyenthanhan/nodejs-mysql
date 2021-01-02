@@ -20,13 +20,6 @@ const { Table, ActionOnTable } = require('../constants');
 exports.create = async (req, res, next) => {
   console.log(req.body);
   // Validate request
-  if (!req.body.requesterId) {
-    next({
-      status: 400,
-      message: lang.general.error._400,
-    });
-    return;
-  }
 
   if (_.isEmpty(req.body.importProducts)) {
     next({

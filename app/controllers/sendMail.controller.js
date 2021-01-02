@@ -75,7 +75,7 @@ exports.sendMail = async (req, res, next) => {
     });
 
     let mailOptions = {
-      from: '"Grocery Store" <an.ngth.1996@gmail.com>',
+      from: '"Grocery Store Support" <an.ngth.1996@gmail.com>',
       to: mails,
       subject: '[Grocery Store] - Báo cáo cuối ngày',
       text: 'Fail to load html',
@@ -84,6 +84,7 @@ exports.sendMail = async (req, res, next) => {
 
     let transporter = nodemailer.createTransport({
       service: 'gmail',
+      host: 'smtp.gmail.com',
       auth: {
         user: 'an.ngth.1996@gmail.com',
         pass: 'I11dEQ%bPA8F',
