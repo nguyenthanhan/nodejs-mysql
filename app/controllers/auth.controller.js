@@ -76,6 +76,7 @@ exports.login = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
+  console.log(req.body);
   if (!req.body.newPassword || !req.body.oldPassword || !req.body.confirmPassword) {
     next({ status: 400, message: lang.general.error._400 });
     return;
@@ -102,9 +103,10 @@ exports.changePassword = async (req, res, next) => {
     //get password from db
     const managerData = await Manager.findByPk(req.userId, {
       raw: true,
-      attributes: { include: ['password'] },
+      attributes: ['password'],
     });
-    if (_.isEmpty(managerData)) {
+
+    if (!managerData || _.isEmpty(managerData)) {
       next({ status: 404, message: lang.general.error.accountNotFound });
       return;
     }
@@ -125,8 +127,8 @@ exports.changePassword = async (req, res, next) => {
         where: { MngID: req.userId },
       })
         .then(num => {
-          if (num === 1) {
-            res.send(common.returnAPIData({}));
+          if (parseInt(num) === 1) {
+            res.send(common.returnAPIData(undefined, 'Cập nhật mật khẩu thành công!'));
           } else {
             next({
               status: 400,
