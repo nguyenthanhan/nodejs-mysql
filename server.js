@@ -109,7 +109,32 @@ if (!isDev && cluster.isMaster) {
       // } else {
       axios
         .post(`${API_BASE}send_mails`, {
-          content: 'Fred',
+          content: 'day',
+        })
+        .then(function (response) {
+          const { status, header, config, data } = response;
+          console.log({ status, header, config, data });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      // }
+    },
+    {
+      scheduled: true,
+      timezone: 'Asia/Bangkok',
+    }
+  );
+
+  cron.schedule(
+    '0 9 * * 0',
+    () => {
+      // if (first_send) {
+      //   first_send = false;
+      // } else {
+      axios
+        .post(`${API_BASE}send_mails`, {
+          content: 'week',
         })
         .then(function (response) {
           const { status, header, config, data } = response;

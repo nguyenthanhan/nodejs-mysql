@@ -203,10 +203,4 @@ db.product.belongsToMany(db.bill, {
 
 //----------
 
-//hook
-// db.lot.afterUpdate(async (lot, options) => {
-//   console.log("update lot");
-//check quantity ==0 delete
-// });
-
 module.exports = db;

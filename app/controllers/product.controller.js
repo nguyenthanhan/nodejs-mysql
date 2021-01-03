@@ -8,6 +8,7 @@ const { product: Product, category: Category, discount: Discount, lot: Lot } = d
 const Op = db.Sequelize.Op;
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
+const moment = require('moment');
 
 // Create and Save a new product
 exports.create = async (req, res, next) => {
@@ -63,6 +64,7 @@ exports.create = async (req, res, next) => {
     description: req.body.description,
     vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,
     discountId: parseInt(req.body.discountId) || undefined,
+    notice_days: parseInt(req.body.notice_days) || undefined,
   };
 
   let imageMessage = 'Tạo sản phẩm thành công nhưng không có hình ảnh sản phẩm';
@@ -128,6 +130,19 @@ exports.findAll = async (req, res, next) => {
     //search name products
     const name = req.query.name_keyword;
 
+    if (req.query.trigger_notice_date && _.isNumber(parseInt(req.query.trigger_date))) {
+      const nearExpiryLot = await Lot.findAll({
+        where: {
+          expires: {
+            [Op.lt]: moment().add(parseInt(req.query.trigger_notice_date), 'days'),
+          },
+        },
+        raw: true,
+      });
+
+      console.log(nearExpiryLot);
+    }
+
     const condition = {
       [Op.and]: [
         name ? { name: { [Op.like]: `%${name}%` } } : null,
@@ -163,6 +178,19 @@ exports.findAll = async (req, res, next) => {
       ],
     };
 
+    const expiredCondition =
+      req.query.is_almost_expired === 'true' || req.query.is_almost_expired === true
+        ? {
+            expires: {
+              [Op.lt]: moment(
+                moment()
+                  .add(parseInt(db.sequelize.col('Product.notice_days')), 'd')
+                  .format()
+              ),
+            },
+          }
+        : null;
+
     const data = await Product.findAll({
       // limit,
       // offset,
@@ -181,6 +209,7 @@ exports.findAll = async (req, res, next) => {
           attributes: {
             exclude: ['productId', 'deletedAt'],
           },
+          // where: expiredCondition,
         },
         {
           model: Discount,
@@ -193,7 +222,7 @@ exports.findAll = async (req, res, next) => {
     const message = data.length === 0 ? 'Không có sản phẩm nào' : 'Lấy danh sách sản phẩm thành công';
     const productsList = data.map(product => product.get({ plain: true }));
 
-    const newProductList = productsList.map(product => {
+    let newProductList = productsList.map(product => {
       const { lots, ...remain } = product;
 
       return {
@@ -201,6 +230,18 @@ exports.findAll = async (req, res, next) => {
         lots: common.sortedByDate(lots, true),
       };
     });
+
+    if (req.query.is_almost_expired === 'true' || req.query.is_almost_expired === true) {
+      newProductList = newProductList.filter(product => {
+        let almostExpiry = false;
+        product.lots.forEach(lot => {
+          if (moment(lot.expires).isBefore(moment().add(product.notice_days, 'd').format())) {
+            almostExpiry = true;
+          }
+        });
+        return almostExpiry;
+      });
+    }
 
     res.send(
       common.returnAPIData(newProductList, message, {
@@ -305,6 +346,7 @@ exports.update = async (req, res, next) => {
     description: req.body.description || undefined,
     vat: parseInt(req.body.vat) ? (parseInt(req.body.vat) === 5 ? 5 : 10) : undefined,
     discountId: parseInt(req.body.discountId) || undefined,
+    notice_days: parseInt(req.body.notice_days) || undefined,
     updatedAt: new Date(),
   };
 

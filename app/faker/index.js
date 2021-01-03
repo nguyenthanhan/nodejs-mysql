@@ -153,6 +153,7 @@ const products = [
     categoryId: 1,
     sell_price: 10000,
     unit_name: 'chai',
+    notice_days: 10,
   },
 
   {
@@ -169,6 +170,7 @@ const products = [
     categoryId: 2,
     sell_price: 5000,
     unit_name: 'cái',
+    notice_days: 2,
   },
   {
     name: 'Kem',
@@ -184,6 +186,7 @@ const products = [
     categoryId: 3,
     sell_price: 34000,
     unit_name: 'hộp',
+    notice_days: 2,
   },
   {
     name: 'Mít sấy',
@@ -199,6 +202,7 @@ const products = [
     categoryId: 4,
     sell_price: 20000,
     unit_name: 'bịch',
+    notice_days: 10,
   },
   {
     name: 'Ngũ cốc ăn kiêng Natural Granola',
@@ -214,6 +218,7 @@ const products = [
     categoryId: 5,
     sell_price: 10000,
     unit_name: 'hộp',
+    notice_days: 10,
   },
   {
     name: 'Đường',
@@ -230,6 +235,7 @@ const products = [
     categoryId: 6,
     sell_price: 10000,
     unit_name: 'bịch',
+    notice_days: 5,
   },
   {
     name: 'Gạo Khang Dân nguyên chất',
@@ -245,6 +251,7 @@ const products = [
     categoryId: 7,
     sell_price: 50000,
     unit_name: 'bịch',
+    notice_days: 20,
   },
   {
     name: 'Rau xà lách',
@@ -261,6 +268,7 @@ const products = [
     categoryId: 8,
     sell_price: 5000,
     unit_name: 'bịch',
+    notice_days: 2,
   },
   {
     name: 'Giấy lụa bỏ túi Pulppy',
@@ -277,6 +285,7 @@ const products = [
     categoryId: 9,
     sell_price: 20000,
     unit_name: 'bịch',
+    notice_days: 1,
   },
   {
     name: 'Bột trà xanh',
@@ -293,6 +302,7 @@ const products = [
     categoryId: 10,
     sell_price: 50000,
     unit_name: 'bịch',
+    notice_days: 10,
   },
   {
     name: 'Bút Mực Sao Thiên',
@@ -308,6 +318,7 @@ const products = [
     categoryId: 11,
     sell_price: 5000,
     unit_name: 'cây',
+    notice_days: 5,
   },
   {
     name: 'Bàn chải đánh răng DOCTOR.B XIAOMI',
@@ -323,6 +334,7 @@ const products = [
     categoryId: 12,
     sell_price: 25000,
     unit_name: 'cái',
+    notice_days: 1,
   },
   {
     name: 'Thẻ điện thoại Viettel, Vina, Mobile 20k',
@@ -338,6 +350,7 @@ const products = [
     categoryId: 13,
     sell_price: 20000,
     unit_name: 'thẻ',
+    notice_days: 20,
   },
 ];
 
