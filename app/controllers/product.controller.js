@@ -30,7 +30,7 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (req.body.W_max_qtt < req.body.W_min_qtt) {
+  if (parseInt(req.body.W_max_qtt) < parseInt(req.body.W_min_qtt)) {
     next({
       status: 400,
       message: 'Số lượng hàng tối đa trong kho hàng nên lớn hơn số lượng hàng tối thiểu',
@@ -38,7 +38,7 @@ exports.create = async (req, res, next) => {
     return;
   }
 
-  if (req.body.S_max_qtt < req.body.S_min_qtt) {
+  if (parseInt(req.body.S_max_qtt) < parseInt(req.body.S_min_qtt)) {
     next({
       status: 400,
       message: 'Số lượng hàng tối đa trên cửa hàng nên lớn hơn số lượng hàng tối thiểu',
