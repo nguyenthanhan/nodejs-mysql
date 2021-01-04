@@ -258,7 +258,11 @@ exports.update = async (req, res, next) => {
     const findImport = _findImport.get({ plain: true });
 
     if (findImport.state === 'close') {
-      return res.send(common.returnAPIData({}, `Tình trạng đơn này đã đóng, không thể cập nhập!`));
+      next({
+        status: 400,
+        message: 'Tình trạng đơn này đã đóng, không thể cập nhập!',
+      });
+      return;
     }
 
     if (
