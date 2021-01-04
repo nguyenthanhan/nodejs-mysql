@@ -150,7 +150,7 @@ exports.update = async (req, res, next) => {
     if (!_findExport) {
       next({
         status: 400,
-        message: `Không thể cập nhập đơn xuất hàng`,
+        message: `Không thể tìm thấy đơn xuất hàng`,
       });
       return;
     }
