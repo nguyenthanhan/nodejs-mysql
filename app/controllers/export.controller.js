@@ -84,7 +84,7 @@ exports.findAll = async (req, res, next) => {
     });
     const newExport = _newExport.map(el => el.get({ plain: true }));
 
-    res.send(common.returnAPIData(newExport), newExport.length === 0 ? 'Không có đơn xuất hàng nào!' : '');
+    res.send(common.returnAPIData(newExport, newExport.length === 0 ? 'Không có đơn xuất hàng nào!' : ''));
   } catch (error) {
     next({
       status: 400,

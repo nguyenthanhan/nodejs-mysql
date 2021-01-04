@@ -144,7 +144,7 @@ exports.findAll = async (req, res, next) => {
       })
     );
 
-    res.send(common.returnAPIData(newData), newData.length === 0 ? 'Không tìm thấy đơn nhập hàng nào' : '');
+    res.send(common.returnAPIData(newData, newData.length === 0 ? 'Không tìm thấy đơn nhập hàng nào' : ''));
   } catch (error) {
     next({
       status: 400,
