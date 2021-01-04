@@ -29,18 +29,19 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
 
-  // if (isDev) {
-  let corsOptions = {
-    origin: 'http://localhost:5000',
-    allowedHeaders: ['sessionId', 'Content-Type'],
-    exposedHeaders: ['sessionId'],
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-  };
+  if (isDev) {
+    let corsOptions = {
+      origin: 'http://localhost:5000',
+      allowedHeaders: ['sessionId', 'Content-Type'],
+      exposedHeaders: ['sessionId'],
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      preflightContinue: false,
+    };
 
-  app.use(cors(corsOptions));
-  // }
+    app.use(cors(corsOptions));
+  }
+
   app.use(logger('dev'));
 
   // parse requests of content-type - application/json

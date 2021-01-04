@@ -157,10 +157,10 @@ db.import.belongsTo(db.supplier, {
 });
 //----------
 
-db.export.belongsTo(db.manager, {
-  foreignKey: 'mngID',
-  as: 'manager',
-});
+// db.export.belongsTo(db.manager, {
+//   foreignKey: 'mngID',
+//   as: 'manager',
+// });
 
 //---------
 const ProductOnBill = sequelize.define(

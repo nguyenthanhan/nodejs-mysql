@@ -84,7 +84,7 @@ exports.findAll = async (req, res, next) => {
     });
     const newExport = _newExport.map(el => el.get({ plain: true }));
 
-    res.send(common.returnAPIData(newExport));
+    res.send(common.returnAPIData(newExport), newExport.length === 0 ? 'Không có đơn xuất hàng nào!' : '');
   } catch (error) {
     next({
       status: 400,
@@ -225,9 +225,8 @@ exports.update = async (req, res, next) => {
       export_date: moment(req.body.export_date) || moment(),
       updatedAt: new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
-      requesterId: parseInt(req.body.supplierId) || undefined,
-      checkerId: parseInt(req.body.supplierId) || undefined,
-      executorId: parseInt(req.body.supplierId) || undefined,
+      checkerId: req.body.state === 'close' ? req.userId : undefined,
+      executorId: req.userId,
       bonus: req.body.bonus || undefined,
     };
 

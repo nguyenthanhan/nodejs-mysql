@@ -144,7 +144,7 @@ exports.findAll = async (req, res, next) => {
       })
     );
 
-    res.send(common.returnAPIData(newData));
+    res.send(common.returnAPIData(newData), newData.length === 0 ? 'Không tìm thấy đơn nhập hàng nào' : '');
   } catch (error) {
     next({
       status: 400,
@@ -288,7 +288,7 @@ exports.update = async (req, res, next) => {
         updatedAt: new Date(),
         state: 'request',
         urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
-        requesterId: parseInt(req.body.supplierId) || undefined,
+        requesterId: req.userId,
         supplierId: parseInt(req.body.supplierId) || undefined,
         bonus: req.body.bonus || undefined,
       };
@@ -328,9 +328,8 @@ exports.update = async (req, res, next) => {
       import_date: moment(req.body.import_date) || moment(),
       updatedAt: new Date(),
       urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
-      requesterId: parseInt(req.body.supplierId) || undefined,
-      checkerId: parseInt(req.body.supplierId) || undefined,
-      executorId: parseInt(req.body.supplierId) || undefined,
+      executorId: req.userId,
+      checkerId: req.body.state === 'close' ? req.userId : undefined,
       supplierId: parseInt(req.body.supplierId) || undefined,
       bonus: req.body.bonus || undefined,
     };
