@@ -246,15 +246,16 @@ const log = () => {
 exports.update = async (req, res, next) => {
   try {
     const _findImport = await Import.findByPk(req.params.id);
-    const findImport = _findImport.get({ plain: true });
 
-    if (!findImport) {
+    if (!_findImport) {
       next({
         status: 400,
         message: 'Không tìm thấy đơn xuất hàng này!',
       });
       return;
     }
+
+    const findImport = _findImport.get({ plain: true });
 
     if (findImport.state === 'close') {
       return res.send(common.returnAPIData({}, `Tình trạng đơn này đã đóng, không thể cập nhập!`));
