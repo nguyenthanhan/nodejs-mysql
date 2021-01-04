@@ -84,7 +84,7 @@ module.exports = (sequelize, Sequelize) => {
       notice_days: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 10,
+        defaultValue: 0,
       },
     },
     {

@@ -64,7 +64,7 @@ exports.create = async (req, res, next) => {
     description: req.body.description,
     vat: req.body.vat && parseInt(req.body.vat, 10) === 5 ? 5 : 10,
     discountId: parseInt(req.body.discountId) || undefined,
-    notice_days: parseInt(req.body.notice_days) || undefined,
+    notice_days: parseInt(req.body.notice_days) || 0,
   };
 
   let imageMessage = 'Tạo sản phẩm thành công nhưng không có hình ảnh sản phẩm';
