@@ -33,37 +33,87 @@ exports.sendMail = async (req, res, next) => {
     console.log('mails', mails);
 
     //chart
-    const myChart = new QuickChart();
-    myChart.setConfig({
+    const timeChart = new QuickChart();
+    timeChart.setConfig({
       type: 'bar',
       data: {
-        labels: ['January', 'February', 'March', 'April', 'May'],
+        labels: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+
         datasets: [
           {
-            label: 'Dogs',
-            data: [50, 60, 70, 180, 190],
+            label: 'Số đơn hàng',
+            data: [2, 6, 5, 18, 12, 5, 3, 8, 9, 1, 9, 11, 15, 17, 12, 7],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1,
           },
         ],
       },
       options: {
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                callback: function (value) {
-                  return '$' + value;
-                },
-              },
+        plugins: {
+          datalabels: {
+            anchor: 'center',
+            align: 'center',
+            color: '#fff',
+            font: {
+              weight: 'bold',
             },
-          ],
+          },
         },
       },
     });
-    myChart.setWidth(500).setHeight(300).setBackgroundColor('transparent');
+    timeChart.setWidth(500).setHeight(300).setBackgroundColor('transparent');
 
-    // const chartUrl = await myChart.getShortUrl();
-    const chartUrl = myChart.getUrl();
-    console.log(chartUrl);
+    // const timeChartUrl = await timeChart.getShortUrl();
+    const timeChartUrl = timeChart.getUrl();
+
+    //chart
+    const circleChart = new QuickChart();
+    circleChart.setConfig({
+      type: 'pie',
+      data: {
+        datasets: [
+          {
+            data: [112, null, null, null, null, null, null, 20, null, null, null, null, 200],
+            backgroundColor: [
+              '#beef00',
+              '#edf756',
+              '#DDAF94',
+              '#ffa8B6',
+              '#ff8928',
+              '#007CC7',
+              '#4DA8DA',
+              '#EEFBFB',
+              '#59ce8f',
+              '#9DC88D',
+              '#DADED4',
+              '#51e2f5',
+              '#d0bdf4',
+            ],
+            label: 'Dataset 1',
+          },
+        ],
+        labels: [
+          'Đồ uống',
+          'Đồ ăn nhanh',
+          'Đồ ăn lạnh',
+          'Thực phẩm khô',
+          'Thực phẩm đóng hộp',
+          'Gia vị',
+          'Lương thực',
+          'Rau củ',
+          'Khăn giấy, giấy vệ sinh, tã em bé',
+          'Hóa mỹ phẩm',
+          'Văn phòng phẩm',
+          'Đồ sinh hoạt cá nhân',
+          'Thẻ cào điện thoại',
+        ],
+      },
+    });
+    circleChart.setWidth(400).setHeight(400).setBackgroundColor('transparent');
+
+    // const timeChartUrl = await timeChart.getShortUrl();
+    const circleChartUrl = circleChart.getUrl();
 
     const html = await fs.readFileSync(path.dirname(__dirname) + '/templates/email.html', 'utf8');
 
@@ -71,7 +121,8 @@ exports.sendMail = async (req, res, next) => {
     const template = handlebars.compile(html);
 
     const htmlToSend = template({
-      img_url: chartUrl,
+      img_url: timeChartUrl,
+      img_url2: circleChartUrl,
     });
 
     let mailOptions = {
