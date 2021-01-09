@@ -232,7 +232,7 @@ exports.findOne = async (req, res, next) => {
   }
 };
 
-const log = () => {
+const log = req => {
   LogController.createLog({
     MngID: req.userId,
     action: ActionOnTable.EDIT,
@@ -318,7 +318,7 @@ exports.update = async (req, res, next) => {
       }
 
       res.send(common.returnAPIData({ updateProductsInImport }, `Cập nhật thông tin nhập hàng thành công`));
-      log();
+      log(req);
       return;
     }
 
@@ -417,7 +417,7 @@ exports.update = async (req, res, next) => {
       );
 
       res.send(common.returnAPIData(updateProductsInImportAndLot, `Cập nhật thông tin nhập hàng thành công`));
-      log();
+      log(req);
     } else {
       next({
         status: 400,

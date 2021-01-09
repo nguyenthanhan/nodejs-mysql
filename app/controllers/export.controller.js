@@ -133,7 +133,7 @@ exports.findOne = async (req, res, next) => {
   }
 };
 
-const log = () => {
+const log = req => {
   LogController.createLog({
     MngID: req.userId,
     action: ActionOnTable.EDIT,
@@ -145,6 +145,7 @@ const log = () => {
 
 // Update a export by the id in the request
 exports.update = async (req, res, next) => {
+  console.log(req.body);
   try {
     const _findExport = await Export.findByPk(req.params.id);
     if (!_findExport) {
@@ -154,6 +155,7 @@ exports.update = async (req, res, next) => {
       });
       return;
     }
+
     const findExport = _findExport.get({ plain: true });
 
     if (findExport.state === 'close') {
@@ -181,7 +183,7 @@ exports.update = async (req, res, next) => {
       const _export = {
         state: 'request',
         requesterId: req.userId,
-        urgent_level: req.body.urgent_level ? req.body.urgent_level : undefined,
+        urgent_level: req.body.urgent_level || undefined,
         request_export_date: moment(req.body.request_export_date) || undefined,
         bonus: req.body.bonus,
         updatedAt: new Date(),
@@ -215,7 +217,7 @@ exports.update = async (req, res, next) => {
         updateProductsInExport = _updateProductsInExport.reduce((sum, item) => sum + parseInt(item), 0);
       }
 
-      log();
+      log(req);
       return res.send(common.returnAPIData({ updateProductsInExport }, `Cập nhật thông tin nhập hàng thành công`));
     }
 
@@ -404,7 +406,7 @@ exports.update = async (req, res, next) => {
 
       console.log('updateProductsInExportAndLot', updateProductsInExportAndLot);
       res.send(common.returnAPIData(updateProductsInExportAndLot, `Cập nhật thông tin nhập hàng thành công`));
-      log();
+      log(req);
     } else {
       next({
         status: 400,
