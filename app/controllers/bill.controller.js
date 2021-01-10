@@ -153,77 +153,122 @@ exports.create = async (req, res, next) => {
 
 // Retrieve all bills from the database.
 exports.findAll = async (req, res, next) => {
-  const cus_name = req.query.cusNameKeyword;
-  let condition = cus_name ? { cus_name: { [Op.like]: `%${cus_name}%` } } : null;
+  try {
+    const cus_name = req.query.cusNameKeyword;
+    let condition = cus_name ? { cus_name: { [Op.like]: `%${cus_name}%` } } : null;
 
-  Bill.findAll({
-    where: condition,
-    include: [
-      {
-        model: Manager,
-        as: 'manager',
-        attributes: ['accountName', 'FName', 'LName'],
-      },
-      {
-        model: Product,
-        as: 'products',
-        attributes: ['PID'],
-      },
-    ],
-  })
-    .then(data => {
-      res.send(common.returnAPIData(data));
-    })
-    .catch(err => {
+    const _getBill = await Bill.findAll({
+      where: condition,
+      include: [
+        {
+          model: Manager,
+          as: 'manager',
+          attributes: ['accountName', 'FName', 'LName'],
+        },
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID'],
+          include: [
+            {
+              model: Lot,
+              as: 'lots',
+              attributes: [
+                'lotId',
+                'qttLotInWarehouse',
+                'qttProductInStore',
+                'importId',
+                'expires',
+                'unit_name',
+                'conversionRate',
+                'import_price_unit',
+                'import_price_product',
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!_getBill) {
       next({
         status: 400,
-        message: err.message,
-        id: 0,
-        name: 'hoá đơn',
-        method: 'get',
+        message: 'Có lỗi xảy ra khi lấy thông tin hoá đơn!',
       });
       return;
+    }
+    const getBill = _getBill.map(el => el.get({ plain: true }));
+
+    res.send(common.returnAPIData(getBill));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      id: 0,
+      name: 'hoá đơn',
+      method: 'get',
     });
+    return;
+  }
 };
 
 // Find a single bill with an id
 exports.findOne = async (req, res, next) => {
-  const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-  Bill.findByPk(id, {
-    include: [
-      {
-        model: Manager,
-        as: 'manager',
-        attributes: ['accountName', 'FName', 'LName'],
-      },
-      {
-        model: Product,
-        as: 'products',
-      },
-    ],
-  })
-    .then(data => {
-      if (data) {
-        res.send(common.returnAPIData(data));
-      } else {
-        next({
-          status: 400,
-          message: 'Không tìm thấy hoá đơn này',
-        });
-        return;
-      }
-    })
-    .catch(err => {
+    const _getABill = await Bill.findByPk(id, {
+      include: [
+        {
+          model: Manager,
+          as: 'manager',
+          attributes: ['accountName', 'FName', 'LName'],
+        },
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['PID'],
+          include: [
+            {
+              model: Lot,
+              as: 'lots',
+              attributes: [
+                'lotId',
+                'qttLotInWarehouse',
+                'qttProductInStore',
+                'importId',
+                'expires',
+                'unit_name',
+                'conversionRate',
+                'import_price_unit',
+                'import_price_product',
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!_getABill) {
       next({
         status: 400,
-        message: err.message,
-        id: req.params.id,
-        name: 'hoá đơn',
-        method: 'get',
+        message: 'Không tìm thấy hoá đơn này',
       });
       return;
+    }
+    const getABill = _getABill.get({ plain: true });
+
+    res.send(common.returnAPIData(getABill));
+  } catch (error) {
+    next({
+      status: 400,
+      message: error.message,
+      id: req.params.id,
+      name: 'hoá đơn',
+      method: 'get',
     });
+    return;
+  }
 };
 
 // Update a bill by the id in the request
