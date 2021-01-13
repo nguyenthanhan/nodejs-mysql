@@ -168,7 +168,7 @@ exports.findAll = async (req, res, next) => {
         {
           model: Product,
           as: 'products',
-          attributes: ['PID'],
+          attributes: { exclude: ['deletedAt'] },
           include: [
             {
               model: Lot,
@@ -227,7 +227,7 @@ exports.findOne = async (req, res, next) => {
         {
           model: Product,
           as: 'products',
-          attributes: ['PID'],
+          attributes: { exclude: ['deletedAt'] },
           include: [
             {
               model: Lot,
