@@ -169,6 +169,12 @@ const ProductOnBill = sequelize.define(
     quantity: {
       type: Sequelize.INTEGER(20),
     },
+    productsFromLots: {
+      type: Sequelize.TEXT,
+    },
+    static_price: {
+      type: Sequelize.BIGINT(20),
+    },
     // ProductId: {
     //   type: Sequelize.BIGINT(20),
     //   references: {

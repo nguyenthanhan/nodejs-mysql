@@ -8,6 +8,7 @@ const _ = require('lodash');
 const moment = require('moment');
 const LogController = require('./log.controller');
 const { Table, ActionOnTable } = require('../constants');
+const { bill } = require('../models/db');
 
 // Create and Save a new bill
 exports.create = async (req, res, next) => {
@@ -41,6 +42,9 @@ exports.create = async (req, res, next) => {
         req.body.sellProducts.map(async sellProduct => {
           // Get and update lots
           let remainProduct = sellProduct.quantity;
+          let remainProduct2 = sellProduct.quantity;
+
+          let productsFromLots = [];
           const _findLot = await Lot.findAll({
             where: { productId: sellProduct.PID },
             attributes: ['lotId', 'qttLotInWarehouse', 'qttProductInStore', 'conversionRate'],
@@ -49,6 +53,24 @@ exports.create = async (req, res, next) => {
             _findLot.map(el => el.get({ plain: true })),
             false
           );
+
+          sortedLots.forEach(eachLot => {
+            if (remainProduct2 === 0) {
+              return;
+            }
+
+            if (remainProduct2 <= eachLot.qttProductInStore) {
+              const tempRemain = remainProduct2;
+              productsFromLots = [...productsFromLots, { lotId: eachLot.lotId, gotProductCount: tempRemain }];
+              remainProduct2 = 0;
+            } else {
+              productsFromLots = [
+                ...productsFromLots,
+                { lotId: eachLot.lotId, gotProductCount: eachLot.qttProductInStore },
+              ];
+              remainProduct2 -= eachLot.qttProductInStore;
+            }
+          });
 
           const _updatedLots = await Promise.all(
             sortedLots.map(async eachLot => {
@@ -84,11 +106,22 @@ exports.create = async (req, res, next) => {
 
           const updatedNumberOfLots = _updatedLots.reduce((sum, bool) => sum + parseInt(bool), 0);
 
+          const _getPrice = await Product.findByPk(sellProduct.PID, {
+            attributes: ['sell_price'],
+          });
+          let sellPrice = 0;
+          if (_getPrice) {
+            const getPrice = _getPrice.get({ plain: true });
+            sellPrice = getPrice.sell_price;
+          }
+
           //create productOnBill
           const _createProductOnBill = await ProductOnBill.create({
             productId: sellProduct.PID,
             quantity: sellProduct.quantity,
             billId: currentBill.BID,
+            productsFromLots: JSON.stringify(productsFromLots),
+            static_price: sellPrice,
           });
           const createProductOnBill = _createProductOnBill.get({ plain: true });
 
@@ -119,6 +152,7 @@ exports.create = async (req, res, next) => {
           return {
             ...createProductOnBill,
             updatedNumberOfLots,
+            productsFromLots,
             updatedProductQuantity: parseInt(updatedProductCount) === 1,
           };
         })
@@ -197,7 +231,22 @@ exports.findAll = async (req, res, next) => {
       });
       return;
     }
-    const getBill = _getBill.map(el => el.get({ plain: true }));
+    const getBill = _getBill
+      .map(el => el.get({ plain: true }))
+      .map(getABill => {
+        return {
+          ...getABill,
+          products: getABill.products.map(product => {
+            return {
+              ...product,
+              ProductOnBill: {
+                ...product.ProductOnBill,
+                productsFromLots: JSON.parse(product.ProductOnBill.productsFromLots),
+              },
+            };
+          }),
+        };
+      });
 
     res.send(common.returnAPIData(getBill));
   } catch (error) {
@@ -257,8 +306,19 @@ exports.findOne = async (req, res, next) => {
       return;
     }
     const getABill = _getABill.get({ plain: true });
-
-    res.send(common.returnAPIData(getABill));
+    const newBill = {
+      ...getABill,
+      products: getABill.products.map(product => {
+        return {
+          ...product,
+          ProductOnBill: {
+            ...product.ProductOnBill,
+            productsFromLots: JSON.parse(product.ProductOnBill.productsFromLots),
+          },
+        };
+      }),
+    };
+    res.send(common.returnAPIData(newBill));
   } catch (error) {
     next({
       status: 400,
