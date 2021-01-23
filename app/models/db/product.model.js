@@ -69,6 +69,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT(20),
         allowNull: false,
       },
+      avg_import_price: {
+        type: Sequelize.BIGINT(20),
+      },
       unit_name: {
         type: Sequelize.STRING(20),
         allowNull: false,
