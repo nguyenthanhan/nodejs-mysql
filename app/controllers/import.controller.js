@@ -388,7 +388,7 @@ exports.update = async (req, res, next) => {
               {
                 model: Lot,
                 as: 'lots',
-                attributes: ['qttLotInWarehouse', 'conversionRate', 'import_price_product'],
+                attributes: ['qttLotInWarehouse', 'qttProductInStore', 'import_price_unit', 'conversionRate'],
               },
             ],
           });
@@ -400,11 +400,17 @@ exports.update = async (req, res, next) => {
               return sum + parseInt(productLot.qttLotInWarehouse) * parseInt(productLot.conversionRate);
             }, 0);
 
-            const avg_import_price =
-              oldProduct.lots.length !== 0 ? _.meanBy(oldProduct.lots, 'import_price_product') : null;
+            let importPriceCount = 0;
+            const importPriceSum = oldProduct.lots.reduce((sum, productLot) => {
+              const sumProducts = parseInt(
+                productLot.qttLotInWarehouse * productLot.conversionRate + productLot.qttProductInStore
+              );
+              importPriceCount += sumProducts;
+              return sum + productLot.import_price_unit * sumProducts;
+            }, 0);
 
             updatedProductCount = await Product.update(
-              { warehouse_curr_qtt, avg_import_price },
+              { warehouse_curr_qtt, avg_import_price: parseInt(importPriceSum / importPriceCount) },
               { where: { PID: importProduct.productId } }
             );
           }
