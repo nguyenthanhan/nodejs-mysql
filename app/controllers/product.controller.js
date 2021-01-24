@@ -164,7 +164,7 @@ exports.findAll = async (req, res, next) => {
         req.query.is_less_than_Wmin === 'false' || req.query.is_less_than_Wmin === false
           ? {
               warehouse_curr_qtt: {
-                [Op.and]: [{ [Op.gte]: db.sequelize.col('W_min_qtt') }, { [Op.gte]: 0 }],
+                [Op.gte]: db.sequelize.col('W_min_qtt'),
               },
             }
           : null,
