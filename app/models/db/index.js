@@ -175,6 +175,9 @@ const ProductOnBill = sequelize.define(
     static_price: {
       type: Sequelize.BIGINT(20),
     },
+    static_import_price: {
+      type: Sequelize.BIGINT(20),
+    },
     // ProductId: {
     //   type: Sequelize.BIGINT(20),
     //   references: {

@@ -115,6 +115,11 @@ exports.create = async (req, res, next) => {
             sellPrice = getPrice.sell_price;
           }
 
+          //get avg_import_price
+          const _getImportPrice = await Product.findByPk(sellProduct.PID, {
+            attributes: ['avg_import_price'],
+          });
+          const staticImportPrice = _getImportPrice.get({ plain: true });
           //create productOnBill
           const _createProductOnBill = await ProductOnBill.create({
             productId: sellProduct.PID,
@@ -122,6 +127,7 @@ exports.create = async (req, res, next) => {
             billId: currentBill.BID,
             productsFromLots: JSON.stringify(productsFromLots),
             static_price: sellPrice,
+            static_import_price: staticImportPrice.avg_import_price,
           });
           const createProductOnBill = _createProductOnBill.get({ plain: true });
 

@@ -383,12 +383,12 @@ exports.update = async (req, res, next) => {
 
           //update count product
           const _oldProduct = await Product.findByPk(importProduct.productId, {
-            attributes: ['PID'],
+            attributes: ['PID', 'warehouse_curr_qtt', 'store_curr_qtt', 'avg_import_price'],
             include: [
               {
                 model: Lot,
                 as: 'lots',
-                attributes: ['qttLotInWarehouse', 'qttProductInStore', 'import_price_unit', 'conversionRate'],
+                attributes: ['qttLotInWarehouse', 'conversionRate'],
               },
             ],
           });
@@ -400,17 +400,19 @@ exports.update = async (req, res, next) => {
               return sum + parseInt(productLot.qttLotInWarehouse) * parseInt(productLot.conversionRate);
             }, 0);
 
-            let importPriceCount = 0;
-            const importPriceSum = oldProduct.lots.reduce((sum, productLot) => {
-              const sumProducts = parseInt(
-                productLot.qttLotInWarehouse * productLot.conversionRate + productLot.qttProductInStore
-              );
-              importPriceCount += sumProducts;
-              return sum + productLot.import_price_unit * sumProducts;
-            }, 0);
+            const oldImportProductCount = oldProduct.warehouse_curr_qtt + oldProduct.store_curr_qtt;
+            const sumNewPrice = parseInt(importProduct.import_price_unit) * parseInt(importProduct.real_total_unit);
+            const importPriceSum = oldProduct.avg_import_price
+              ? oldProduct.avg_import_price * oldImportProductCount + sumNewPrice
+              : sumNewPrice;
 
             updatedProductCount = await Product.update(
-              { warehouse_curr_qtt, avg_import_price: parseInt(importPriceSum / importPriceCount) },
+              {
+                warehouse_curr_qtt,
+                avg_import_price: parseInt(
+                  importPriceSum / (oldImportProductCount + parseInt(importProduct.real_total_unit))
+                ),
+              },
               { where: { PID: importProduct.productId } }
             );
           }

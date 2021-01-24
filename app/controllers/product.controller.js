@@ -164,7 +164,7 @@ exports.findAll = async (req, res, next) => {
         req.query.is_less_than_Wmin === 'false' || req.query.is_less_than_Wmin === false
           ? {
               warehouse_curr_qtt: {
-                [Op.gte]: db.sequelize.col('W_min_qtt'),
+                [Op.and]: [{ [Op.gte]: db.sequelize.col('W_min_qtt') }, { [Op.gte]: 0 }],
               },
             }
           : null,
@@ -178,18 +178,18 @@ exports.findAll = async (req, res, next) => {
       ],
     };
 
-    const expiredCondition =
-      req.query.is_almost_expired === 'true' || req.query.is_almost_expired === true
-        ? {
-            expires: {
-              [Op.lt]: moment(
-                moment()
-                  .add(parseInt(db.sequelize.col('Product.notice_days')), 'd')
-                  .format()
-              ),
-            },
-          }
-        : null;
+    // const expiredCondition =
+    //   req.query.is_almost_expired === 'true' || req.query.is_almost_expired === true
+    //     ? {
+    //         expires: {
+    //           [Op.lt]: moment(
+    //             moment()
+    //               .add(parseInt(db.sequelize.col('Product.notice_days')), 'd')
+    //               .format()
+    //           ),
+    //         },
+    //       }
+    //     : null;
 
     const data = await Product.findAll({
       // limit,
@@ -224,10 +224,16 @@ exports.findAll = async (req, res, next) => {
 
     let newProductList = productsList.map(product => {
       const { lots, ...remain } = product;
+      const newLots = lots.filter(lot => {
+        if (lot.qttLotInWarehouse === 0 && lot.qttProductInStore === 0) {
+          return false;
+        }
+        return true;
+      });
 
       return {
         ...remain,
-        lots: common.sortedByDate(lots, true),
+        lots: common.sortedByDate(newLots, true),
       };
     });
 
@@ -238,6 +244,9 @@ exports.findAll = async (req, res, next) => {
           if (moment(lot.expires).isBefore(moment().add(product.notice_days, 'd').format())) {
             almostExpiry = true;
           }
+          // if (lot.qttLotInWarehouse === 0 && lot.qttProductInStore === 0 && product.lots.length === 1) {
+          //   almostExpiry = false;
+          // }
         });
         return almostExpiry;
       });
